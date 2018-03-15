@@ -12,16 +12,15 @@ try:
     measurements = glob("PES PSG rescore/*");
     for measurement in measurements:
         r = get_recording_with_derived(measurement);
-        rip_header = r.get_signal_header_for_signal('RIP Sum');
-        breaths = r.get_breath_events(rip_header, r.analysis_period);
+        epoch_markers = r.get_sleep_events();
         pes_header = r.get_signal_header_for_signal('PES 3');
-        nadir_per_breath = array([
-            min(get_data_for_period(pes_header, breath)) for breath in breaths
+        nadir_per_epoch = array([
+            min(get_data_for_period(pes_header, epoch.Period)) for epoch in epoch_markers
         ]);
-        time_series = array(nadir_per_breath);
+        time_series = array(nadir_per_epoch);
         measurement_name = path.basename(measurement);
         stderr.write(measurement_name, time_series.shape);
-        filename = "nadir/BbB/" + measurement_name;
+        filename = "nadir/epoch/" + measurement_name;
         stderr.write('Saving ' + filename + '.npy...');
         save(filename, time_series);
         stderr.write(' Done.\r\nSaving ' + filename + '.txt.gz...');
