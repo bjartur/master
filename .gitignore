@@ -1,0 +1,12 @@
+
+*.xml
+*.ndf
+*.ini
+*.txt
+*.ndb
+*.nef
+*.npf
+*.npy
+*.gz
+*.iml
+*.pyc
