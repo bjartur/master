@@ -6,20 +6,19 @@ from nox_reader import *
 from numpy import *
 
 try:
-    stderr.write('----Running----\r\n');
-    labels = [];
+    stderr.write('--Nadir by Epoch--\r\n');
 
-    measurements = glob("PES PSG rescore/*");
+    measurements = glob("PES PSG rescore/*097ae");
     for measurement in measurements:
         r = get_recording_with_derived(measurement);
-        epoch_markers = r.get_sleep_events();
+        epoch_markers = r.get_sleep_events(whole_recording=False);
         pes_header = r.get_signal_header_for_signal('PES 3');
         nadir_per_epoch = array([
             min(get_data_for_period(pes_header, epoch.Period)) for epoch in epoch_markers
         ]);
         time_series = array(nadir_per_epoch);
         measurement_name = path.basename(measurement);
-        stderr.write(measurement_name, time_series.shape);
+        stderr.write("{0} has dimensions {1}.\r\n".format(measurement_name, time_series.shape));
         filename = "nadir/epoch/" + measurement_name;
         stderr.write('Saving ' + filename + '.npy...');
         save(filename, time_series);
