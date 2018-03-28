@@ -1,5 +1,5 @@
 from glob import glob
-from os import path
+from os import path, makedirs
 from sys import stderr
 from nox_reader import get_recording_with_derived
 from nox_reader.nox_recording_class import Recording
@@ -36,6 +36,8 @@ def csvwriter(filepath: str, data: ndarray, fmt: str="%.18e") -> Callable[[str],
 
 
 def write(measurement_name: str, path: str, statistics: ndarray, fmt: str):
+    makedirs(path, mode=0o007, exist_ok=True);
+
     stderr.write("{0} has dimensions {1}.\r\n".format(measurement_name, statistics.shape));
     filename = "{0}/{1}".format(path, measurement_name);
     stderr.write('Saving ' + filename + '.npy...');
