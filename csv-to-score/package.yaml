@@ -1,0 +1,52 @@
+name:                csv-to-score
+version:             0.1.0.0
+github:              "bjartur/csv-to-score"
+license:             BSD3
+author:              "Bjartur Thorlacius"
+maintainer:          "bjt9@hi.is"
+copyright:           "Copyright (c) 2018 Bjartur Thorlacius"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Find esophageal events.
+category:            Science
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+#description:         
+
+dependencies:
+- base >= 4.7 && < 5
+
+
+
+library:
+  source-dirs: src
+
+executables:
+  csv-to-score-exe:
+    main:                Main.hs
+    source-dirs:         cmd
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - csv-to-score
+
+tests:
+  csv-to-score-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - csv-to-score
+    - QuickCheck
+    - hspec
