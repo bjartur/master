@@ -1,3 +1,5 @@
+{-# LANGUAGE Safe #-}
+
 module Lib
     ( increasing
     ) where
