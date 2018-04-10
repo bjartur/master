@@ -1,4 +1,4 @@
-import Lib (increasing)
+import Lib
 import Test.Hspec
 import Test.QuickCheck (Arbitrary, NonEmptyList(..), Property, property)
 import Data.Function ((&))
@@ -56,6 +56,14 @@ function `morphsReversalIntoNegation` (NonEmpty list) =
            let allButFirst = tail . function
            reverse(allButFirst filtered) == map not (allButFirst(reverse filtered))
 
+shouldShortenListByOne =
+        it "returns a list one item shorter than input"
+        . property
+        . shortensAListByOne
+
+shortensAListByOne :: ([a] -> [b]) -> NonEmptyList a -> Bool
+function `shortensAListByOne` (NonEmpty list) = length(function list) + 1 == length list
+
 main :: IO ()
 main = hspec $ do
         describe "increasing" $ do
@@ -69,5 +77,9 @@ main = hspec $ do
                 it "returns three times True and ten times False given [1..3] ++ [2,1..(-7)]" 
                        $         increasing([1..3] ++ [2,1..(-7)])
                        `shouldBe`(replicate 3 True ++ replicate 10 False)
+        describe "diffs" $ do
+                mapM_($ diffs) [
+                        shouldShortenListByOne
+                        ]
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
                 return ()
