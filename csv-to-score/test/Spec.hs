@@ -1,10 +1,11 @@
 import Lib
 import Test.Hspec
 import Test.QuickCheck (Arbitrary, NonEmptyList(..), Property, property)
-import Data.Function ((&))
 import Data.List (sort, nub)
+import Control.Applicative
+import Data.Function
 
-
+{-
 shouldPreserveListLength = it "returns a list of length equal to the input list."
         . toPreserveListLength
 
@@ -13,73 +14,110 @@ toPreserveListLength = property . preservesListLength
 
 preservesListLength :: ([a] -> [b]) -> [a] -> Bool
 function `preservesListLength` list = length (function list) == length list
-
-
-shouldMapTheFirstElementToTrue = it "maps the first element, if any, to True."
-        . toMapTheFirstElementToTrue
-
-toMapTheFirstElementToTrue :: (Arbitrary a, Show a) => ([a] -> [Bool]) -> Property
-toMapTheFirstElementToTrue = property . mapsTheFirstElementToTrue
-
-mapsTheFirstElementToTrue :: ([a] -> [Bool]) -> NonEmptyList a -> Bool
-function `mapsTheFirstElementToTrue` (NonEmpty list) = head (function list)
+-}
 
 ofAscendingListShouldBeAllTrue =
-        it "returns a replicate of True for an ascending list"
+        it "returns a replicate of True for an ascending list."
         . toBeAllTrueForAscendingList
 
 toBeAllTrueForAscendingList :: (Arbitrary a, Ord a, Show a) => ([a] -> [Bool]) -> Property
 toBeAllTrueForAscendingList = property . isAllTrueForAscendingList
 
-isAllTrueForAscendingList :: Ord a => ([a] -> [Bool]) -> [a] -> Bool
-isAllTrueForAscendingList function list =
-        function(sort list) == map(const True) list
+isAllTrueForAscendingList :: Ord a => ([a] -> [Bool]) -> NonEmptyList a -> Bool
+isAllTrueForAscendingList function (NonEmpty list) =
+        function(sort list) == tail(map(const True) list)
 
-ofDescendingListShouldHaveAllFalseTail =
-        it "returns True cons a replicate of False for a descending list"
-        . property
-        . mapsDescendingTailToAllFalseTail
+ofAscendingListShouldContainOnlyZero =
+                it "finds the only rise in any ascending list"
+              . property
+              . mapsAscendingListToListContainingOnlyZeroAndLength
 
-mapsDescendingTailToAllFalseTail :: Ord a =>
+mapsAscendingListToListContainingOnlyZeroAndLength :: (Eq b, Ord a, Num b) => ([a] -> [(b,Int)]) -> NonEmptyList a -> Bool
+mapsAscendingListToListContainingOnlyZeroAndLength function (NonEmpty list) = function(sort list) == [(0,length list)]
+
+ofDescendingListShouldBeAllFalse =
+        it "returns a replicate of False for a descending list."
+      . property
+      . mapsDescendingListToAllFalse
+
+mapsDescendingListToAllFalse :: Ord a =>
         ([a] -> [Bool]) -> NonEmptyList a -> Bool
-mapsDescendingTailToAllFalseTail function (NonEmpty list) =
-        function(reverse(sort list)) == True : map(const False) (tail list)
+mapsDescendingListToAllFalse function (NonEmpty list) =
+        function(reverse(sort list)) == map(const False) (tail list)
 
 shouldMorphReversalIntoNegation =
-        it "preservers reversal for lists without duplicates"
-        . property
-        . morphsReversalIntoNegation
+        it "preservers reversal for lists without duplicates."
+      . property
+      . morphsReversalIntoNegation
 
 morphsReversalIntoNegation :: ([Double] -> [Bool]) -> NonEmptyList Double -> Bool
 function `morphsReversalIntoNegation` (NonEmpty list) =
         do let filtered = nub list
-           let allButFirst = tail . function
-           reverse(allButFirst filtered) == map not (allButFirst(reverse filtered))
+           reverse(function filtered) == map not (function $ reverse filtered)
 
 shouldShortenListByOne =
-        it "returns a list one item shorter than input"
-        . property
-        . shortensAListByOne
+        it "returns a list one item shorter than input."
+      . property
+      . shortensListByOne
 
-shortensAListByOne :: ([a] -> [b]) -> NonEmptyList a -> Bool
-function `shortensAListByOne` (NonEmpty list) = length(function list) + 1 == length list
+shortensListByOne :: ([a] -> [b]) -> NonEmptyList a -> Bool
+function `shortensListByOne` (NonEmpty list) = length(function list) + 1 == length list
+
+shouldOnlyReturnIndicesLowerThanTheLengthOf =
+        it "returns neither indices nor counts greater than the length of the input list."
+      . property
+      . onlyReturnsIndicesLowerThanTheLengthOf
+
+(>$) = flip fmap
+infixl 1 >$
+
+onlyReturnsIndicesLowerThanTheLengthOf :: ([a] -> [(Int,Int)]) -> [a] -> Bool
+function `onlyReturnsIndicesLowerThanTheLengthOf` list =
+        function list
+   <**> [fst,snd]
+     >$ (< length list)
+      & and
+
+examples :: (Show a, Show b, Eq b) => (a -> b) -> [(a,b)] -> Expectation
+examples function = mapM_(\(input,output) -> function input `shouldBe` output)
 
 main :: IO ()
 main = hspec $ do
         describe "increasing" $ do
                 mapM_($ increasing) [
-                        shouldMapTheFirstElementToTrue,
-                        shouldPreserveListLength,
+                        shouldShortenListByOne,
                         ofAscendingListShouldBeAllTrue,
-                        ofDescendingListShouldHaveAllFalseTail,
+                        ofDescendingListShouldBeAllFalse,
                         shouldMorphReversalIntoNegation
                         ]
-                it "returns three times True and ten times False given [1..3] ++ [2,1..(-7)]" 
-                       $         increasing([1..3] ++ [2,1..(-7)])
-                       `shouldBe`(replicate 3 True ++ replicate 10 False)
-        describe "diffs" $ do
-                mapM_($ diffs) [
-                        shouldShortenListByOne
+                it "returns two times True and ten times False given [1..3] ++ [2,1..(-7)]" $
+                        examples increasing $
+                        [
+                               ([1..3] ++ [2,1..(-7)],(replicate 2 True ++ replicate 10 False))
+                                ,(1:[0..5]++[4..7],False:replicate 5 True++False:replicate 3 True)
                         ]
+        describe "spans" $ do
+                it "finds and measures spans of Trues" $ examples spans
+                                [
+                                        ([],[])
+                                        ,([True,True,False,True],[(0,2),(3,1)])
+                                        ,([False,True,False,True,True,True,True],[(1,1),(3,4)])
+                                ]
+              --it "finds the correct number of spans" $
+              --        increasing
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
-                return ()
+                it "finds no rise in an empty list" $
+                        indicesOfRisesLongerThanThree[] `shouldBe` []
+                ofAscendingListShouldContainOnlyZero indicesOfRisesLongerThanThree
+                it "skips over an increasing span of length three as well as a decrease." $
+                        indicesOfRisesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
+                it "identifies long rises" $ do
+                        examples indicesOfRisesLongerThanThree
+                                [
+                                        ([1..10],[(0,10)]),
+                                        (1:[0..5]++[4..7],[(1,6),(7,4)])
+                                ]
+                mapM_($ indicesOfRisesLongerThanThree)
+                        [
+                                shouldOnlyReturnIndicesLowerThanTheLengthOf
+                        ]
