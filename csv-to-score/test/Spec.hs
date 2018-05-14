@@ -1,9 +1,10 @@
-import Lib
-import Test.Hspec
-import Test.QuickCheck (Arbitrary, NonEmptyList(..), Property, property)
-import Data.List (sort, nub)
 import Control.Applicative
 import Data.Function
+import Data.List (sort, nub)
+import Lib hiding (readFile)
+import Prelude hiding (readFile)
+import Test.Hspec
+import Test.QuickCheck (Arbitrary, NonEmptyList(..), Property, property, (==>))
 
 {-
 shouldPreserveListLength = it "returns a list of length equal to the input list."
@@ -25,15 +26,19 @@ toBeAllTrueForAscendingList = property . isAllTrueForAscendingList
 
 isAllTrueForAscendingList :: Ord a => ([a] -> [Bool]) -> NonEmptyList a -> Bool
 isAllTrueForAscendingList function (NonEmpty list) =
-        function(sort list) == tail(map(const True) list)
+        do let filtered = nub list
+           function(sort filtered) == tail(map(const True) filtered)
 
 ofAscendingListShouldContainOnlyZero =
                 it "finds the only rise in any ascending list"
               . property
               . mapsAscendingListToListContainingOnlyZeroAndLength
 
-mapsAscendingListToListContainingOnlyZeroAndLength :: (Eq b, Ord a, Num b) => ([a] -> [(b,Int)]) -> NonEmptyList a -> Bool
-mapsAscendingListToListContainingOnlyZeroAndLength function (NonEmpty list) = function(sort list) == [(0,length list)]
+mapsAscendingListToListContainingOnlyZeroAndLength :: (Eq b, Ord a, Num b) => ([a] -> [(b,Int)]) -> NonEmptyList a -> Property
+mapsAscendingListToListContainingOnlyZeroAndLength function (NonEmpty unfiltered) =
+        let list = nub unfiltered in
+        length list > 1
+    ==> function(sort list) == [(0,length list - 1)]
 
 ofDescendingListShouldBeAllFalse =
         it "returns a replicate of False for a descending list."
@@ -105,17 +110,18 @@ main = hspec $ do
                                 ]
               --it "finds the correct number of spans" $
               --        increasing
+        describe "rises" $
+                ofAscendingListShouldContainOnlyZero rises
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
                 it "finds no rise in an empty list" $
                         indicesOfRisesLongerThanThree[] `shouldBe` []
-                ofAscendingListShouldContainOnlyZero indicesOfRisesLongerThanThree
                 it "skips over an increasing span of length three as well as a decrease." $
                         indicesOfRisesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
                 it "identifies long rises" $ do
                         examples indicesOfRisesLongerThanThree
                                 [
-                                        ([1..10],[(0,10)]),
-                                        (1:[0..5]++[4..7],[(1,6),(7,4)])
+                                        ([1..10],[(0,9)]),
+                                        (1:[0..5]++[4..7],[(1,5),(7,3)])
                                 ]
                 mapM_($ indicesOfRisesLongerThanThree)
                         [

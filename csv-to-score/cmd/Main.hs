@@ -1,4 +1,5 @@
 module Main where
+import Prelude hiding (readFile)
 import Lib
 import Control.Applicative
 import Control.Arrow
@@ -26,11 +27,10 @@ timestampsOfRiseEnd =
                    timestamp
                    (\(index,count)-> index + count)
 
-csv :: IO String
-csv = readFile "C:/Users/Bjartur/Master/NoxPes2Csv/nadir/BbB/20141111T235541 - 57128.txt"
-
+instance Input IO where
+        csv = readFile "C:/Users/Bjartur/Master/NoxPes2Csv/nadir/BbB/20141111T235541 - 57128.txt"
 main :: IO ()
-main = writeToNewCsvs timestampsOfRiseBeginning
+main = return ()
 
 (>>$) :: (Functor l, Functor m) => l (m a) -> (a -> b) -> l (m b)
 boxed >>$ function =
@@ -38,11 +38,10 @@ boxed >>$ function =
                >$ fmap function
 infixl 0 >>$
 
-(>>$$) :: (Functor io, Functor list) => io (list a) -> io (a -> b) -> io (list b)
+(>>$$) :: (Monad io, Functor list) => io (list a) -> io (a -> b) -> io (list b)
 boxedValue >>$$ boxedFunction =
-                  boxedFunction >>= \function->
-                  boxedValue
-              >>$ function
+                (boxedValue >>$)
+             =<< boxedFunction
 infixl 0 >>$$
 
 timestamp :: ((Index,Count) -> Index) -> IO [String]
@@ -62,13 +61,16 @@ getTimestamp =    readFormerColumn
 readFormerColumn :: IO [String]
 readFormerColumn = column formerColumn
 
+linesOfCsv :: IO [String]
+linesOfCsv =        csv
+                 >$ lines
+
 type Column = (Char -> Bool) -> String -> String
 
 column :: Read a => Column -> IO [a]
 column selectColumn =
-                    csv
-                 >$ lines
-               <**> (selectColumn (/= ',')
+                    linesOfCsv
+               >>$ (selectColumn (/= ',')
                      >>> read)
 
 formerColumn :: Column

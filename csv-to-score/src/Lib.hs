@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib where
+module Lib (readFile, increasing, spans, rises, indicesOfRisesLongerThanThree, Input, csv) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
@@ -18,20 +18,20 @@ spans :: -- Find and measure each span of True.
         [Bool] ->    -- A list which may contain consecutive Trues.
         [
                 (Int,-- The index of a True not preceded by a False.
-                Int) -- The number of Trues followed by the first True, plus one.
+                Int) -- The number of Trues followed by the first True.
         ]
 
 spans []      = []
 spans xs = reverse $ go [] [] 0 False xs where
         go :: -- search for spans of True
                 [Int]  -> -- Indices of previously found Trues not preceded by a True.
-                [Int]  -> -- For each True not preceded by a True, the number of consecutive Trues.
+                [Int]  -> -- For each prevously found True not preceded by a True, the number of trailing Trues.
                 Int    -> -- Number of elements already removed from the front of the list.
                 Bool   -> -- Last element to be removed (or False, if none has been removed).
                 [Bool] -> -- The remainder of the list yet to be searched through.
                 [( -- in reverse order, a list of pairs of:
                         Int -- the index of a True not preceed by another True,
-                       ,Int -- and one plus the number of consecutive Trues immediately following the True with the above index.
+                       ,Int -- and the number of consecutive Trues immediately following the True with the above index.
                 )]
         go prevs lengths index _ [] = zip prevs lengths
         go prevs lengths index False (False:xs) = go prevs lengths (index+1) False xs
@@ -44,3 +44,6 @@ rises = spans.increasing
 
 indicesOfRisesLongerThanThree :: [Double] -> [(Int,Int)]
 indicesOfRisesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
+
+class Monad m => Input m where
+        csv :: m String -- wrapped string delimated by newlines and commas.
