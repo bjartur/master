@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (readFile, increasing, spans, rises, indicesOfRisesLongerThanThree) where
+module Lib (increasing, spans, rises, indicesOfRisesLongerThanThree) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
