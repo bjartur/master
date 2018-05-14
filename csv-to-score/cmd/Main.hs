@@ -1,8 +1,9 @@
 module Main where
-import Prelude hiding (readFile)
-import Lib
+import Input
 import Control.Applicative
 import Control.Arrow
+import Prelude hiding (readFile)
+import Lib
 
 (>$) :: Functor l => l a -> (a -> b) -> l b
 (>$) = flip fmap

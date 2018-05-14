@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (readFile, increasing, spans, rises, indicesOfRisesLongerThanThree, Input, csv) where
+module Lib (readFile, increasing, spans, rises, indicesOfRisesLongerThanThree) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
@@ -44,6 +44,3 @@ rises = spans.increasing
 
 indicesOfRisesLongerThanThree :: [Double] -> [(Int,Int)]
 indicesOfRisesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
-
-class Monad m => Input m where
-        csv :: m String -- wrapped string delimated by newlines and commas.
