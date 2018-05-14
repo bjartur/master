@@ -13,16 +13,16 @@ type Index = Int -- nonnegative
 type Count = Int -- positive
 type Debt  = Int -- impositive
 
-nadirs :: IO [(Index,Count)]
+nadirs :: Input input => input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
                 >$ indicesOfRisesLongerThanThree
 
-timestampsOfRiseBeginning :: IO [String]
+timestampsOfRiseBeginning :: Input input => input [String]
 timestampsOfRiseBeginning =
                    timestamp
                    (\(index,_)-> index)
 
-timestampsOfRiseEnd :: IO [String]
+timestampsOfRiseEnd :: Input input => input [String]
 timestampsOfRiseEnd =
                    timestamp
                    (\(index,count)-> index + count)
@@ -44,30 +44,30 @@ boxedValue >>$$ boxedFunction =
              =<< boxedFunction
 infixl 0 >>$$
 
-timestamp :: ((Index,Count) -> Index) -> IO [String]
+timestamp :: Input input => ((Index,Count) -> Index) -> input [String]
 timestamp accessor =
                   nadirs
               >>$ accessor
              >>$$       readFormerColumn
                     >$ (!!)
 
-readLatterColumnAsDoubles :: IO [Double]
+readLatterColumnAsDoubles :: Input input => input [Double]
 readLatterColumnAsDoubles = column latterColumn
 
-getTimestamp :: IO (Index -> String)
+getTimestamp :: Input input => input (Index -> String)
 getTimestamp =    readFormerColumn
               >$ (!!)
 
-readFormerColumn :: IO [String]
+readFormerColumn :: Input input => input [String]
 readFormerColumn = column formerColumn
 
-linesOfCsv :: IO [String]
+linesOfCsv :: Input input => input [String]
 linesOfCsv =        csv
                  >$ lines
 
 type Column = (Char -> Bool) -> String -> String
 
-column :: Read a => Column -> IO [a]
+column :: (Input input, Read readable) => Column -> input [readable]
 column selectColumn =
                     linesOfCsv
                >>$ (selectColumn (/= ',')
