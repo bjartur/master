@@ -1,7 +1,9 @@
+{-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
 import Control.Applicative
 import Data.Function
 import Data.List (sort, nub)
-import Lib hiding (readFile)
+import Input hiding ((>$))
+import Lib
 import Prelude hiding (readFile)
 import Test.Hspec
 import Test.QuickCheck (Arbitrary, NonEmptyList(..), Property, property, (==>))
@@ -86,6 +88,12 @@ function `onlyReturnsIndicesLowerThanTheLengthOf` list =
 examples :: (Show a, Show b, Eq b) => (a -> b) -> [(a,b)] -> Expectation
 examples function = mapM_(\(input,output) -> function input `shouldBe` output)
 
+newtype Abcdef a = Abcdef a deriving (Eq, Show, Functor, Monad, Applicative)
+instance Input Abcdef where
+        csv = Abcdef "a,b\r\ncd,ef\r\n"
+
+
+
 main :: IO ()
 main = hspec $ do
         describe "increasing" $ do
@@ -127,3 +135,6 @@ main = hspec $ do
                         [
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
+        describe "readFormerColumn" $ do
+                it "reads input \"a,b\\r\\ncd,ef\\r\\n as a,cd." $ do
+                        (readFormerColumn :: Abcdef [String]) `shouldBe` Abcdef ["a","cd"]
