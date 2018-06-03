@@ -92,6 +92,10 @@ newtype Abcdef a = Abcdef a deriving (Eq, Show, Functor, Monad, Applicative)
 instance Input Abcdef where
         csv = Abcdef "a,b\r\ncd,ef\r\n"
 
+newtype CsvContainingNumbers a = CsvContainingNumbers a deriving (Applicative, Eq, Functor, Monad, Show)
+instance Input CsvContainingNumbers where
+        csv = CsvContainingNumbers "former column,-2.894930373863120749e-02\r\nformer column,-7.567405304247912341e-02"
+
 
 
 main :: IO ()
@@ -136,5 +140,9 @@ main = hspec $ do
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
         describe "readFormerColumn" $ do
-                it "reads input \"a,b\\r\\ncd,ef\\r\\n as a,cd." $ do
-                        (readFormerColumn :: Abcdef [String]) `shouldBe` Abcdef ["a","cd"]
+                it "can extract strings with and without spaces from small CSV files" $ do
+                        (readFormerColumn :: Abcdef[String]) `shouldBe` Abcdef["a","cd"]
+                        (readFormerColumn :: CsvContainingNumbers[String]) `shouldBe` CsvContainingNumbers(replicate 2 "former column")
+        describe "readLatterColumn" $ do
+                it "can extract numbers in scientific notation from small CSV files" $ do
+                        (readLatterColumnAsDoubles :: CsvContainingNumbers[Double]) `shouldBe` CsvContainingNumbers[-2.894930373863120749e-02,-7.567405304247912341e-02]
