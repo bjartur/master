@@ -13,7 +13,7 @@ infixl 1 >$
 
 nadirs :: Input input => input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
-                >$ indicesOfRisesLongerThanThree
+                >$ indicesOfDropsLongerThanThree
 
 timestampsOfRiseBeginning :: Input input => input [String]
 timestampsOfRiseBeginning =

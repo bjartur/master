@@ -1,14 +1,25 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, spans, rises, indicesOfRisesLongerThanThree) where
+module Lib (increasing, decreasing, spans, rises, drops, indicesOfRisesLongerThanThree, indicesOfDropsLongerThanThree) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
 
--- Maps the first element to True. Maps a later element to True iff it is strictly greater than the previous element.
+-- The output list is one element shorter than the input list.
+-- For each overlapping pair of adjacent numbers in the input list,
+-- the corresponding Bool in the output list is True iff
+-- the former number is strictly less than the latter.
 increasing :: [Double] -> [Bool]
 increasing [] = []
 increasing list = zipWith (<) list (tail list)
+
+-- The output list is one element shorter than the input list.
+-- For each overlapping pair of adjacent numbers in the input list,
+-- the corresponding Bool in the output list is True iff
+-- the former number is strictly greater than the latter.
+decreasing :: [Double] -> [Bool]
+decreasing [] = []
+decreasing list = zipWith (>) list (tail list)
 
 trueIndices :: [Bool] -> [Int]
 trueIndices = elemIndices True
@@ -42,5 +53,11 @@ spans xs = reverse $ go [] [] 0 False xs where
 rises :: [Double] -> [(Int,Int)]
 rises = spans.increasing
 
+drops :: [Double] -> [(Int,Int)]
+drops = spans.decreasing
+
 indicesOfRisesLongerThanThree :: [Double] -> [(Int,Int)]
 indicesOfRisesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
+
+indicesOfDropsLongerThanThree :: [Double] -> [(Int,Int)]
+indicesOfDropsLongerThanThree list = [ (index,count) | (index, count) <- drops list, count >= 3]
