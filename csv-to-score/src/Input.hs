@@ -1,31 +1,47 @@
 module Input where
 import Control.Applicative
 import Control.Arrow
+import Data.Function
 import Lib
 
 type Index = Int -- nonnegative
 type Count = Int -- positive
 type Debt  = Int -- impositive
 
-(>$) :: Functor l => l a -> (a -> b) -> l b
+(>$) :: Functor l=> l a-> (a-> b)-> l b
 (>$) = flip fmap
 infixl 1 >$
 
-nadirs :: Input input => input [(Index,Count)]
+nadirs :: Input input=> input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
                 >$ indicesOfDropsLongerThanThree
 
+indexOfBeginningOf :: (Index,Count)-> Index
+indexOfBeginningOf =
+                   fst
+
+indexOfEndOf :: (Index,Count)-> Index
+indexOfEndOf =     uncurry (+)
+
 timestampsOfRiseBeginning :: Input input => input [String]
 timestampsOfRiseBeginning =
-                   timestamp
-                   (\(index,_)-> index)
+                   timestamp indexOfBeginningOf
 
-timestampsOfRiseEnd :: Input input => input [String]
+
+timestampsOfRiseEnd :: Input input=> input [String]
 timestampsOfRiseEnd =
-                   timestamp
-                   (\(index,count)-> index + count)
+                   timestamp indexOfEndOf
 
-(>>$) :: (Functor l, Functor m) => l (m a) -> (a -> b) -> l (m b)
+baselines :: Input input=> input [Double]
+baselines = do
+    beginIndexes <- (nadirs >>$ indexOfBeginningOf :: Input input=> input [Int])
+    endIndexes <- (nadirs >>$ indexOfEndOf :: Input input=> input [Int])
+    let selectors = zipWith range (0:endIndexes) beginIndexes :: [ [Double]-> [Double] ]
+    pressures <- readLatterColumnAsDoubles
+    let ranges = selectors >$ ($ pressures)
+    return $ ranges >$ average
+
+(>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
 boxed >>$ function =
                   boxed
                >$ fmap function
@@ -41,7 +57,7 @@ timestamp :: Input input => ((Index,Count) -> Index) -> input [String]
 timestamp accessor =
                   nadirs
               >>$ accessor
-             >>$$       getTimestamps
+             >>$$ getTimestamps
 
 readLatterColumnAsDoubles :: Input input => input [Double]
 readLatterColumnAsDoubles = column latterColumn >>$ read

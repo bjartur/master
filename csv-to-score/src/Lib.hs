@@ -1,9 +1,16 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, drops, indicesOfRisesLongerThanThree, indicesOfDropsLongerThanThree) where
+module Lib (increasing, decreasing, spans, rises, drops, indicesOfRisesLongerThanThree, indicesOfDropsLongerThanThree, average, range) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
+import Control.Arrow ((>>>))
+range :: Int -> Int -> [a] -> [a]
+range beginning end = drop beginning
+                  >>> take end
+
+average :: [Double] -> Double
+average list = sum list / (fromIntegral.length) list
 
 -- The output list is one element shorter than the input list.
 -- For each overlapping pair of adjacent numbers in the input list,
