@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
+    {-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
 import Control.Applicative
 import Data.Function
 import Data.List (sort, nub)
@@ -124,7 +124,7 @@ main = hspec $ do
               --        increasing
         describe "rises" $
                 ofAscendingListShouldContainOnlyZero rises
-        describe "Three breaths each with a lower pressure than a preceding breath" $ do
+        describe "Three breaths each with a higher pressure than a preceding breath" $ do
                 it "finds no rise in an empty list" $
                         indicesOfRisesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span of length three as well as a decrease." $
@@ -136,6 +136,21 @@ main = hspec $ do
                                         (1:[0..5]++[4..7],[(1,5),(7,3)])
                                 ]
                 mapM_($ indicesOfRisesLongerThanThree)
+                        [
+                                shouldOnlyReturnIndicesLowerThanTheLengthOf
+                        ]
+        describe "Three breaths each with a lower pressure than a preceding breath" $ do
+                it "finds no rise in an empty list" $
+                        indicesOfDeclinesLongerThanThree[] `shouldBe` []
+                it "skips over an increasing span as well as a decrease of length three." $
+                        indicesOfDeclinesLongerThanThree([-7..1] ++ [3,2,1]) `shouldBe` []
+                it "identifies long declines" $ do
+                        examples indicesOfDeclinesLongerThanThree
+                                [
+                                        ([10,9..1],[(0,9)]),
+                                        (1:[5,4..0]++[7,6..4],[(1,5),(7,3)])
+                                ]
+                mapM_($ indicesOfDeclinesLongerThanThree)
                         [
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]

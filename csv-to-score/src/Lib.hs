@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, drops, indicesOfRisesLongerThanThree, indicesOfDropsLongerThanThree, average, range) where
+module Lib (increasing, decreasing, spans, rises, declines, indicesOfRisesLongerThanThree, indicesOfDeclinesLongerThanThree, average, range) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
@@ -60,11 +60,11 @@ spans xs = reverse $ go [] [] 0 False xs where
 rises :: [Double] -> [(Int,Int)]
 rises = spans.increasing
 
-drops :: [Double] -> [(Int,Int)]
-drops = spans.decreasing
+declines :: [Double] -> [(Int,Int)]
+declines = spans.decreasing
 
 indicesOfRisesLongerThanThree :: [Double] -> [(Int,Int)]
 indicesOfRisesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
 
-indicesOfDropsLongerThanThree :: [Double] -> [(Int,Int)]
-indicesOfDropsLongerThanThree list = [ (index,count) | (index, count) <- drops list, count >= 3]
+indicesOfDeclinesLongerThanThree :: [Double] -> [(Int,Int)]
+indicesOfDeclinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]

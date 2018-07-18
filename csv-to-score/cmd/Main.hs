@@ -13,7 +13,7 @@ spliceRows = zipWith spliceRow
 spliceRowsFrom :: IO [String] -> IO [String] -> IO [String]
 spliceRowsFrom = liftA2 spliceRows
 rows :: IO [String]
-rows = spliceRowsFrom timestampsOfRiseBeginning timestampsOfRiseEnd
+rows = spliceRowsFrom timestampsOfDeclineBeginning timestampsOfDeclineEnd
 output :: IO String
 output = rows >$ unlines
 

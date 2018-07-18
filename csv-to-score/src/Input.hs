@@ -14,7 +14,7 @@ infixl 1 >$
 
 nadirs :: Input input=> input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
-                >$ indicesOfDropsLongerThanThree
+                >$ indicesOfDeclinesLongerThanThree
 
 indexOfBeginningOf :: (Index,Count)-> Index
 indexOfBeginningOf =
@@ -23,13 +23,13 @@ indexOfBeginningOf =
 indexOfEndOf :: (Index,Count)-> Index
 indexOfEndOf =     uncurry (+)
 
-timestampsOfRiseBeginning :: Input input => input [String]
-timestampsOfRiseBeginning =
+timestampsOfDeclineBeginning :: Input input => input [String]
+timestampsOfDeclineBeginning =
                    timestamp indexOfBeginningOf
 
 
-timestampsOfRiseEnd :: Input input=> input [String]
-timestampsOfRiseEnd =
+timestampsOfDeclineEnd :: Input input=> input [String]
+timestampsOfDeclineEnd =
                    timestamp indexOfEndOf
 
 baselines :: Input input=> input [Double]
