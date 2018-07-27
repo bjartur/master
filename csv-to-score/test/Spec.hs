@@ -1,4 +1,4 @@
-    {-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
+{-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
 import Control.Applicative
 import Data.Function
 import Data.List (sort, nub)
