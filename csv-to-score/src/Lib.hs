@@ -1,13 +1,22 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, declines, indicesOfRisesLongerThanThree, indicesOfDeclinesLongerThanThree, average, range) where
+module Lib (increasing, decreasing, spans, rises, declines, indicesOfRisesLongerThanThree, indicesOfDeclinesLongerThanThree, average, range, Index, Count) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
 import Control.Arrow ((>>>))
-range :: Int -> Int -> [a] -> [a]
+
+type Index = Int -- nonnegative
+type Count = Int -- positive
+type Debt  = Int -- impositive
+
+-- The latter Index, end, is one plus the index of the last element in the range
+range :: Index -> Index -> [a] -> [a]
 range beginning end = drop beginning
-                  >>> take end
+                    >>> take count
+      where
+                   count :: Count
+                   count = end - beginning
 
 average :: [Double] -> Double
 average list = sum list / (fromIntegral.length) list

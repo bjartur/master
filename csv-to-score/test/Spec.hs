@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
 import Control.Applicative
 import Data.Function
-import Data.List (sort, nub)
-import Input hiding ((>$))
+import Data.List (sort, nub, foldl1')
+import Input
 import Lib
 import Prelude hiding (readFile)
 import Test.Hspec
@@ -75,9 +75,6 @@ shouldOnlyReturnIndicesLowerThanTheLengthOf =
       . property
       . onlyReturnsIndicesLowerThanTheLengthOf
 
-(>$) = flip fmap
-infixl 1 >$
-
 onlyReturnsIndicesLowerThanTheLengthOf :: ([a] -> [(Int,Int)]) -> [a] -> Bool
 function `onlyReturnsIndicesLowerThanTheLengthOf` list =
         function list
@@ -96,7 +93,23 @@ newtype CsvContainingNumbers a = CsvContainingNumbers a deriving (Applicative, E
 instance Input CsvContainingNumbers where
         csv = CsvContainingNumbers "former column,-2.894930373863120749e-02\r\nformer column,-7.567405304247912341e-02"
 
+newtype LongCsv a = LongCsv a deriving (Applicative, Eq, Functor, Monoid, Show)
+instance Input LongCsv where
+    csv = LongCsv $ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
+         ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
+instance Monad LongCsv where
+    (LongCsv value) >>= f = f value
+    return = LongCsv
 
+newtype LongerCsv a = LongerCsv a deriving (Applicative, Eq, Functor, Monoid, Show)
+instance Input LongerCsv where
+    csv = LongerCsv $ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
+         ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
+         ++ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
+         ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
+instance Monad LongerCsv where
+    (LongerCsv value) >>= f = f value
+    return = LongerCsv
 
 main :: IO ()
 main = hspec $ do
@@ -155,9 +168,55 @@ main = hspec $ do
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
         describe "readFormerColumn" $ do
-                it "can extract strings with and without spaces from small CSV files" $ do
+                it "extracts strings with and without spaces from small CSV files" $ do
                         (readFormerColumn :: Abcdef[String]) `shouldBe` Abcdef["a","cd"]
                         (readFormerColumn :: CsvContainingNumbers[String]) `shouldBe` CsvContainingNumbers(replicate 2 "former column")
         describe "readLatterColumn" $ do
-                it "can extract numbers in scientific notation from small CSV files" $ do
+                it "extracts numbers in scientific notation from small CSV files" $ do
                         (readLatterColumnAsDoubles :: CsvContainingNumbers[Double]) `shouldBe` CsvContainingNumbers[-2.894930373863120749e-02,-7.567405304247912341e-02]
+        describe "baselines" $ do
+                it "calculates a mean before a decline" $ do
+                    shouldBe
+                        (
+                            (baselines :: LongCsv[Double])
+                        >>$ (/ (-7.566e-02))
+                        >>$ (\float-> float-1)
+                        >>$ abs
+                        >>$ (< 0.001)
+                         >$ and
+                        )
+                        (LongCsv True)
+                    shouldBe
+                        (
+                            (baselines :: LongCsv[Double])
+                         >$ length
+                        )
+                        (LongCsv 1)
+                it "calculates a mean before each decline" $ do
+                    shouldBe
+                        (
+                            (baselines :: LongerCsv[Double])
+                         >$ head
+                         >$ (/ (-7.566e-02))
+                         >$ (\float-> float-1)
+                         >$ abs
+                         >$ (< 0.001)
+                        )
+                        (LongerCsv True)
+                    shouldBe
+                        (
+                            (baselines :: LongerCsv[Double])
+                         >$ length
+                        )
+                        (LongerCsv 2)
+                    shouldBe
+                        (
+                            (baselines :: LongerCsv[Double])
+                            >$ tail
+                            >$ head
+                            >$ (/ 1.2)
+                            >$ (\float-> float-1)
+                            >$ abs
+                            >$ (< 0.001)
+                        )
+                        (LongerCsv True)

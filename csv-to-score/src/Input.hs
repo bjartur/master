@@ -4,10 +4,6 @@ import Control.Arrow
 import Data.Function
 import Lib
 
-type Index = Int -- nonnegative
-type Count = Int -- positive
-type Debt  = Int -- impositive
-
 (>$) :: Functor l=> l a-> (a-> b)-> l b
 (>$) = flip fmap
 infixl 1 >$
@@ -34,8 +30,8 @@ timestampsOfDeclineEnd =
 
 baselines :: Input input=> input [Double]
 baselines = do
-    beginIndexes <- (nadirs >>$ indexOfBeginningOf :: Input input=> input [Int])
-    endIndexes <- (nadirs >>$ indexOfEndOf :: Input input=> input [Int])
+    beginIndexes <- (nadirs >>$ indexOfBeginningOf :: Input input=> input [Index])
+    endIndexes <- (nadirs >>$ indexOfEndOf :: Input input=> input [Index])
     let selectors = zipWith range (0:endIndexes) beginIndexes :: [ [Double]-> [Double] ]
     pressures <- readLatterColumnAsDoubles
     let ranges = selectors >$ ($ pressures)
@@ -44,14 +40,14 @@ baselines = do
 (>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
 boxed >>$ function =
                   boxed
-               >$ fmap function
-infixl 0 >>$
+               >$  fmap function
+infixl 2 >>$
 
 (>>$$) :: (Monad io, Functor list) => io (list a) -> io (a -> b) -> io (list b)
 boxedValue >>$$ boxedFunction =
                 (boxedValue >>$)
              =<< boxedFunction
-infixl 0 >>$$
+infixl 2 >>$$
 
 timestamp :: Input input => ((Index,Count) -> Index) -> input [String]
 timestamp accessor =
