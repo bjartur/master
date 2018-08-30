@@ -12,57 +12,62 @@ nadirs :: Input input=> input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
                 >$ indicesOfDeclinesLongerThanThree
 
-indexOfBeginningOf :: (Index,Count)-> Index
-indexOfBeginningOf =
-                   fst
+indexBefore :: (Index,Count)-> Index
+indexBefore =      fst
 
 indexOfEndOf :: (Index,Count)-> Index
 indexOfEndOf =     uncurry (+)
 
+indexAfter :: (Index,Count)-> Index
+indexAfter =       indexOfEndOf
+                >$ (+1)
+
 timestampsOfDeclineBeginning :: Input input => input [String]
 timestampsOfDeclineBeginning =
-                   timestamp indexOfBeginningOf
+                   timestamp indexBefore
 
 
 timestampsOfDeclineEnd :: Input input=> input [String]
 timestampsOfDeclineEnd =
                    timestamp indexOfEndOf
 
-baselines :: Input input=> input [Double]
-baselines = do
-    beginIndexes <- (nadirs >>$ indexOfBeginningOf :: Input input=> input [Index])
-    endIndexes <- (nadirs >>$ indexOfEndOf :: Input input=> input [Index])
-    let selectors = zipWith range (0:endIndexes) beginIndexes :: [ [Double]-> [Double] ]
+bases :: Input input=> input[[Double]]
+bases = do
+    beginIndices <- (nadirs >>$ indexBefore :: Input input=> input [Index])
+    afterIndices <- (nadirs >>$ indexAfter :: Input input=> input [Index])
+    let selectors = zipWith range (0:afterIndices) beginIndices :: [ [Double]-> [Double] ]
     pressures <- readLatterColumnAsDoubles
-    let ranges = selectors >$ ($ pressures)
-    return $ ranges >$ average
+    return $ selectors >$ ($ pressures)
+
+baselines :: Input input=> input[Double]
+baselines = bases >>$ average
 
 (>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
 boxed >>$ function =
-                  boxed
-               >$  fmap function
+                   boxed
+                >$ fmap function
 infixl 2 >>$
 
 (>>$$) :: (Monad io, Functor list) => io (list a) -> io (a -> b) -> io (list b)
 boxedValue >>$$ boxedFunction =
-                (boxedValue >>$)
-             =<< boxedFunction
+                   (boxedValue >>$)
+               =<< boxedFunction
 infixl 2 >>$$
 
-timestamp :: Input input => ((Index,Count) -> Index) -> input [String]
+timestamp :: Input input=> ((Index,Count) -> Index) -> input[String]
 timestamp accessor =
-                  nadirs
-              >>$ accessor
-             >>$$ getTimestamps
+                   nadirs
+               >>$ accessor
+              >>$$ getTimestamps
 
-readLatterColumnAsDoubles :: Input input => input [Double]
+readLatterColumnAsDoubles :: Input input=> input[Double]
 readLatterColumnAsDoubles = column latterColumn >>$ read
 
-getTimestamps :: Input input => input (Index -> String)
+getTimestamps :: Input input=> input(Index -> String)
 getTimestamps =    readFormerColumn
               >$ (!!)
 
-readFormerColumn :: Input input => input [String]
+readFormerColumn :: Input input => input[String]
 readFormerColumn = column formerColumn
 
 linesOfCsv :: Input input => input [String]
@@ -71,7 +76,7 @@ linesOfCsv =        csv
 
 type Column = (Char -> Bool) -> String -> String
 
-column :: Input input => Column -> input [String]
+column :: Input input=> Column -> input[String]
 column selectColumn =
                     linesOfCsv
                >>$ selectColumn (/= ',')
@@ -91,4 +96,4 @@ dropFirstColumn = dropWhile
           >>>> tail
 
 class Monad m => Input m where
-        csv :: m String -- wrapped string delimated by newlines and commas.
+        csv :: m String -- wrapped string delimited by newlines and commas.

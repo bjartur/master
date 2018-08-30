@@ -82,6 +82,9 @@ function `onlyReturnsIndicesLowerThanTheLengthOf` list =
      >$ (< length list)
       & and
 
+equallyLong :: [b] -> [c] -> Bool
+equallyLong xs ys = length xs == length ys
+
 examples :: (Show a, Show b, Eq b) => (a -> b) -> [(a,b)] -> Expectation
 examples function = mapM_(\(input,output) -> function input `shouldBe` output)
 
@@ -105,7 +108,7 @@ newtype LongerCsv a = LongerCsv a deriving (Applicative, Eq, Functor, Monoid, Sh
 instance Input LongerCsv where
     csv = LongerCsv $ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
          ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
-         ++ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
+         ++ "former column,-3.14e-01\r\nformer column,-4.564403304247e-01\r\n"
          ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
 instance Monad LongerCsv where
     (LongerCsv value) >>= f = f value
@@ -133,8 +136,6 @@ main = hspec $ do
                                         ,([True,True,False,True],[(0,2),(3,1)])
                                         ,([False,True,False,True,True,True,True],[(1,1),(3,4)])
                                 ]
-              --it "finds the correct number of spans" $
-              --        increasing
         describe "rises" $
                 ofAscendingListShouldContainOnlyZero rises
         describe "Three breaths each with a higher pressure than a preceding breath" $ do
@@ -179,7 +180,7 @@ main = hspec $ do
                     shouldBe
                         (
                             (baselines :: LongCsv[Double])
-                        >>$ (/ (-7.566e-02))
+                        >>$ (/ (0.34956063797168058106))
                         >>$ (\float-> float-1)
                         >>$ abs
                         >>$ (< 0.001)
@@ -192,12 +193,12 @@ main = hspec $ do
                          >$ length
                         )
                         (LongCsv 1)
-                it "calculates a mean before each decline" $ do
+                it "can calculate a mean before each decline" $ do
                     shouldBe
                         (
                             (baselines :: LongerCsv[Double])
                          >$ head
-                         >$ (/ (-7.566e-02))
+                         >$ (/ (0.34956063797168058106))
                          >$ (\float-> float-1)
                          >$ abs
                          >$ (< 0.001)
@@ -217,6 +218,9 @@ main = hspec $ do
                             >$ (/ 1.2)
                             >$ (\float-> float-1)
                             >$ abs
-                            >$ (< 0.001)
                         )
-                        (LongerCsv True)
+                        (LongerCsv 0)
+                it "calculates as many baselines as there are declines" $ do
+                    shouldBe -- TODO: generalize into a property of Arbitrary Input input=> input[Double]s.
+                        (fmap length (baselines :: LongerCsv[Double]))
+                        (fmap length (nadirs :: LongerCsv[(Index,Count)]))

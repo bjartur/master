@@ -10,13 +10,13 @@ type Index = Int -- nonnegative
 type Count = Int -- positive
 type Debt  = Int -- impositive
 
--- The latter Index, end, is one plus the index of the last element in the range
+-- inclusive
 range :: Index -> Index -> [a] -> [a]
 range beginning end = drop beginning
-                    >>> take count
+                  >>> take count
       where
                    count :: Count
-                   count = end - beginning
+                   count = end - beginning + 1
 
 average :: [Double] -> Double
 average list = sum list / (fromIntegral.length) list
@@ -52,7 +52,7 @@ spans []      = []
 spans xs = reverse $ go [] [] 0 False xs where
         go :: -- search for spans of True
                 [Int]  -> -- Indices of previously found Trues not preceded by a True.
-                [Int]  -> -- For each prevously found True not preceded by a True, the number of trailing Trues.
+                [Int]  -> -- For each prevously found True not preceded by a True, the number of consecutive Trues.
                 Int    -> -- Number of elements already removed from the front of the list.
                 Bool   -> -- Last element to be removed (or False, if none has been removed).
                 [Bool] -> -- The remainder of the list yet to be searched through.
