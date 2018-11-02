@@ -20,7 +20,7 @@ indexOfEndOf =     uncurry (+)
 
 indexAfter :: (Index,Count)-> Index
 indexAfter =       indexOfEndOf
-                >$ (+1)
+                >$ (+ 1)
 
 timestampsOfDeclineBeginning :: Input input => input [String]
 timestampsOfDeclineBeginning =
