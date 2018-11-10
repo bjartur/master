@@ -1,26 +1,12 @@
-module Input where
+module Input (module Input, module Lib) where
 import Control.Applicative
 import Control.Arrow
 import Data.Function
 import Lib
 
-(>$) :: Functor l=> l a-> (a-> b)-> l b
-(>$) = flip fmap
-infixl 1 >$
-
 nadirs :: Input input=> input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
                 >$ indicesOfDeclinesLongerThanThree
-
-indexBefore :: (Index,Count)-> Index
-indexBefore =      fst
-
-indexOfEndOf :: (Index,Count)-> Index
-indexOfEndOf =     uncurry (+)
-
-indexAfter :: (Index,Count)-> Index
-indexAfter =       indexOfEndOf
-                >$ (+ 1)
 
 timestampsOfDeclineBeginning :: Input input => input [String]
 timestampsOfDeclineBeginning =

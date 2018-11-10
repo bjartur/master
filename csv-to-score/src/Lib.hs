@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, declines, indicesOfRisesLongerThanThree, indicesOfDeclinesLongerThanThree, average, range, Index, Count) where
+module Lib (increasing, decreasing, spans, rises, declines, indicesOfRisesLongerThanThree, indicesOfDeclinesLongerThanThree, average, range, abrupt, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$)) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
@@ -77,3 +77,23 @@ indicesOfRisesLongerThanThree list = [ (index,count) | (index, count) <- rises l
 
 indicesOfDeclinesLongerThanThree :: [Double] -> [(Int,Int)]
 indicesOfDeclinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
+
+abrupt :: [Double]-> [Double]-> (Int,(Index,Count))-> [(Index,Count)]
+abrupt pressures references (number,nadir) =
+        if (pressures !! indexAfter nadir) < (references !! number)
+        then []
+        else [nadir]
+
+indexBefore :: (Index,Count)-> Index
+indexBefore =      fst
+
+indexOfEndOf :: (Index,Count)-> Index
+indexOfEndOf =     uncurry (+)
+
+indexAfter :: (Index,Count)-> Index
+indexAfter =       indexOfEndOf
+                >$ (+ 1)
+
+(>$) :: Functor l=> l a-> (a-> b)-> l b
+(>$) = flip fmap
+infixl 1 >$
