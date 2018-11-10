@@ -1,12 +1,13 @@
 {-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
 import Control.Applicative
 import Data.Function
+import Data.Functor.Const
 import Data.List (sort, nub, foldl1')
 import Input
 import Lib
 import Prelude hiding (readFile)
 import Test.Hspec
-import Test.QuickCheck (Arbitrary, NonEmptyList(..), Property, property, (==>))
+import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), NonEmptyList(..), Property, property, (==>))
 
 {-
 shouldPreserveListLength = it "returns a list of length equal to the input list."
@@ -220,7 +221,13 @@ main = hspec $ do
                             >$ abs
                         )
                         (LongerCsv 0)
-                it "calculates as many baselines as there are declines" $ do
-                    shouldBe -- TODO: generalize into a property of Arbitrary Input input=> input[Double]s.
+                it "calculates as many baselines as there are declines." $ do
+                    shouldBe
                         (fmap length (baselines :: LongerCsv[Double]))
                         (fmap length (nadirs :: LongerCsv[(Index,Count)]))
+        describe "abrupt" $ do
+                it "dismisses a triangle." $ do
+                        examples (abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  [10])
+                                [
+                                        ( (0,(0,10)) , [] )
+                                ]

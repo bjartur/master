@@ -28,6 +28,15 @@ bases = do
 baselines :: Input input=> input[Double]
 baselines = bases >>$ average
 
+
+abruptNadirs :: Input input=> input [(Index,Count)]
+abruptNadirs = do
+    candidates <- nadirs
+    pressures <- readLatterColumnAsDoubles
+    references <- baselines
+    let enumerated = zip [1..] candidates
+    return $ enumerated >>= abrupt pressures references
+
 (>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
 boxed >>$ function =
                    boxed
