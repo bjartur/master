@@ -32,7 +32,7 @@ isAllTrueForAscendingList function (NonEmpty list) =
            function(sort filtered) == tail(map(const True) filtered)
 
 ofAscendingListShouldContainOnlyZero =
-                it "finds the only rise in any ascending list"
+                it "finds the only rise in any ascending list."
               . property
               . mapsAscendingListToListContainingOnlyZeroAndLength
 
@@ -123,14 +123,14 @@ main = hspec $ do
                         ofDescendingListShouldBeAllFalse,
                         shouldMorphReversalIntoNegation
                         ]
-                it "returns two times True and ten times False given [1..3] ++ [2,1..(-7)]" $
+                it "returns two times True and ten times False given [1..3] ++ [2,1..(-7)]." $
                         examples increasing $
                         [
                                ([1..3] ++ [2,1..(-7)],(replicate 2 True ++ replicate 10 False))
                                 ,(1:[0..5]++[4..7],False:replicate 5 True++False:replicate 3 True)
                         ]
         describe "spans" $ do
-                it "finds and measures spans of Trues" $ examples spans
+                it "finds and measures spans of Trues." $ examples spans
                                 [
                                         ([],[])
                                         ,([True,True,False,True],[(0,2),(3,1)])
@@ -139,7 +139,7 @@ main = hspec $ do
         describe "rises" $
                 ofAscendingListShouldContainOnlyZero rises
         describe "Three breaths each with a higher pressure than a preceding breath" $ do
-                it "finds no rise in an empty list" $
+                it "finds no rise in an empty list." $
                         indicesOfRisesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span of length three as well as a decrease." $
                         indicesOfRisesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
@@ -154,11 +154,11 @@ main = hspec $ do
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
-                it "finds no rise in an empty list" $
+                it "finds no rise in an empty list." $
                         indicesOfDeclinesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span as well as a decrease of length three." $
                         indicesOfDeclinesLongerThanThree([-7..1] ++ [3,2,1]) `shouldBe` []
-                it "identifies long declines" $ do
+                it "identifies long declines." $ do
                         examples indicesOfDeclinesLongerThanThree
                                 [
                                         ([10,9..1],[(0,9)]),
@@ -169,14 +169,14 @@ main = hspec $ do
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
         describe "readFormerColumn" $ do
-                it "extracts strings with and without spaces from small CSV files" $ do
+                it "extracts strings with and without spaces from small CSV files." $ do
                         (readFormerColumn :: Abcdef[String]) `shouldBe` Abcdef["a","cd"]
                         (readFormerColumn :: CsvContainingNumbers[String]) `shouldBe` CsvContainingNumbers(replicate 2 "former column")
         describe "readLatterColumn" $ do
-                it "extracts numbers in scientific notation from small CSV files" $ do
+                it "extracts numbers in scientific notation from small CSV files." $ do
                         (readLatterColumnAsDoubles :: CsvContainingNumbers[Double]) `shouldBe` CsvContainingNumbers[-2.894930373863120749e-02,-7.567405304247912341e-02]
         describe "baselines" $ do
-                it "calculates a mean before a decline" $ do
+                it "calculates a mean before a decline." $ do
                     shouldBe
                         (
                             (baselines :: LongCsv[Double])
@@ -193,7 +193,7 @@ main = hspec $ do
                          >$ length
                         )
                         (LongCsv 1)
-                it "can calculate a mean before each decline" $ do
+                it "can calculate a mean before each decline." $ do
                     shouldBe
                         (
                             (baselines :: LongerCsv[Double])
