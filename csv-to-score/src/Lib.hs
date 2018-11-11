@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, declines, indicesOfRisesLongerThanThree, indicesOfDeclinesLongerThanThree, average, range, abrupt, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$)) where
+module Lib (increasing, decreasing, spans, rises, declines, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$)) where
 
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
@@ -72,11 +72,11 @@ rises = spans.increasing
 declines :: [Double] -> [(Int,Int)]
 declines = spans.decreasing
 
-indicesOfRisesLongerThanThree :: [Double] -> [(Int,Int)]
-indicesOfRisesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
+risesLongerThanThree :: [Double] -> [(Int,Int)]
+risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
 
-indicesOfDeclinesLongerThanThree :: [Double] -> [(Int,Int)]
-indicesOfDeclinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
+declinesLongerThanThree :: [Double] -> [(Int,Int)]
+declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
 abrupt :: [Double]-> [Double]-> (Int,(Index,Count))-> [(Index,Count)]
 abrupt pressures references (number,nadir) =

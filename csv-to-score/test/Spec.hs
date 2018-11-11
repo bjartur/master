@@ -32,7 +32,7 @@ isAllTrueForAscendingList function (NonEmpty list) =
         do let filtered = nub list
            function(sort filtered) == tail(map(const True) filtered)
 
-ofAscendingListShouldContainOnlyZero =
+ofAscendingListShouldContainOnlyZeroAndLength =
                 it "finds the only rise in any ascending list."
               . property
               . mapsAscendingListToListContainingOnlyZeroAndLength
@@ -138,34 +138,34 @@ main = hspec $ do
                                         ,([False,True,False,True,True,True,True],[(1,1),(3,4)])
                                 ]
         describe "rises" $
-                ofAscendingListShouldContainOnlyZero rises
+                ofAscendingListShouldContainOnlyZeroAndLength rises
         describe "Three breaths each with a higher pressure than a preceding breath" $ do
                 it "finds no rise in an empty list." $
-                        indicesOfRisesLongerThanThree[] `shouldBe` []
+                        risesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span of length three as well as a decrease." $
-                        indicesOfRisesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
+                        risesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
                 it "identifies long rises" $ do
-                        examples indicesOfRisesLongerThanThree
+                        examples risesLongerThanThree
                                 [
                                         ([1..10],[(0,9)]),
                                         (1:[0..5]++[4..7],[(1,5),(7,3)])
                                 ]
-                mapM_($ indicesOfRisesLongerThanThree)
+                mapM_($ risesLongerThanThree)
                         [
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
                 it "finds no rise in an empty list." $
-                        indicesOfDeclinesLongerThanThree[] `shouldBe` []
+                        declinesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span as well as a decrease of length three." $
-                        indicesOfDeclinesLongerThanThree([-7..1] ++ [3,2,1]) `shouldBe` []
+                        declinesLongerThanThree([-7..1] ++ [3,2,1]) `shouldBe` []
                 it "identifies long declines." $ do
-                        examples indicesOfDeclinesLongerThanThree
+                        examples declinesLongerThanThree
                                 [
                                         ([10,9..1],[(0,9)]),
                                         (1:[5,4..0]++[7,6..4],[(1,5),(7,3)])
                                 ]
-                mapM_($ indicesOfDeclinesLongerThanThree)
+                mapM_($ declinesLongerThanThree)
                         [
                                 shouldOnlyReturnIndicesLowerThanTheLengthOf
                         ]
@@ -229,5 +229,10 @@ main = hspec $ do
                 it "dismisses a triangle." $ do
                         examples (abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  [10])
                                 [
-                                        ( (0,(0,10)) , [] )
+                                        ( (0,(0,9)) , [] )
+                                ]
+                it "can notice an abrupt return to baseline" $ do
+                        examples (abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] [8.5])
+                                [
+                                        ( (0,(4,9)) , [(4,9)] )
                                 ]

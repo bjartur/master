@@ -6,7 +6,7 @@ import Lib
 
 nadirs :: Input input=> input [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
-                >$ indicesOfDeclinesLongerThanThree
+                >$ declinesLongerThanThree
 
 timestampsOfDeclineBeginning :: Input input => input [String]
 timestampsOfDeclineBeginning =
