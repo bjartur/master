@@ -1,24 +1,16 @@
 {-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
+import Control.Arrow
 import Control.Applicative
+import Control.Monad(join)
 import Data.Function
 import Data.Functor.Const
 import Data.List (sort, nub, foldl1')
+import Debug.Trace
 import Input
 import Lib
 import Prelude hiding (readFile)
 import Test.Hspec
-import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), NonEmptyList(..), Property, property, (==>))
-
-{-
-shouldPreserveListLength = it "returns a list of length equal to the input list."
-        . toPreserveListLength
-
-toPreserveListLength :: (Arbitrary a, Show a) => ([a] -> [b]) -> Property
-toPreserveListLength = property . preservesListLength
-
-preservesListLength :: ([a] -> [b]) -> [a] -> Bool
-function `preservesListLength` list = length (function list) == length list
--}
+import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), NonEmptyList(..), Property, property, Testable, (==>))
 
 ofAscendingListShouldBeAllTrue =
         it "returns a replicate of True for an ascending list."
@@ -83,8 +75,34 @@ function `onlyReturnsIndicesLowerThanTheLengthOf` list =
      >$ (< length list)
       & and
 
-equallyLong :: [b] -> [c] -> Bool
-equallyLong xs ys = length xs == length ys
+xs `subset` ys = all (`elem` ys) xs
+
+f `subsets` g = \input-> f input `subset` g input
+
+uncreative :: ( [Double]-> [(a,(Index,Count))]-> [(Index,Count)] )-> [(a,(Index,Count))]-> Bool
+uncreative f input = (f (map (const 8.5) input) `subsets` map snd) input
+
+
+randomNadir ::
+    Int-> -- beginning; the generated nadir will start *after* this index
+    Int-> -- recordLength; at minimum beginning + 4
+    Gen (Index,Count)
+randomNadir beginning recordLength = do
+        start <-choose(beginning, (recordLength-1)-3-1)
+        count <-choose(3, (recordLength-1)-start-1)
+        return (start,count)
+
+randomNadirs :: Int-> Gen [(Index,Count)]
+randomNadirs recordLength = let
+            go index nadirs = if index > (recordLength-1)-3-1
+                then nadirs
+                else do
+                         (nextIndex,count) <- randomNadir index recordLength
+                         list <- nadirs
+                         go (nextIndex+count) $ return $ (nextIndex,count):list
+        in
+            go 1 (return [])
+         >$ reverse
 
 examples :: (Show a, Show b, Eq b) => (a -> b) -> [(a,b)] -> Expectation
 examples function = mapM_(\(input,output) -> function input `shouldBe` output)
@@ -236,3 +254,13 @@ main = hspec $ do
                                 [
                                         ( (0,(4,9)) , [(4,9)] )
                                 ]
+                it "baffles" $
+                        (forAll :: (Show a, Testable prop) => Gen a -> (a -> prop) -> Property)
+                        (   randomNadirs 19
+                         >$ zip [(0::Int)..]
+                        )
+                        (uncreative $ \references candidates->
+                                do
+                                        candidate <-candidates
+                                        abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] references candidate
+                        )

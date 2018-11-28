@@ -58,7 +58,7 @@ spans xs = reverse $ go [] [] 0 False xs where
                 [Bool] -> -- The remainder of the list yet to be searched through.
                 [( -- in reverse order, a list of pairs of:
                         Int -- the index of a True not preceed by another True,
-                       ,Int -- and the number of consecutive Trues immediately following the True with the above index.
+                       ,Int -- and the number of consecutive Trues including the True with the above index.
                 )]
         go prevs lengths index _ [] = zip prevs lengths
         go prevs lengths index False (False:xs) = go prevs lengths (index+1) False xs
