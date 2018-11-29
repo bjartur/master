@@ -254,7 +254,7 @@ main = hspec $ do
                                 [
                                         ( (0,(4,9)) , [(4,9)] )
                                 ]
-                it "baffles" $
+                it "only accepts or rejects candidate nadirs without introducing new ones" $
                         (forAll :: (Show a, Testable prop) => Gen a -> (a -> prop) -> Property)
                         (   randomNadirs 19
                          >$ zip [(0::Int)..]
