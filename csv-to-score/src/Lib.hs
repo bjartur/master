@@ -5,6 +5,8 @@ module Lib (increasing, decreasing, spans, rises, declines, risesLongerThanThree
 -- Returns all indices of the specified value in a given list.
 import Data.List (elemIndices)
 import Control.Arrow ((>>>))
+import Prelude hiding ((!!))
+import Data.List.Safe ((!!))
 
 type Index = Int -- nonnegative
 type Count = Int -- positive
@@ -67,10 +69,10 @@ spans xs = reverse $ go [] [] 0 False xs where
         go prevs lengths index True (False:xs) = go prevs lengths (index+1) False xs
 
 rises :: [Double] -> [(Int,Int)]
-rises = spans.increasing
+rises = increasing>>>spans
 
 declines :: [Double] -> [(Int,Int)]
-declines = spans.decreasing
+declines = decreasing>>>spans
 
 risesLongerThanThree :: [Double] -> [(Int,Int)]
 risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
@@ -79,8 +81,10 @@ declinesLongerThanThree :: [Double] -> [(Int,Int)]
 declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
 abrupt :: [Double]-> [Double]-> (Int,(Index,Count))-> [(Index,Count)]
-abrupt pressures references (number,nadir) =
-        if (pressures !! indexAfter nadir) < (references !! number)
+abrupt pressures references (number,nadir) = do
+        pressure <- pressures !! indexAfter nadir
+        reference <- references !! number
+        if pressure < reference
         then []
         else [nadir]
 

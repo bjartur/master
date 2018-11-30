@@ -26,6 +26,8 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - listsafe
 
 executables:
   csv-to-score-exe:
