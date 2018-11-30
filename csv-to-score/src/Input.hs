@@ -1,6 +1,7 @@
 module Input (module Input, module Lib) where
 import Control.Applicative
 import Control.Arrow
+import Control.Monad
 import Data.Function
 import Lib
 
@@ -17,25 +18,25 @@ timestampsOfDeclineEnd :: Input input=> input [String]
 timestampsOfDeclineEnd =
                    timestamp indexOfEndOf
 
-bases :: Input input=> input[[Double]]
-bases = do
-    beginIndices <- (nadirs >>$ indexBefore :: Input input=> input [Index])
-    afterIndices <- (nadirs >>$ indexAfter :: Input input=> input [Index])
-    let selectors = zipWith range (0:afterIndices) beginIndices :: [ [Double]-> [Double] ]
-    pressures <- readLatterColumnAsDoubles
-    return $ selectors >$ ($ pressures)
-
-baselines :: Input input=> input[Double]
-baselines = bases >>$ average
+baselines :: [(Index,Count)]-> [Double]-> [Double]
+baselines candidates pressures = let
+            beginIndices = candidates >$ indexBefore
+            afterIndices = candidates >$ indexAfter
+            selectors = zipWith range (0:afterIndices) beginIndices :: [ [Double]-> [Double] ]
+    in
+            selectors
+         >$ ($ pressures)
+         >$ average
 
 
 abruptNadirs :: Input input=> input [(Index,Count)]
-abruptNadirs = do
-    candidates <- nadirs
-    pressures <- readLatterColumnAsDoubles
-    references <- baselines
-    let enumerated = zip [1..] candidates
-    return $ enumerated >>= abrupt pressures references
+abruptNadirs =
+    liftA2 abrupts nadirs readLatterColumnAsDoubles
+
+abrupts :: [(Index,Count)]-> [Double]-> [(Index,Count)]
+abrupts candidates pressures =
+    zip [1..] candidates
+ >>=ap abrupt (baselines candidates) pressures
 
 (>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
 boxed >>$ function =
