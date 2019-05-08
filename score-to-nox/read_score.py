@@ -13,8 +13,8 @@ def mark_first_events(recording: Recording, log=False):
             stderr.write("base scoring: {}\n".format(arbitrarily_chosen_scoring_name))
         recording.set_active_scoring_group(arbitrarily_chosen_scoring_name)
 
-        for _ in range(10):
-            row = input.readline().strip().split(',')
+        for line in lines:
+            row = line.strip().split(',')
             beginning, end = [datetime.strptime(cell, '%Y-%m-%d %H:%M:%S.%f') for cell in row]
             duration = end - beginning
             start_time = row[0].replace(' ', 'T')[:-3]
