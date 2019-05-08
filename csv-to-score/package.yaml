@@ -30,7 +30,7 @@ library:
   - listsafe
 
 executables:
-  csv-to-score-exe:
+  csv-to-score:
     main:                Main.hs
     source-dirs:         cmd
     ghc-options:
