@@ -29,7 +29,7 @@ def mark_first_events(recording: Recording, log=False):
 
 
 if __name__ == '__main__':
-    filepath = 'PES PSG rescore\\20141111T235541 - 57128'
+    filepath = 'PES PSG rescore\\20141218T214507 - eb35b'
     if(False):
         stderr.write("Does the recording {} exist? ".format(filepath))
         if(path.isdir(filepath)):
