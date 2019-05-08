@@ -7,11 +7,12 @@ from sys import stderr
 from os import path
 
 def mark_first_events(recording: Recording, log=False):
-    with open('..\csv-to-score\output') as input:
-        arbitrarily_chosen_scoring_name = recording.get_all_scoring_names()[0]
+    with open('..\csv-to-score\output', 'r', encoding='ascii') as lines:
+        scoring_names = recording.get_all_scoring_names()
+        scoring_name = 'Sigga' if 'Sigga' in scoring_names else scoring_names[0]
         if (log):
-            stderr.write("base scoring: {}\n".format(arbitrarily_chosen_scoring_name))
-        recording.set_active_scoring_group(arbitrarily_chosen_scoring_name)
+            stderr.write("base scoring: {}\n".format(scoring_name))
+        recording.set_active_scoring_group(scoring_name)
 
         for line in lines:
             row = line.strip().split(',')
