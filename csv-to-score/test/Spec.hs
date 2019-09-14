@@ -10,7 +10,7 @@ import Input
 import Lib
 import Prelude hiding (readFile)
 import Test.Hspec
-import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), NonEmptyList(..), Property, property, Testable, (==>))
+import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), maxSuccess, NonEmptyList(..), Property, property, stdArgs, Testable, quickCheckWith, (==>))
 
 
 ofAscendingListShouldBeAllTrue =
@@ -50,7 +50,7 @@ mapsDescendingListToAllFalse function (NonEmpty list) =
 
 
 shouldMorphReversalIntoNegation =
-        it "preservers reversal for lists without duplicates."
+        it "preserves reversal for lists without duplicates."
       . property
       . morphsReversalIntoNegation
 
@@ -68,17 +68,31 @@ shouldShortenListByOne =
 shortensListByOne :: ([a] -> [b]) -> NonEmptyList a -> Bool
 function `shortensListByOne` (NonEmpty list) = length(function list) + 1 == length list
 
-
-shouldOnlyReturnIndicesLowerThanTheLengthOf =
-        it "returns neither indices nor counts greater than the length of the input list."
+returnsInitIndices = do
+        it "only returns indices in init."
       . property
-      . onlyReturnsIndicesLowerThanTheLengthOf
+      . initIndexOnly
 
-onlyReturnsIndicesLowerThanTheLengthOf :: ([a] -> [(Int,Int)]) -> [a] -> Bool
-function `onlyReturnsIndicesLowerThanTheLengthOf` list =
-        function list
-   <**> [fst,snd]
-     >$ (< (length list)-1)
+initIndexOnly :: ([a] -> [(Int,Int)]) -> [a] -> Bool
+function `initIndexOnly` list = do
+        (function list >$ fst)
+  <**> [
+           (>= 0),
+           \index-> length list - index >= 2
+       ]
+     & and
+
+returnsCountsCappedAtInputLength = do
+  it "never finds a span longer than its superlist."
+      . property
+      . countCappedAtInputLength
+
+countCappedAtInputLength :: ([a] -> [(Int,Int)]) -> [a] -> Bool
+function `countCappedAtInputLength` list = do
+       (function list >$ snd)
+   <**> [ (1 <=),
+         (length list >=)
+        ]
       & and
 
 
@@ -162,14 +176,14 @@ main = hspec $ do
                         examples increasing $
                         [
                                ([1..3] ++ [2,1..(-7)],(replicate 2 True ++ replicate 10 False))
-                                ,(1:[0..5]++[4..7],False:replicate 5 True++False:replicate 3 True)
+                             , (1:[0..5]++[4..7],False:replicate 5 True++False:replicate 3 True)
                         ]
         describe "spans" $ do
                 it "finds and measures spans of Trues." $ examples spans
                                 [
                                         ([],[])
-                                        ,([True,True,False,True],[(0,2),(3,1)])
-                                        ,([False,True,False,True,True,True,True],[(1,1),(3,4)])
+                                      , ([True,True,False,True],[(0,2),(3,1)])
+                                      , ([False,True,False,True,True,True,True],[(1,1),(3,4)])
                                 ]
         describe "rises" $
                 ofAscendingListShouldContainOnlyZeroAndLength rises
@@ -179,14 +193,22 @@ main = hspec $ do
                 it "skips over an increasing span of length three as well as a decrease." $
                         risesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
                 it "identifies long rises" $ do
-                        examples risesLongerThanThree
+                        quickCheckWith stdArgs { maxSuccess = 5000 } $ examples risesLongerThanThree
                                 [
-                                        ([1..10],[(0,9)]),
-                                        (1:[0..5]++[4..7],[(1,5),(7,3)])
+                                        ([1..10],[(0,9)])
+                                      , (1:[0..5]++[4..7],[(1,5),(7,3)])
                                 ]
+                returnsInitIndices risesLongerThanThree
                 mapM_($ risesLongerThanThree)
                         [
-                                shouldOnlyReturnIndicesLowerThanTheLengthOf
+                                returnsInitIndices
+                              , returnsCountsCappedAtInputLength
+                              , it "of [1..4] returns no index greater than 2"
+                                . shouldSatisfy [1..4]
+                                . initIndexOnly
+                              , it "of [1..4] returns no index greater than 2"
+                                . shouldSatisfy [1..4]
+                                . countCappedAtInputLength
                         ]
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
                 it "finds no rise in an empty list." $
@@ -201,7 +223,8 @@ main = hspec $ do
                                 ]
                 mapM_($ declinesLongerThanThree)
                         [
-                                shouldOnlyReturnIndicesLowerThanTheLengthOf
+                                returnsInitIndices
+                              , returnsCountsCappedAtInputLength
                         ]
         describe "readFormerColumn" $ do
                 it "extracts strings with and without spaces from small CSV files." $ do

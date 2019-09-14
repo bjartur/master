@@ -38,12 +38,6 @@ abrupts candidates pressures =
     zip [1..] candidates
  >>=ap abrupt (baselines candidates) pressures
 
-(>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
-boxed >>$ function =
-                   boxed
-                >$ fmap function
-infixl 2 >>$
-
 (>>$$) :: (Monad io, Functor list) => io (list a) -> io (a -> b) -> io (list b)
 boxedValue >>$$ boxedFunction =
                    (boxedValue >>$)
