@@ -1,20 +1,20 @@
 module Input (module Input, module Lib) where
 import Control.Applicative
-import Control.Arrow
 import Control.Monad
-import Data.Function
 import Lib
 
-nadirs :: Input input=> input [(Index,Count)]
+type CSV = String
+
+nadirs :: CSV-> [(Index,Count)]
 nadirs =           readLatterColumnAsDoubles
                 >$ declinesLongerThanThree
 
-timestampsOfDeclineBeginning :: Input input => input [String]
+timestampsOfDeclineBeginning :: String-> [String]
 timestampsOfDeclineBeginning =
                    timestamp indexBefore
 
 
-timestampsOfDeclineEnd :: Input input=> input [String]
+timestampsOfDeclineEnd :: String-> [String]
 timestampsOfDeclineEnd =
                    timestamp indexOfEndOf
 
@@ -29,61 +29,45 @@ baselines candidates pressures = let
          >$ average
 
 
-abruptNadirs :: Input input=> input [(Index,Count)]
-abruptNadirs =
-    liftA2 abrupts nadirs readLatterColumnAsDoubles
+abruptNadirs :: CSV-> [(Index,Count)]
+abruptNadirs = liftA2 abrupts nadirs readLatterColumnAsDoubles
 
 abrupts :: [(Index,Count)]-> [Double]-> [(Index,Count)]
 abrupts candidates pressures =
     zip [1..] candidates
  >>=ap abrupt (baselines candidates) pressures
 
-(>>$$) :: (Monad io, Functor list) => io (list a) -> io (a -> b) -> io (list b)
-boxedValue >>$$ boxedFunction =
-                   (boxedValue >>$)
-               =<< boxedFunction
-infixl 2 >>$$
+timestamp :: ((Index,Count)-> Index)-> String-> [String]
+timestamp accessor csv =
+                   nadirs csv
+                >$ accessor
+                >$ getTimestamps csv
 
-timestamp :: Input input=> ((Index,Count) -> Index) -> input[String]
-timestamp accessor =
-                   nadirs
-               >>$ accessor
-              >>$$ getTimestamps
-
-readLatterColumnAsDoubles :: Input input=> input[Double]
+readLatterColumnAsDoubles :: CSV-> [Double]
 readLatterColumnAsDoubles = column latterColumn >>$ read
 
-getTimestamps :: Input input=> input(Index -> String)
-getTimestamps =    readFormerColumn
-              >$ (!!)
+getTimestamps :: CSV-> Index-> String
+getTimestamps = readFormerColumn >$ (!!)
 
-readFormerColumn :: Input input => input[String]
+readFormerColumn :: CSV-> [String]
 readFormerColumn = column formerColumn
 
-linesOfCsv :: Input input => input [String]
-linesOfCsv =        csv
-                 >$ lines
+type Column = (Char-> Bool)-> String-> String
 
-type Column = (Char -> Bool) -> String -> String
-
-column :: Input input=> Column -> input[String]
-column selectColumn =
-                    linesOfCsv
-               >>$ selectColumn (/= ',')
+column :: Column-> CSV-> [String]
+column selectColumn csv =
+                   lines csv
+                >$ selectColumn (/= ',')
 
 formerColumn :: Column
 formerColumn = firstColumn
 
+firstColumn :: Column
 firstColumn = takeWhile
-
-(>>>>) f g x = f x
-           >>> g
 
 latterColumn :: Column
 latterColumn = dropFirstColumn
 
+dropFirstColumn :: Column
 dropFirstColumn = dropWhile
-          >>>> tail
-
-class Monad m => Input m where
-        csv :: m String -- wrapped string delimited by newlines and commas.
+          >>$ tail

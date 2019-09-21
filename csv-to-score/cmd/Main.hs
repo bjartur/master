@@ -1,22 +1,35 @@
 module Main where
-import Control.Applicative
+import Control.Applicative (liftA2)
+import Control.Monad (forM_)
 import Input
+import System.Environment (getArgs)
+import System.FilePath (takeFileName, (</>))
 
---contents = glob >>= mapM (lines.readFile)
-instance Input IO where
-        csv = readFile "C:/Users/Bjartur/Master/NoxPes2Csv/nadir/BbB/20141218T214507 - eb35b.txt"
+spliceRow :: String-> String-> String
+spliceRow left right = left ++ (',':right)
 
-spliceRow :: String -> String -> String
-spliceRow formerCell latterCell = formerCell ++ ',' : latterCell
-spliceRows :: [String] -> [String] -> [String]
-spliceRows = zipWith spliceRow
-spliceRowsFrom :: IO [String] -> IO [String] -> IO [String]
-spliceRowsFrom = liftA2 spliceRows
-rows :: IO [String]
-rows = spliceRowsFrom timestampsOfDeclineBeginning timestampsOfDeclineEnd
-output :: IO String
-output = rows >$ unlines
+spliceColumns :: [String]-> [String]-> [String]
+spliceColumns = zipWith spliceRow
+
+scores :: CSV-> [String]
+scores = liftA2 spliceColumns timestampsOfDeclineBeginning timestampsOfDeclineEnd
+
+scoring :: CSV-> String
+scoring = scores >$ unlines
+
+fewerThan :: [a]-> Int-> Bool
+elements `fewerThan` n = null $ drop (n-1) elements
 
 main :: IO ()
-main = output
-   >>= writeFile "output"
+main = do
+  args <- getArgs
+  if args `fewerThan` 2
+    then mapM_ putStrLn ["csv2score version 1", "Usage: csv2score DESTINATION FILE..."]
+    else let destination = head args in
+      forM_ (tail args) $ \arg-> (readFile arg >$ scoring) >>= writeFile (destination </> takeFileName arg)
+
+readFiles :: [String]-> IO [CSV]
+readFiles filenames = mapM readFile filenames
+
+readCSVs :: IO [CSV]
+readCSVs = getArgs >>= readFiles

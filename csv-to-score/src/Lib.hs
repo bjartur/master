@@ -11,21 +11,21 @@ type Count = Int -- positive
 --type Debt  = Int -- impositive
 
 -- inclusive
-range :: Index -> Index -> [a] -> [a]
+range :: Index-> Index-> [a]-> [a]
 range beginning end = drop beginning
                   >>> take count
       where
                    count :: Count
                    count = end - beginning + 1
 
-average :: [Double] -> Double
+average :: [Double]-> Double
 average list = sum list / (fromIntegral.length) list
 
 -- The output list is one element shorter than the input list.
 -- For each overlapping pair of adjacent numbers in the input list,
 -- the corresponding Bool in the output list is True iff
 -- the former number is strictly less than the latter.
-increasing :: [Double] -> [Bool]
+increasing :: [Double]-> [Bool]
 increasing [] = []
 increasing list = zipWith (<) list (tail list)
 
@@ -33,12 +33,12 @@ increasing list = zipWith (<) list (tail list)
 -- For each overlapping pair of adjacent numbers in the input list,
 -- the corresponding Bool in the output list is True iff
 -- the former number is strictly greater than the latter.
-decreasing :: [Double] -> [Bool]
+decreasing :: [Double]-> [Bool]
 decreasing [] = []
 decreasing list = zipWith (>) list (tail list)
 
 spans :: -- Find and measure each span of True.
-        [Bool] ->    -- A list which may contain consecutive Trues.
+        [Bool]->    -- A list which may contain consecutive Trues.
         [
                 (Int,-- The index of a True not preceded by a False.
                 Int) -- The number of Trues followed by the first True.
@@ -63,16 +63,16 @@ spans booleans = reverse $ go [] [] 0 False booleans where
         go prevs lengths index True (False:bs) = go prevs lengths (index+1) False bs
         go _     []      _     True (True:_) = error "Airway resistance detection failed (spans invariant violated)."
 
-rises :: [Double] -> [(Int,Int)]
+rises :: [Double]-> [(Index,Count)]
 rises = increasing>>>spans
 
-declines :: [Double] -> [(Int,Int)]
+declines :: [Double]-> [(Index,Count)]
 declines = decreasing>>>spans
 
-risesLongerThanThree :: [Double] -> [(Int,Int)]
+risesLongerThanThree :: [Double]-> [(Index,Count)]
 risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]
 
-declinesLongerThanThree :: [Double] -> [(Int,Int)]
+declinesLongerThanThree :: [Double]-> [(Index,Count)]
 declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
 -- Note: abrupt returns the empty list if it encounters an out-of-bounds index

@@ -36,9 +36,9 @@ executables:
     ghc-options:
     - -threaded
     - -rtsopts
-    - -with-rtsopts=-N
     dependencies:
     - csv-to-score
+    - filepath < 1.5
 
 tests:
   csv-to-score-test:

@@ -137,31 +137,16 @@ randomNadirs recordLength = let
 examples :: (Show a, Show b, Eq b) => (a -> b) -> [(a,b)] -> Expectation
 examples function = mapM_(\(input,output) -> function input `shouldBe` output)
 
-newtype Abcdef a = Abcdef a deriving (Eq, Show, Functor, Monad, Applicative)
-instance Input Abcdef where
-        csv = Abcdef "a,b\r\ncd,ef\r\n"
+abcdef = "a,b\r\ncd,ef\r\n"
 
-newtype CsvContainingNumbers a = CsvContainingNumbers a deriving (Applicative, Eq, Functor, Monad, Show)
-instance Input CsvContainingNumbers where
-        csv = CsvContainingNumbers "former column,-2.894930373863120749e-02\r\nformer column,-7.567405304247912341e-02"
+csvContainingNumbers = "former column,-2.894930373863120749e-02\r\nformer column,-7.567405304247912341e-02"
 
-newtype LongCsv a = LongCsv a deriving (Applicative, Eq, Functor, Monoid, Show)
-instance Input LongCsv where
-    csv = LongCsv $ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
+longCsv = "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
          ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
-instance Monad LongCsv where
-    (LongCsv value) >>= f = f value
-    return = LongCsv
-
-newtype LongerCsv a = LongerCsv a deriving (Applicative, Eq, Functor, Monoid, Show)
-instance Input LongerCsv where
-    csv = LongerCsv $ "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
-         ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
+longerCsv = "former column,-7.567405304247912341e-02\r\nformer column,-7.564403304247913341e-02\r\n"
+        ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
          ++ "former column,-3.14e-01\r\nformer column,-4.564403304247e-01\r\n"
          ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
-instance Monad LongerCsv where
-    (LongerCsv value) >>= f = f value
-    return = LongerCsv
 
 main :: IO ()
 main = hspec $ do
@@ -228,11 +213,11 @@ main = hspec $ do
                         ]
         describe "readFormerColumn" $ do
                 it "extracts strings with and without spaces from small CSV files." $ do
-                        (readFormerColumn :: Abcdef[String]) `shouldBe` Abcdef["a","cd"]
-                        (readFormerColumn :: CsvContainingNumbers[String]) `shouldBe` CsvContainingNumbers(replicate 2 "former column")
+                        readFormerColumn abcdef `shouldBe` ["a","cd"]
+                        readFormerColumn csvContainingNumbers `shouldBe` replicate 2 "former column"
         describe "readLatterColumn" $ do
                 it "extracts numbers in scientific notation from small CSV files." $ do
-                        (readLatterColumnAsDoubles :: CsvContainingNumbers[Double]) `shouldBe` CsvContainingNumbers[-2.894930373863120749e-02,-7.567405304247912341e-02]
+                        readLatterColumnAsDoubles csvContainingNumbers `shouldBe` [-2.894930373863120749e-02,-7.567405304247912341e-02]
         describe "baselines" $ do
                 let pressures  = [-7.567405304247912341e-02,-7.564403304247913341e-02,1.2,1.1,1.0,-3.1e-01]
                 let candidates = declinesLongerThanThree pressures
