@@ -6,7 +6,7 @@ from nox_reader.nox_recording_class import Recording
 from sys import stderr
 from os import path
 
-def mark_first_events(recording: Recording, log=False):
+def mark_events(recording: Recording, log=False):
     with open('..\csv-to-score\output', 'r', encoding='ascii') as lines:
         scoring_names = recording.get_all_scoring_names()
         scoring_name = 'Sigga' if 'Sigga' in scoring_names else scoring_names[0]
