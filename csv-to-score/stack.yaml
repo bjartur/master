@@ -1,4 +1,4 @@
-resolver: lts-14.6
+resolver: nightly-2019-09-21
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
