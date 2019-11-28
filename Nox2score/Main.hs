@@ -10,14 +10,9 @@ import System.FilePath( takeFileName, (</>) )
 import System.IO( IOMode(ReadMode, WriteMode), hGetContents, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
 import Text.ParserCombinators.ReadP( ReadP, char, eof, many, optional, readP_to_S, satisfy, string )
 
-x & f = f x
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
 infixl 8 >$
-
-(>>$):: (Functor outer, Functor inner)=> outer( inner input )-> (input-> output)-> outer ( inner output )
-input >>$ function = input >$ fmap function
-infixl 8 >>$
 
 main:: IO ()
 main= (do
@@ -105,4 +100,4 @@ format (DateTime year month day hour minute second)=
      ++ ".000000"
 
 formatRow:: (DateTime, DateTime)-> String
-formatRow (beginning, end)= format beginning ++ "," ++ format end
+formatRow (beginning, end)= format beginning ++ "," ++ format end ++ "\r\n"
