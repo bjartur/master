@@ -1,27 +1,45 @@
-import Control.Applicative (liftA2, some)
-import Control.Monad( forM_)
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
+module Main where
+
+import Control.Applicative (liftA2, some )
+import Control.Monad( forM_, join )
 import Data.Char
 import Data.List
-import System.Environment (getArgs)
-import System.FilePath (takeFileName, (</>))
-import Text.ParserCombinators.ReadP( ReadP, char, eof, readP_to_S, satisfy, string,  )
+import System.Environment( getArgs )
+import System.FilePath( takeFileName, (</>) )
+import System.IO( IOMode(ReadMode, WriteMode), hGetContents, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
+import Text.ParserCombinators.ReadP( ReadP, char, eof, many, optional, readP_to_S, satisfy, string )
 
+x & f = f x
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
+infixl 8 >$
+
+(>>$):: (Functor outer, Functor inner)=> outer( inner input )-> (input-> output)-> outer ( inner output )
+input >>$ function = input >$ fmap function
+infixl 8 >>$
 
 main:: IO ()
-main= do
-  args <- getArgs
-  if args `fewerThan` 2
-    then mapM_ putStrLn ["Nox2score version 1", "Usage: Nox2score DESTINATION FILE..."]
-    else let destination = head args in
-      forM_ (tail args) $ \arg-> (readFile arg >$ convert) >>= writeFile (destination </> takeFileName arg)
+main= (do
+  paths <- getArgs
+  if paths `fewerThan` 2
+    then mapM_ putStrLn ["Nox2score version 0", "Usage: Nox2score DESTINATION FILE..."]
+    else let destination = head paths in
+      forM_ (tail paths) $ \path->
+        withBinaryFile path ReadMode $ \inputHandle->
+         (hSetEncoding inputHandle utf16
+       >> hGetContents inputHandle
+          >$ convert
+          >>= withFile (destination </> takeFileName path) WriteMode . \output-> \outputHandle->
+                hSetEncoding outputHandle utf8
+            >> hPutStr outputHandle output)
+  )
 
 convert:: String-> String
 convert= (readP_to_S file :: String-> [([(DateTime, DateTime)], String)])
   >$ last
   >$ fst
-  >$ (=<<) formatRow
+  >$ (formatRow =<<)
 
 file:: ReadP [ (DateTime, DateTime) ]
 file= do
@@ -33,22 +51,24 @@ file= do
 
 row:: ReadP (DateTime, DateTime)
 row= do
-  start <- date
-  end <- date
-  some $ satisfy (liftA2 (&&) (/='\r') (/='\n'))
+  start <- dateTime
+  end <- dateTime
+  many $ satisfy (liftA2 (&&) (/='\r') (/='\n'))
   string "\r\n"
   return (start, end)
 
-data DateTime = DateTime
+data DateTime= DateTime
  Int -- year
  Int -- month
  Int -- day
  Int -- hour
  Int -- minute
  Int -- second
+ deriving (Show, Eq)
 
-date:: ReadP DateTime
-date= do
+
+dateTime:: ReadP DateTime
+dateTime= do
   day <- couple
   char '/'
   month <- couple
