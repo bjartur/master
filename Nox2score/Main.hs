@@ -92,11 +92,16 @@ digit= satisfy isDigit
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
 
+pad :: String-> String
+pad number@[_]= '0':number
+pad number@[_,_]= number
+pad _= error "pad: only one or two digits allowed!"
+
 format:: DateTime-> String
 format (DateTime year month day hour minute second)=
-         "-" `intercalate` fmap show [year, month, day]
+         "-" `intercalate` (show year : fmap (show >$ pad) [month, day])
      ++ " "
-     ++ ":" `intercalate` fmap show [hour, minute, second]
+     ++ ":" `intercalate` fmap (show >$ pad)  [hour, minute, second]
      ++ ".000000"
 
 formatRow:: (DateTime, DateTime)-> String
