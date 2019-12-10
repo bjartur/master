@@ -100,4 +100,4 @@ format (DateTime year month day hour minute second)=
      ++ ".000000"
 
 formatRow:: (DateTime, DateTime)-> String
-formatRow (beginning, end)= format beginning ++ "," ++ format end ++ "\r\n"
+formatRow (beginning, end)= format beginning ++ "," ++ format end ++ "\n" -- carriage return implicit
