@@ -2,13 +2,13 @@
 module Main where
 
 import Control.Applicative (liftA2, some )
-import Control.Monad( forM_, join )
+import Control.Monad( forM_ )
 import Data.Char
 import Data.List
 import System.Environment( getArgs )
 import System.FilePath( takeFileName, (</>) )
 import System.IO( IOMode(ReadMode, WriteMode), hGetContents, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
-import Text.ParserCombinators.ReadP( ReadP, char, eof, many, optional, readP_to_S, satisfy, string )
+import Text.ParserCombinators.ReadP( ReadP, char, eof, many, readP_to_S, satisfy, string )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
