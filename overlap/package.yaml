@@ -1,0 +1,20 @@
+---
+name: overlap
+version: 0.0.0.0
+
+dependencies:
+  - base < 4.14 && >= 2.10
+  - filepath < 1.5 && >= 1.4
+
+executables:
+  overlap:
+    main: Main.hs
+
+tests:
+  spec:
+    main: Tests.hs
+    other-modules: Main
+    dependencies:
+    - hspec
+    - QuickCheck
+    ghc-options: -main-is Tests
