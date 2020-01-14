@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveFunctor, DeriveAnyClass #-}
 import Control.Arrow
 import Control.Applicative
 import Control.Monad(ap, join)
