@@ -12,21 +12,26 @@ def extract(splitting_method, splitting_method_name, statistic, fmt) -> None:
     """
     :type splitting_method:      Callable[[Recording], List[cm.Period]]
     :type splitting_method_name: str
-    :type statistic:             Callable[[Recording, List[cm.Period]], ndarray])
+    :type statistic:             Callable[[Recording, List[cm.Period], str], ndarray])
     :type fmt:                   str
     """
     try:
-        measurements = glob("PES PSG rescore/*");
+        measurements = glob("VSN-14-080/*/");
+        print(measurements)
         for measurement in measurements:
             if " - 097ae" in measurement:
                 continue;
             recording = get_recording_with_derived(measurement);
             periods = splitting_method(recording);
-            statistics = statistic(recording, periods);
+            statistics = statistic(recording, periods, signal(measurement));
             measurement_name = path.basename(measurement);
             write(measurement_name, splitting_method_name, statistics, fmt);
     finally:
         stderr.write('--Terminating--\r\n');
+
+
+def signal(measurement_name: str) -> str:
+    return 'PES 2' if measurement_name.endswith('VSN-14-080-006/') else 'PES 3'
 
 
 def csvwriter(filepath: str, data: ndarray, fmt: str="%.18e") -> Callable[[str], None]:

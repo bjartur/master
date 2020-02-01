@@ -10,8 +10,8 @@ def nadir(pes_header: cm.ISignal, period: cm.Period) -> Tuple[datetime, float]:
     time = get_python_date(period.To);
     return time, min(data);
 
-def get_nadirs(recording, periods) -> ndarray:
-    pes_header = recording.get_signal_header_for_signal('PES 3');
+def get_nadirs(recording, periods, signal='PES 3') -> ndarray:
+    pes_header = recording.get_signal_header_for_signal(signal);
     nadirs = array([
         nadir(pes_header, period) for period in periods
     ]);
