@@ -3,26 +3,35 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Tests where
 
+import Control.Monad( replicateM )
 import Data.Function( (&) )
-import Data.List
+import Data.List( intercalate, sort )
 import Prelude hiding( readFile )
 import Test.Hspec
 import Text.ParserCombinators.ReadP( eof, ReadP, readP_to_S )
 import Test.QuickCheck (Arbitrary, arbitrary, Gen, choose, property)
 
-import Main ( DateTime(..), couple, dateTime, diff, digit, file, interval, row, (>$) )
+import Main ( DateTime(..), couple, correlation, dateTime, digit, file, Interval, measure, overlap, overlaps, union, row, (>$) )
 
 examples:: (Show a, Show b, Eq b)=> (a -> b)-> [(a,b)]-> Expectation
-examples f= mapM_(uncurry (f >$ shouldBe))
+examples f= (f >$ shouldBe) & uncurry & mapM_
 
 parse:: ReadP output-> String-> output
 parse parser= readP_to_S (parser <* eof)
   >$ last
   >$ fst
 
+-- pick a string of decimal digits representing a number in the given inclusive range.
+-- | @pick lower upper@
+--
+--   [@lower@] The lowest number to choose from.
+--
+--   [@upper@] The highest number to choose from.
 pick:: Int-> Int-> Gen String
 pick lower upper= choose(lower,upper) >$ show
 
+-- @zeropad width input@
+-- Left-pad the @String@ @input@ with zeros until it's no longer shorter than @width@.
 zeropad:: Int-> String-> String
 zeropad width input= if length(take width input) < width then '0':input & zeropad width else input
 
@@ -94,18 +103,64 @@ main= hspec $ do
           `shouldStartWith` [(DateTime 2014 11 12 1 16 35, DateTime 2014 11 12 1 16 45), (DateTime 2014 11 12 1 17 4, DateTime 2014 11 12 1 17 14)]
 
     let a `minus` b= DateTime (year a - year b) (month a - month b) (day a - day b) (hour a - hour b) (minute a - minute b) (second a - second b)
-    describe "interval" $ do
-      it "can calculate the length of an interval starting up to 59 whole minutes after midnight and ending that same night, or the day or evening after" . property $ do
-        end<- arbitrary :: Gen DateTime
+    describe "measure" $ do
+      it "can calculate the length of an interval starting up to 59 whole minutes after midnight and ending that same night, or the day or evening after"
+       . property $ do
+        end<- arbitrary:: Gen DateTime
         let beginning= end { hour = 0, second = 0 }
-        return $ interval (beginning, end) `shouldBe` 3600*(hour end) + second end
+        return $ measure (beginning, end) `shouldBe` 3600*(hour end) + second end
     describe "instance DateTime Ord" $ do
       it "considers dates farther from year 1 to be greater" $ do
-        let a `lessThan` b= a `minus` b & \datetime-> dropWhile (\accessor-> accessor datetime == 0) [year, day, hour, minute, second] & \accessors-> if null accessors then False else head accessors datetime < 0
-        property (\a b-> (a < b) == (a `lessThan` b))
-    describe "diff" $ do
-      it "is defined" $
-        diff `shouldNotBe` ()
+        let a `lessThan` b= a `minus` b
+                          & \datetime->
+                              dropWhile (\accessor-> accessor datetime == 0) [year, day, hour, minute, second]
+                            & \accessors->
+                                if null accessors
+                                then False
+                                else head accessors datetime < 0
+        property $ \a b-> (a < b) == (a `lessThan` b)
+    describe "overlaps" $ it "is invariant under a superset"
+     . property $ do
+      size<- arbitrary:: Gen Int
+      datetimes<- replicateM (2 * abs size + 2) arbitrary >$ nubSort:: Gen [DateTime]
+      let overarching= (head datetimes, last datetimes)
+      let pair[]= []
+          pair[_]= undefined
+          pair(a:b:xs)= (a,b) : pair xs
+      let disjoints= pair datetimes
+      return $ do
+        overlaps disjoints [overarching] `shouldBe` overlaps disjoints disjoints
+        overlaps disjoints disjoints `shouldNotBe` 0
+    describe "overlap" $ do
+      it "calculates the number of seconds for which a couple of intervals overlap" $
+        examples (overlap (DateTime 1 2 3 4 5 6, DateTime 1 2 3 4 7 9)) [
+        ( (DateTime 1 2 3 4 6 6, DateTime 1 2 3 4 10 6), 63 ),
+            ( (DateTime 1 2 3 4 6 6, DateTime 1 2 3 4 7 6), 60 )
+        ]
+    describe "overlaps" $ do
+      it "can measure the intersection of, one one hand, a sequence of disjoint intervals and, on the other, an interval containing them all"
+       . property $ do
+        (overarching,disjoints)<- arbitrarySet
+        return (overlaps [overarching] disjoints `shouldBe` sum(map measure disjoints))
+    describe "union" $ do
+      it "of a set and itself should be the set unchanged"
+       . property $ do
+        (_,disjoints)<- arbitrarySet
+        return (union disjoints disjoints `shouldBe` disjoints)
+
+    describe "correlation" $ do
+      it "considers a list equivalent to itself"
+       . property $ do
+        (_,disjoints)<- arbitrarySet
+        return (correlation disjoints disjoints `shouldBe` 1)
+      it "considers the empty set 100% correlated with itself" $
+        correlation [] [] `shouldBe` 1
+      it "considers no non-empty set 100% correlated with the empty set"
+       . property $ do
+        (_,disjoints)<- arbitrarySet
+        return $ do
+          correlation disjoints [] `shouldNotBe` 1
+          correlation [] disjoints `shouldNotBe` 1
 
 instance Arbitrary DateTime where
   arbitrary= pure DateTime
@@ -115,3 +170,19 @@ instance Arbitrary DateTime where
      <*> choose(1,24)
      <*> choose(1,60)
      <*> choose(1,60)
+
+nubSort:: [DateTime]-> [DateTime]
+nubSort = sort >$ fastnub
+    where fastnub(one:other:rest)= if one==other then fastnub(one:rest) else one:fastnub(other:rest)
+          fastnub(short)= short
+
+arbitrarySet:: Gen (Interval,[Interval])
+arbitrarySet= do
+      size<- arbitrary:: Gen Int
+      datetimes<- replicateM (2 * abs size + 2) arbitrary >$ nubSort:: Gen [DateTime]
+      let overarching= (head datetimes, last datetimes)
+      let pair[]= []
+          pair[_]= undefined
+          pair(a:b:xs)= (a,b) : pair xs
+      let disjoints= pair datetimes
+      return (overarching,disjoints)
