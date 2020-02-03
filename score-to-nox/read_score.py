@@ -7,10 +7,9 @@ from nox_reader.nox_recording_class import Recording
 from sys import stderr
 from os import path
 
-def mark_events(recording: Recording, signal='PES 3', log=False):
-    with open('..\csv-to-score\output', 'r', encoding='ascii') as lines:
-        scoring_names = recording.get_all_scoring_names()
-        scoring_name = 'Sigga' if 'Sigga' in scoring_names else scoring_names[0]
+def mark_events(recording: Recording, score: str, signal='PES 3', log=False):
+    with open('score', 'r', encoding='ascii') as lines:
+        scoring_name = recording.get_all_scoring_names()[0] # last open scoring
         if log:
             stderr.write("base scoring: {}\n".format(scoring_name))
         recording.set_active_scoring_group(scoring_name)
@@ -27,11 +26,11 @@ def mark_events(recording: Recording, signal='PES 3', log=False):
                 stderr.write("Duration:              {}\n".format(duration))
             recording.add_marker_to_active_scoring(event_type="autopes", start_time=start_time,
                                              signal_header=pes, duration=duration.total_seconds(), artifact=False)
-        recording.save_scoring("Fyrsta hækkun")
+        recording.save_scoring("Bjartur")
 
 
 if __name__ == '__main__':
-    paths = ["autoscored/" + path.basename(original) for original in glob("../NoxPes2score/VSN-14-080/*/")]
+    paths = glob("autoscored\\*\\")
     if(False):
         stderr.write("Does the recording {} exist? ".format(filepath))
         if(path.isdir(filepath)):
@@ -40,8 +39,10 @@ if __name__ == '__main__':
             stderr.write("No\n")
     for filepath in paths:
         recording = Recording(filepath, False)
-        mark_events(recording, best_signal(filepath), True)
+        name = path.basename(path.dirname(filepath))
+        score = '..\\csv-to-score\\output\\' + name
+        mark_events(recording, score, best_signal(name), True)
 
 
 def best_signal(measurement_name: str) -> str:
-    return 'PES 2' if measurement_name.endswith('VSN-14-080-006/') else 'PES 3'
+    return 'PES 2' if measurement_name == 'VSN-14-080-006' else 'PES 3'
