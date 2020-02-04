@@ -16,15 +16,15 @@ def extract(splitting_method, splitting_method_name, statistic, fmt) -> None:
     :type fmt:                   str
     """
     try:
-        measurements = glob("VSN-14-080/*/");
+        measurements = glob("VSN-14-080\\*\\");
         print(measurements)
         for measurement in measurements:
-            if " - 097ae" in measurement:
+            if  path.basename(path.dirname(measurement)) in ("VSN-14-080-031", "VSN-14-080-002_needsfix"):
                 continue;
             recording = get_recording_with_derived(measurement);
             periods = splitting_method(recording);
             statistics = statistic(recording, periods, signal(measurement));
-            measurement_name = path.basename(measurement);
+            measurement_name = path.basename(path.dirname(measurement));
             write(measurement_name, splitting_method_name, statistics, fmt);
     finally:
         stderr.write('--Terminating--\r\n');
