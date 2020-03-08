@@ -9,7 +9,7 @@ import Text.ParserCombinators.ReadP( ReadP, char, eof, readP_to_S, satisfy, stri
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
-infixl 8 >$
+infixl 1 >$
 
 type Interval= (DateTime, DateTime)
 data DateTime= DateTime {
@@ -26,7 +26,10 @@ main= do
   paths <- getArgs
   if paths `fewerThan` 2
     then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER"]
-    else traverse readFile paths >>= mapM_ (readP_to_S file >$ print)
+    else
+        (traverse readFile paths ::IO [String])
+    >>= (\[former,latter]-> correlation (parse former ::[Interval]) (parse latter ::[Interval])
+                          & print)
 
 correlation:: [Interval]-> [Interval]-> Double
 correlation one other= do
@@ -71,6 +74,10 @@ measure(from, to)= let
 
 overlap:: Interval-> Interval-> Int
 overlap (from, to) (start, end)= measure(max from start, min to end)
+
+parse:: String-> [Interval]
+parse= readP_to_S file
+    >$ last >$ fst
 
 file:: ReadP [ (DateTime, DateTime) ]
 file= some row <* eof
