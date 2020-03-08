@@ -47,7 +47,11 @@ readLatterColumnAsDoubles :: CSV-> [Double]
 readLatterColumnAsDoubles = column latterColumn >>$ read
 
 getTimestamps :: CSV-> Index-> String
-getTimestamps = readFormerColumn >$ (!!)
+getTimestamps = readFormerColumn >$ (!!) >>$ appendMicrosecondsIfMissing
+
+appendMicrosecondsIfMissing:: String-> String
+appendMicrosecondsIfMissing datetime=
+  datetime ++ if length datetime == length "YYYY-MM-DD HH:MM:SS" then ".000000" else ""
 
 readFormerColumn :: CSV-> [String]
 readFormerColumn = column formerColumn
