@@ -1,0 +1,33 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: d3ff1516f407536fb5648f07b56e1f7a0930c17bc55c8c0dde0a8a052a0f8c64
+
+name:           nox2score
+version:        0.0.0.0
+build-type:     Simple
+
+executable nox2score
+  main-is: Main.hs
+  other-modules:
+      Paths_nox2score
+  build-depends:
+      base <4.14 && >=2.10
+    , filepath <1.5 && >=1.4
+  default-language: Haskell2010
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Tests.hs
+  other-modules:
+      Main
+  ghc-options: -main-is Tests
+  build-depends:
+      QuickCheck
+    , base <4.14 && >=2.10
+    , filepath <1.5 && >=1.4
+    , hspec
+  default-language: Haskell2010
