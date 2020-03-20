@@ -19,5 +19,10 @@ def get_nadirs(recording, periods, signal='PES 3') -> ndarray:
     return nadirs;
 
 
-def extract_nadirs(splitting_method, splitting_method_name) -> None:
-    extract(splitting_method, "nadir/" + splitting_method_name, get_nadirs, "%s,%.18e");
+def extract_nadirs(measurements, splitting_method, splitting_method_name) -> None:
+    """
+    :type measurements:          List[str]
+    :type splitting_method:      Callable[[Recording], List[cm.Period]]
+    :type splitting_method_name: str
+    """
+    extract(measurements, splitting_method, "nadir/" + splitting_method_name, get_nadirs, "%s,%.18e");

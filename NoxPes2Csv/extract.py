@@ -8,35 +8,34 @@ from typing import List, Callable
 from numpy import ndarray, save, savetxt
 
 
-def extract(splitting_method, splitting_method_name, statistic, fmt) -> None:
+def extract(measurements, splitting_method, splitting_method_name, statistic, fmt) -> None:
     """
+    :type measurements:          List[str]
     :type splitting_method:      Callable[[Recording], List[cm.Period]]
     :type splitting_method_name: str
     :type statistic:             Callable[[Recording, List[cm.Period], str], ndarray])
     :type fmt:                   str
     """
     try:
-        measurements = glob("VSN-14-080\\*\\");
-        print(measurements)
         for measurement in measurements:
             if  path.basename(path.dirname(measurement)) in ("VSN-14-080-031", "VSN-14-080-002_needsfix"):
                 continue;
             recording = get_recording_with_derived(measurement);
             periods = splitting_method(recording);
-            statistics = statistic(recording, periods, signal(measurement));
+            statistics = statistic(recording, periods, best_signal(path.dirname(measurement)));
             measurement_name = path.basename(path.dirname(measurement));
             write(measurement_name, splitting_method_name, statistics, fmt);
     finally:
         stderr.write('--Terminating--\r\n');
 
 
-def signal(measurement_name: str) -> str:
-    return 'PES 2' if measurement_name.endswith('VSN-14-080-006/') else 'PES 3'
+with open('../best_signal.py', 'rb') as file:
+    exec(file.read()); #def best_signal(name: str)
 
 
 def csvwriter(filepath: str, data: ndarray, fmt: str="%.18e") -> Callable[[str], None]:
     def savecsv(filename_extension: str):
-        savetxt(filepath + filename_extension, data, fmt=fmt)
+        savetxt(filepath + filename_extension, data, fmt=fmt);
     return savecsv;
 
 
@@ -51,5 +50,5 @@ def write(measurement_name: str, path: str, statistics: ndarray, fmt: str):
     stderr.write(' Done.\r\nSaving ' + filename + '.txt.gz...');
     savecsv(".txt.gz");
     stderr.write(' Done.\r\nSaving ' + filename + '.txt...');
-    savecsv(".txt")
+    savecsv(".txt");
     stderr.write(' Done.\r\n');
