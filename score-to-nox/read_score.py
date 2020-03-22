@@ -7,12 +7,11 @@ from nox_reader.nox_recording_class import Recording
 from sys import stderr
 from os import path
 
-def mark_events(recording: Recording, score: str, signal='PES 3', log=False):
-    with open('score', 'r', encoding='ascii') as lines:
-        scoring_name = recording.get_all_scoring_names()[0] # last open scoring
+def mark_events(recording: Recording, score: str, base_scoring='PSGPes', signal='PES 3', log=False):
+    with open(score, 'r', encoding='ascii') as lines:
         if log:
-            stderr.write("base scoring: {}\n".format(scoring_name))
-        recording.set_active_scoring_group(scoring_name)
+            stderr.write("base scoring: {}\n".format(base_scoring))
+        recording.set_active_scoring_group(base_scoring)
 
         for line in lines:
             row = line.strip().split(',')
@@ -29,6 +28,10 @@ def mark_events(recording: Recording, score: str, signal='PES 3', log=False):
         recording.save_scoring("Bjartur")
 
 
+with open('../best_signal.py', 'rb') as file:
+    exec(file.read()); #def best_signal(name: str)
+
+
 if __name__ == '__main__':
     paths = glob("autoscored\\*\\")
     if(False):
@@ -40,9 +43,7 @@ if __name__ == '__main__':
     for filepath in paths:
         recording = Recording(filepath, False)
         name = path.basename(path.dirname(filepath))
-        score = '..\\csv-to-score\\output\\' + name
-        mark_events(recording, score, best_signal(name), True)
+        base_scoring = 'PSGPes' if name != 'VSN-14-080-006' else 'PSG-Marta'
+        score = '..\\csv-to-score\\output\\' + name + '.txt'
+        mark_events(recording, score, base_scoring, best_signal(name), True)
 
-
-def best_signal(measurement_name: str) -> str:
-    return 'PES 2' if measurement_name == 'VSN-14-080-006' else 'PES 3'
