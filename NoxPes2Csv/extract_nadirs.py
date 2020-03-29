@@ -6,10 +6,11 @@ from typing import Tuple
 
 
 def nadir(pes_header: cm.ISignal, period: cm.Period) -> Tuple[datetime, float]:
-    data = get_data_for_period(pes_header, period);
+    data = [effort for effort in get_data_for_period(pes_header, period) if effort != 0e1];
     time = get_python_date(period.To);
-#   data is proportional to effort so we flip the sign to get pressure
-    return time, -max(data);
+    greatest_effort = max(data);
+    least_pressure = -greatest_effort;
+    return time, least_pressure;
 
 def get_nadirs(recording, periods, signal='PES 3') -> ndarray:
     pes_header = recording.get_signal_header_for_signal(signal);
