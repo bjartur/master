@@ -5,7 +5,7 @@ import Control.Applicative( liftA2, some )
 import Data.Char
 import Data.Function( (&), on )
 import System.Environment( getArgs )
-import Text.ParserCombinators.ReadP( ReadP, char, eof, readP_to_S, satisfy, string )
+import Text.ParserCombinators.ReadP( ReadP, char, eof, readP_to_S, satisfy )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -87,7 +87,7 @@ row= do
   start <- dateTime
   char ','
   end <- dateTime
-  string "\r\n"
+  char '\n' -- native line separator has already been translated to \n
   return (start, end)
 
 dateTime:: ReadP DateTime
