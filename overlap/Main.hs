@@ -3,9 +3,9 @@ module Main where
 
 import Control.Applicative( liftA2, some )
 import Data.Char
-import Data.Function( (&), on )
+import Data.Function( on, (&) )
 import System.Environment( getArgs )
-import Text.ParserCombinators.ReadP( ReadP, char, eof, readP_to_S, satisfy )
+import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy, (<++) )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -85,40 +85,48 @@ file= some row <* eof
 row:: ReadP (DateTime, DateTime)
 row= do
   start <- dateTime
-  char ','
+  expect ','
   end <- dateTime
-  char '\n' -- native line separator has already been translated to \n
+  expect '\n' -- native line separator has already been translated to \n
   return (start, end)
 
 dateTime:: ReadP DateTime
 dateTime= do
   year <- liftA2 (+) (fmap (100*) couple) couple
-  char '-'
+  expect '-'
   month <- couple
-  char '-'
+  expect '-'
   day <- couple
-  char ' '
+  expect ' '
   hour <- couple
-  char ':'
+  expect ':'
   minute <- couple
-  char ':'
+  expect ':'
   second <- couple
-  char '.'
+  expect '.'
   centisecond <- couple
   couple
   couple
   return $ DateTime year month day hour minute (if centisecond >= 50 then second + 1 else second)
 
 couple:: ReadP Int
-couple= do
-  tens <- digit
-  singles <- digit
-  return (tens*10 + singles)
+couple=
+  (do
+    tens <- digit
+    singles <- digit
+    return (tens*10 + singles)
+  ) <++ (sequence[get,get] >>= expected "a couple of digits")
 
 digit:: ReadP Int
 digit= satisfy isDigit
   >$ ord
   >$ \ascii-> ascii-48
+
+expect:: Char-> ReadP Char
+expect character= char character <++ (get >>= expected (show character))
+
+expected:: Show a=> String-> a-> ReadP bottom
+expected expectation reality= error ("\n\tExpected " ++ expectation ++ " but got " ++ show reality ++ "!\n")
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
