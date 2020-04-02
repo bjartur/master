@@ -8,6 +8,7 @@ import Data.Function( (&) )
 import Data.List( intercalate, sort )
 import Prelude hiding( readFile )
 import Test.Hspec
+import Test.Hspec.Core.QuickCheck( modifyMaxSuccess )
 import Text.ParserCombinators.ReadP( eof, ReadP, readP_to_S )
 import Test.QuickCheck (Arbitrary, arbitrary, Gen, choose, property)
 
@@ -36,7 +37,7 @@ zeropad:: Int-> String-> String
 zeropad width input= if length(take width input) < width then '0':input & zeropad width else input
 
 main:: IO ()
-main= hspec $ do
+main= hspec.modifyMaxSuccess(10*) $ do
     describe "digit" $ do
         it "parses a digit" $ do
             examples (parse digit) $
@@ -81,12 +82,14 @@ main= hspec $ do
              >$ (==[])
 
     describe "row" $ do
-      it "parses a score CSV row" $ do
+      it "parses score CSV rows" $ do
           examples (parse row) [
             ("2014-11-12 01:12:35.917000,2014-11-12 01:12:45.036000\r\n", (DateTime 2014 11 12 1 12 36, DateTime 2014 11 12 1 12 45))
+           ,("2015-01-21 22:43:25.000000,2015-01-21 22:43:40.000000\r\n", (DateTime 2015 1 21 22 43 25, DateTime 2015 1 21 22 43 40))
+           ,("2015-01-21 22:39:33.125000,2015-01-21 22:39:44.404000\r\n", (DateTime 2015 1 21 22 39 33, DateTime 2015 1 21 22 39 44))
             ]
     describe "file" $ do
-      it "accepts several actual rows as valid" $
+      it "accepts several autoscore rows as valid" $
         parse file (intercalate "\r\n" [
           "2014-11-12 01:16:34.941000,2014-11-12 01:16:45.300000",
           "2014-11-12 01:17:03.899000,2014-11-12 01:17:14.458000",
@@ -100,8 +103,33 @@ main= hspec $ do
           "2014-11-12 01:27:40.017000,2014-11-12 01:27:50.576000",
           "2014-11-12 01:29:37.569000,2014-11-12 01:29:50.768000",
         ""])
-          `shouldStartWith` [(DateTime 2014 11 12 1 16 35, DateTime 2014 11 12 1 16 45), (DateTime 2014 11 12 1 17 4, DateTime 2014 11 12 1 17 14)]
-
+        `shouldStartWith` [(DateTime 2014 11 12 1 16 35, DateTime 2014 11 12 1 16 45),
+                             (DateTime 2014 11 12 1 17 4, DateTime 2014 11 12 1 17 14)]
+      it "accepts several manually exported as valid (after conversion)" $
+        parse file (intercalate "\r\n" [
+          "2015-01-21 22:51:45.000000,2015-01-21 22:51:56.000000",
+          "2015-01-21 22:52:49.000000,2015-01-21 22:53:09.000000",
+          "2015-01-21 22:53:20.000000,2015-01-21 22:53:39.000000",
+          "2015-01-21 22:53:46.000000,2015-01-21 22:54:16.000000",
+          "2015-01-21 22:54:23.000000,2015-01-21 22:54:39.000000",
+          "2015-01-21 22:54:45.000000,2015-01-21 22:55:19.000000",
+          "2015-01-21 22:56:10.000000,2015-01-21 22:56:35.000000",
+          "2015-01-21 22:56:46.000000,2015-01-21 22:57:03.000000",
+          "2015-01-21 22:57:21.000000,2015-01-21 22:57:43.000000",
+          "2015-01-21 22:57:55.000000,2015-01-21 22:58:12.000000",
+          "2015-01-21 22:58:35.000000,2015-01-21 22:58:52.000000",
+          "2015-01-21 22:59:49.000000,2015-01-21 23:00:02.000000",
+          "2015-01-21 23:00:05.000000,2015-01-21 23:00:16.000000",
+          "2015-01-21 23:00:20.000000,2015-01-21 23:00:31.000000",
+          "2015-01-21 23:00:35.000000,2015-01-21 23:01:01.000000",
+          "2015-01-21 23:01:06.000000,2015-01-21 23:01:19.000000",
+          "2015-01-21 23:01:41.000000,2015-01-21 23:02:20.000000",
+          "2015-01-21 23:02:24.000000,2015-01-21 23:02:39.000000",
+          "2015-01-21 23:02:44.000000,2015-01-21 23:02:55.000000",
+          "2015-01-21 23:03:01.000000,2015-01-21 23:03:34.000000",
+        ""])
+        `shouldEndWith` [(DateTime 2015 01 21 23 02 44, DateTime 2015 01 21 23 02 55),
+                      (DateTime 2015 01 21 23 03 01, DateTime 2015 01 21 23 03 34)]
     let a `minus` b= DateTime (year a - year b) (month a - month b) (day a - day b) (hour a - hour b) (minute a - minute b) (second a - second b)
     describe "measure" $ do
       it "can calculate the length of an interval starting up to 59 whole minutes after midnight and ending that same night, or the day or evening after"
@@ -119,8 +147,7 @@ main= hspec $ do
                                 then False
                                 else head accessors datetime < 0
         property $ \a b-> (a < b) == (a `lessThan` b)
-    describe "overlaps" $ it "is invariant under a superset"
-     . property $ do
+    describe "overlaps" . it "is invariant under a superset" . property $ do
       size<- arbitrary:: Gen Int
       datetimes<- replicateM (2 * abs size + 2) arbitrary >$ nubSort:: Gen [DateTime]
       let overarching= (head datetimes, last datetimes)
@@ -147,7 +174,6 @@ main= hspec $ do
        . property $ do
         (_,disjoints)<- arbitrarySet
         return (union disjoints disjoints `shouldBe` disjoints)
-
     describe "correlation" $ do
       it "considers a list equivalent to itself"
        . property $ do

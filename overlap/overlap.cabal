@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bbe4a5493aa8ea3009adc72da0cb3d8a2f44e6c53d59080ef1006c3f747f11df
+-- hash: a986bae195bd449451ef95c97718aea5c35f597bd137d3e0e0941d99427989b6
 
 name:           overlap
 version:        0.0.0.0
@@ -30,4 +30,5 @@ test-suite spec
     , base <4.14 && >=2.10
     , filepath <1.5 && >=1.4
     , hspec
+    , hspec-core
   default-language: Haskell2010

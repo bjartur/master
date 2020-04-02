@@ -17,4 +17,5 @@ tests:
     dependencies:
     - hspec
     - QuickCheck
+    - hspec-core
     ghc-options: -main-is Tests
