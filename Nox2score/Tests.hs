@@ -9,7 +9,7 @@ import Test.Hspec
 import Text.ParserCombinators.ReadP (eof, ReadP, readP_to_S)
 import Test.QuickCheck (choose, property)
 
-import Main ( DateTime(..), couple, dateTime, digit, file, row, (>$) )
+import Main ( DateTime(..), couple, dateTime, digit, file, isRecordingName, row, (>$) )
 
 finally:: ReadP a -> ReadP a
 finally parser= do
@@ -134,3 +134,7 @@ main= hspec $ do
         "02/12/2014 04:28:53,02/12/2014 04:29:15,Vaka,",
         ""
       ]) `shouldStartWith` [(DateTime 2014 12 2 0 40 0, DateTime 2014 12 2 0 40 27)]
+    describe "recordingName" $ it "accepts recording names, if only, of the form VSN-14-080-0[0-2][3-9]" $ property $ do
+      former <- choose('0','2')
+      latter <- choose('3','9')
+      pure $ isRecordingName ("VSN-14-080-0" ++ [former,latter])

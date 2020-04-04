@@ -1,19 +1,19 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module Main where
 
-import Control.Applicative (liftA2, some )
-import Control.Monad( filterM, when )
+import Control.Applicative (liftA2, some, (<|>) )
+import Control.Monad( guard, filterM, when )
 import Data.Char
 import Data.Function( (&) )
-import Data.Functor( (<&>) )
+import Data.Functor( (<&>), ($>) )
 import Data.Foldable( traverse_ )
 import Data.List
 import System.Directory( getDirectoryContents )
 import System.Environment( getArgs )
 import System.Exit( die )
-import System.FilePath( FilePath, takeFileName, (</>), (<.>) )
+import System.FilePath( takeFileName, (</>), (<.>) )
 import System.IO( Handle, IOMode(ReadMode, WriteMode), hGetContents, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
-import Text.ParserCombinators.ReadP( ReadP, char, eof, many, readP_to_S, satisfy, skipMany1, string )
+import Text.ParserCombinators.ReadP( ReadP, char, eof, get, look, many, manyTill, optional, readP_to_S, satisfy, string, (<++) )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -27,18 +27,19 @@ main= do
     else traverse_ (head paths & make) (tail paths)
 
 make:: FilePath-> FilePath-> IO ()
-make  destinationFolder inputPath=
-  withBinaryFile inputPath ReadMode (convertAndSave destinationFolder)
+make  destinationFolder inputPath= do
+  let date = take 8 (takeFileName inputPath)
+  withBinaryFile inputPath ReadMode (convertAndSave destinationFolder date)
 
-convertAndSave:: FilePath-> Handle-> IO ()
-convertAndSave destinationFolder inputHandle=
+convertAndSave:: FilePath-> String-> Handle-> IO ()
+convertAndSave destinationFolder date inputHandle=
      hSetEncoding inputHandle utf16
   >> hGetContents inputHandle >$ convert
-  >>= save destinationFolder
+  >>= save destinationFolder date
 
-save:: FilePath-> (DateTime, String)-> IO ()
-save destinationFolder ((DateTime year month day _ _ _), output)= do
-  stem <- recordingName year month day
+save:: FilePath-> String-> String-> IO ()
+save destinationFolder date output= do
+  stem <- recordingName date
   withFile (destinationFolder </> stem <.> "csv") WriteMode (write output)
 
 write:: String-> Handle-> IO ()
@@ -48,39 +49,65 @@ write output handle=
 
 isRecordingName:: FilePath-> Bool
 isRecordingName= readP_to_S (do
-                                     _ <- string "VSN-14-080-0"
-                                     skipMany1 (satisfy (/='_'))
-                                     _ <- string ".txt"
+                                     string "VSN-14-080-0"
+                                     get
+                                     get
+                                     optional (char '/' <|> char '\\')
                                      eof
                                  ) <&> (not.null)
 
-recordingName:: Int-> Int-> Int-> IO FilePath
-recordingName year month day = do
-  let date = format (DateTime year month day 0 0 0) & take 10
-  entries <- getDirectoryContents "../NoxPes2Csv/nadir/BbB/"
-  let possibilities = filter isRecordingName entries :: [FilePath]
-  candidates <- filterM (startsOn date) (map ("../NoxPes2Csv/nadir/BbB/" ++) possibilities)
+recordingFolder:: FilePath
+recordingFolder = "../NoxPes2Csv/VSN-14-080/"
+
+recordings:: IO [FilePath]
+recordings= do
+      getDirectoryContents recordingFolder
+  <&> filter isRecordingName
+  <&> map (recordingFolder </>)
+
+recordingName:: String-> IO FilePath
+recordingName date = do
+
+  candidates <- recordings >>= filterM (startsOn date)
+  when (null candidates) . die $ "Could not find any recording from day " ++ date ++ "!"
   when (tail candidates & (not.null)) . die $ "No more than one recording expected on day " ++ date ++ "!"
   let only = head candidates
-  let Just filename = stripPrefix "../NoxPes2Csv/nadir/BbB/" only
-  return $! take (length "VSN-14-080-0NN") filename
+
+  putStrLn $ "Recording " ++ takeFileName only ++ " corresponds to manual scoring from " ++ date ++ "."
+  return $! takeFileName only
 
 startsOn:: String-> FilePath-> IO Bool
 startsOn date path= do
-  withFile path ReadMode (startsWith date)
+  withFile (path </> "EventLog.txt") ReadMode (startsWith date)
+
+data EventCode = RecordingStarted | Other deriving Eq
+data Event = Event{eventCode::EventCode, eventDate::String, eventMessage::String}
+
+parseEvent:: String-> Event
+parseEvent= parse $ do
+  code <- liftA2 (+) (fmap (100*) couple) couple
+  expect ';'
+  date <- manyTill get (char 'T')
+  manyTill get (char ';') $> ()
+  message <- look
+  return Event{eventCode=if code == 114 then RecordingStarted else Other, eventDate=date, eventMessage=message}
 
 startsWith:: String-> Handle-> IO Bool
 startsWith date handle= do
-  contents <- (hGetContents handle)
-  return $! take 10 contents == date
+  events <- hGetContents handle <&> lines <&> map parseEvent
+  let startingDates = do
+        Event code candiDate _ <- events
+        guard $ code == RecordingStarted
+        return candiDate
+  return $! date == head startingDates
 
 -- In: file in Noxturnal CSV format
 -- Out: (recording start datetime, file in NumPy CSV format)
-convert:: String-> (DateTime, String)
+convert:: String-> String
 convert= (readP_to_S file :: String-> [([(DateTime, DateTime)], String)])
   >$ last
   >$ fst
-  >$ \intervals-> (intervals & head & fst, intervals >>= formatRow)
+  >$ (>>= formatRow)
 
 file:: ReadP [ (DateTime, DateTime) ]
 file= do
@@ -97,6 +124,9 @@ row= do
   many $ satisfy (liftA2 (&&) (/='\r') (/='\n'))
   string "\r\n"
   return (start, end)
+
+parse:: ReadP a-> String-> a
+parse parser= readP_to_S parser >$ last >$ fst
 
 data DateTime= DateTime
  Int -- year
@@ -134,6 +164,12 @@ digit:: ReadP Int
 digit= satisfy isDigit
   >$ ord
   >$ \ascii-> ascii-48
+
+expect:: Char-> ReadP ()
+expect character= char character <++ (get >>= expected (show character)) $> ()
+
+expected:: Show a=> String-> a-> ReadP bottom
+expected expectation reality= error ("\n\tExpected " ++ expectation ++ " but got " ++ show reality ++ "!\n")
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
