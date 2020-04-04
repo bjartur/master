@@ -20,9 +20,11 @@ def split_recording_into_breaths(recording: Recording) -> List[cm.Period]:
     while breath_number < len(breaths):
         while epochs[0].Period.get_To() < breaths[breath_number].get_From():
             epochs.pop(0);
-        assert epochs[0].Period.get_From() <= breaths[breath_number].get_From();
-        sleep_stage = epochs[0].get_Key().Type.__str__();
-        if sleep_stage == 'sleep-wake':
+
+        while breath_number < len(breaths) and breaths[breath_number].get_From() < epochs[0].Period.get_From():
+            breaths.pop(breath_number); # no sleep-wake stage scored
+
+        if epochs[0].get_Key().Type.__str__() == 'sleep-wake':
             while breath_number < len(breaths) and breaths[breath_number].get_From() < epochs[0].Period.get_To():
                 breaths.pop(breath_number);
         else:
