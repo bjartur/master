@@ -141,17 +141,17 @@ data DateTime= DateTime
 dateTime:: ReadP DateTime
 dateTime= do
   day <- couple
-  char '/'
+  expect '/'
   month <- couple
-  char '/'
+  expect '/'
   year <- liftA2 (+) (fmap (100*) couple) couple
-  char ' '
+  expect ' '
   hour <- couple
-  char ':'
+  expect ':'
   minute <- couple
-  char ':'
+  expect ':'
   second <- couple
-  char ','
+  expect ','
   return $ DateTime year month day hour minute second
 
 couple:: ReadP Int
