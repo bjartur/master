@@ -3,6 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Tests where
 
+import Control.Exception( ErrorCall, catch, evaluate )
 import Control.Monad( replicateM )
 import Data.Function( (&) )
 import Data.List( intercalate, sort )
@@ -36,6 +37,10 @@ pick lower upper= choose(lower,upper) >$ show
 zeropad:: Int-> String-> String
 zeropad width input= if length(take width input) < width then '0':input & zeropad width else input
 
+shouldNotAccept:: (Show a, Eq a)=> ReadP a-> String-> Expectation
+shouldNotAccept parser input=
+  catch (evaluate $ readP_to_S parser input) (\exception-> (exception:: ErrorCall) `seq` return []) `shouldReturn` []
+
 main:: IO ()
 main= hspec.modifyMaxSuccess(10*) $ do
     describe "digit" $ do
@@ -49,7 +54,7 @@ main= hspec.modifyMaxSuccess(10*) $ do
             examples (parse couple) $
                   zip (replicate 2 ['0'..'9'] & sequence) [0..99]
         it "rejects 0x as not a couple of digits" $ do
-            readP_to_S (couple>>eof) "0x" `shouldBe` []
+            shouldNotAccept (couple>>eof) "0x"
     describe "dateTime" $ do
         it "parses actual dates and a timestamps correctly" $ do
           examples (parse dateTime) [
@@ -78,19 +83,18 @@ main= hspec.modifyMaxSuccess(10*) $ do
             seconds<- pick 1 59 >$ zeropad 2
             microseconds<- pick 1 999999 >$ zeropad 6
             pure (years ++ "-" ++ months ++ "-" ++ days ++ " " ++ hours ++ ":" ++ minutes ++ ":" ++ seconds ++ "." ++ microseconds)
-             >$ readP_to_S dateTime
-             >$ (==[])
+             >$ shouldNotAccept dateTime
 
     describe "row" $ do
       it "parses score CSV rows" $ do
           examples (parse row) [
-            ("2014-11-12 01:12:35.917000,2014-11-12 01:12:45.036000\r\n", (DateTime 2014 11 12 1 12 36, DateTime 2014 11 12 1 12 45))
-           ,("2015-01-21 22:43:25.000000,2015-01-21 22:43:40.000000\r\n", (DateTime 2015 1 21 22 43 25, DateTime 2015 1 21 22 43 40))
-           ,("2015-01-21 22:39:33.125000,2015-01-21 22:39:44.404000\r\n", (DateTime 2015 1 21 22 39 33, DateTime 2015 1 21 22 39 44))
+            ("2014-11-12 01:12:35.917000,2014-11-12 01:12:45.036000\n", (DateTime 2014 11 12 1 12 36, DateTime 2014 11 12 1 12 45))
+           ,("2015-01-21 22:43:25.000000,2015-01-21 22:43:40.000000\n", (DateTime 2015 1 21 22 43 25, DateTime 2015 1 21 22 43 40))
+           ,("2015-01-21 22:39:33.125000,2015-01-21 22:39:44.404000\n", (DateTime 2015 1 21 22 39 33, DateTime 2015 1 21 22 39 44))
             ]
     describe "file" $ do
       it "accepts several autoscore rows as valid" $
-        parse file (intercalate "\r\n" [
+        parse file (intercalate "\n" [
           "2014-11-12 01:16:34.941000,2014-11-12 01:16:45.300000",
           "2014-11-12 01:17:03.899000,2014-11-12 01:17:14.458000",
           "2014-11-12 01:20:56.804000,2014-11-12 01:21:10.483000",
@@ -106,7 +110,7 @@ main= hspec.modifyMaxSuccess(10*) $ do
         `shouldStartWith` [(DateTime 2014 11 12 1 16 35, DateTime 2014 11 12 1 16 45),
                              (DateTime 2014 11 12 1 17 4, DateTime 2014 11 12 1 17 14)]
       it "accepts several manually exported as valid (after conversion)" $
-        parse file (intercalate "\r\n" [
+        parse file (intercalate "\n" [
           "2015-01-21 22:51:45.000000,2015-01-21 22:51:56.000000",
           "2015-01-21 22:52:49.000000,2015-01-21 22:53:09.000000",
           "2015-01-21 22:53:20.000000,2015-01-21 22:53:39.000000",
