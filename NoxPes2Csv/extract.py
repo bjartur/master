@@ -18,7 +18,7 @@ def extract(measurements, splitting_method, splitting_method_name, statistic, fm
     """
     try:
         for measurement in measurements:
-            if  path.basename(path.dirname(measurement)) in ("VSN-14-080-031", "VSN-14-080-002_needsfix"):
+            if  path.basename(path.dirname(measurement)) in ("VSN-14-080-030", "VSN-14-080-031", "VSN-14-080-002_needsfix"):
                 continue;
             recording = get_recording_with_derived(measurement);
             periods = splitting_method(recording);
