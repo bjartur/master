@@ -178,7 +178,7 @@ main = hspec $ do
                         risesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span of length three as well as a decrease." $
                         risesLongerThanThree([1..3] ++ [2,1..(-7)]) `shouldBe` []
-                it "identifies long rises" $ do
+                it "identifies long rises." $
                         quickCheckWith stdArgs { maxSuccess = 5000 } $ examples risesLongerThanThree
                                 [
                                         ([1..10],[(0,9)])
@@ -196,14 +196,16 @@ main = hspec $ do
                                 . shouldSatisfy [1..4]
                                 . countCappedAtInputLength
                         ]
-                it "has been parametrized" $ do
+                it "has been parametrized." $
                   property $ returnTheSame risesLongerThanThree (risesLongerThan 3)
+                it "a smaller number of increasing spans can only come by raising the minimum length of each." $
+                  property $ \n m pressures-> (length(risesLongerThan n pressures) < length(risesLongerThan m pressures)) ==> (n > m)
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
                 it "finds no rise in an empty list." $
                         declinesLongerThanThree[] `shouldBe` []
                 it "skips over an increasing span as well as a decrease of length three." $
                         declinesLongerThanThree([-7..1] ++ [3,2,1]) `shouldBe` []
-                it "identifies long declines." $ do
+                it "identifies long declines." $
                         examples declinesLongerThanThree
                                 [
                                         ([10,9..1],[(0,9)]),
@@ -214,8 +216,10 @@ main = hspec $ do
                                 returnsInitIndices
                               , returnsCountsCappedAtInputLength
                         ]
-                it "has been parametrized" $ do
+                it "has been parametrized" $
                   property $ returnTheSame declinesLongerThanThree (declinesLongerThan 3)
+                it "a smaller number of decreasing spans can only come by raising the minimum length of each." $
+                  property $ \n m pressures-> (length(declinesLongerThan n pressures) < length(declinesLongerThan m pressures)) ==> (n > m)
         describe "readFormerColumn" $ do
                 it "extracts strings with and without spaces from small CSV files." $ do
                         readFormerColumn abcdef `shouldBe` ["a","cd"]
