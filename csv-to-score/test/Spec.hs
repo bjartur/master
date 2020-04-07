@@ -111,6 +111,8 @@ ofEqualLength =
 returnEqualLength :: ([Double]-> [a])-> ([Double]-> [b])-> [Double]-> Bool
 returnEqualLength f g x = length (f x) == length (g x)
 
+returnTheSame :: Eq b=> (a-> b)-> (a-> b)-> a-> Bool
+returnTheSame f g x = f x == g x
 
 randomNadir ::
     Int-> -- beginning; the generated nadir will start *after* this index
@@ -194,6 +196,8 @@ main = hspec $ do
                                 . shouldSatisfy [1..4]
                                 . countCappedAtInputLength
                         ]
+                it "has been parametrized" $ do
+                  property $ returnTheSame risesLongerThanThree (risesLongerThan 3)
         describe "Three breaths each with a lower pressure than a preceding breath" $ do
                 it "finds no rise in an empty list." $
                         declinesLongerThanThree[] `shouldBe` []
@@ -210,6 +214,8 @@ main = hspec $ do
                                 returnsInitIndices
                               , returnsCountsCappedAtInputLength
                         ]
+                it "has been parametrized" $ do
+                  property $ returnTheSame declinesLongerThanThree (declinesLongerThan 3)
         describe "readFormerColumn" $ do
                 it "extracts strings with and without spaces from small CSV files." $ do
                         readFormerColumn abcdef `shouldBe` ["a","cd"]

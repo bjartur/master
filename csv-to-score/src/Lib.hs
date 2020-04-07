@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, declines, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
+module Lib (increasing, decreasing, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
 
 import Control.Arrow ((>>>))
 import Data.List.Safe ((!!))
@@ -68,6 +68,12 @@ rises = increasing>>>spans
 
 declines :: [Double]-> [(Index,Count)]
 declines = decreasing>>>spans
+
+risesLongerThan :: Int-> [Double]-> [(Index,Count)]
+risesLongerThan n list = filter (\(_, count)-> n <= count) (rises list)
+
+declinesLongerThan :: Int-> [Double]-> [(Index,Count)]
+declinesLongerThan n list = filter (\(_, count)-> n <= count) (declines list)
 
 risesLongerThanThree :: [Double]-> [(Index,Count)]
 risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, count >= 3]

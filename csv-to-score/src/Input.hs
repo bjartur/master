@@ -5,18 +5,18 @@ import Lib
 
 type CSV = String
 
-nadirs :: CSV-> [(Index,Count)]
-nadirs =           readLatterColumnAsDoubles
-                >$ declinesLongerThanThree
+nadirs :: Int-> CSV-> [(Index,Count)]
+nadirs n =           readLatterColumnAsDoubles
+                >$ declinesLongerThan n
 
-timestampsOfDeclineBeginning :: String-> [String]
-timestampsOfDeclineBeginning =
-                   timestamp indexBefore
+timestampsOfDeclineBeginning :: Int-> String-> [String]
+timestampsOfDeclineBeginning n =
+                   timestamp indexBefore n
 
 
-timestampsOfDeclineEnd :: String-> [String]
-timestampsOfDeclineEnd =
-                   timestamp indexOfEndOf
+timestampsOfDeclineEnd :: Int-> String-> [String]
+timestampsOfDeclineEnd n =
+                   timestamp indexOfEndOf n
 
 baselines :: [(Index,Count)]-> [Double]-> [Double]
 baselines candidates pressures = let
@@ -29,17 +29,17 @@ baselines candidates pressures = let
          >$ average
 
 
-abruptNadirs :: CSV-> [(Index,Count)]
-abruptNadirs = liftA2 abrupts nadirs readLatterColumnAsDoubles
+abruptNadirs :: Int-> CSV-> [(Index,Count)]
+abruptNadirs n = liftA2 abrupts (nadirs n) readLatterColumnAsDoubles
 
 abrupts :: [(Index,Count)]-> [Double]-> [(Index,Count)]
 abrupts candidates pressures =
     zip [1..] candidates
  >>=ap abrupt (baselines candidates) pressures
 
-timestamp :: ((Index,Count)-> Index)-> String-> [String]
-timestamp accessor csv =
-                   nadirs csv
+timestamp :: ((Index,Count)-> Index)-> Int-> String-> [String]
+timestamp accessor n csv =
+                   nadirs n csv
                 >$ accessor
                 >$ getTimestamps csv
 
