@@ -145,7 +145,7 @@ main= hspec.modifyMaxSuccess(10*) $ do
       it "considers dates farther from year 1 to be greater" $ do
         let a `lessThan` b= a `minus` b
                           & \datetime->
-                              dropWhile (\accessor-> accessor datetime == 0) [year, day, hour, minute, second]
+                              dropWhile (\accessor-> accessor datetime == 0) [year, month, day, hour, minute, second]
                             & \accessors->
                                 if null accessors
                                 then False
