@@ -8,21 +8,20 @@ from typing import List, Callable
 from numpy import ndarray, save, savetxt
 
 
-def extract(measurements, splitting_method, splitting_method_name, statistic, fmt) -> None:
+def extract(measurements, splitting_method_name, statistic, fmt) -> None:
     """
     :type measurements:          List[str]
-    :type splitting_method:      Callable[[Recording], List[cm.Period]]
     :type splitting_method_name: str
     :type statistic:             Callable[[Recording, List[cm.Period], str], ndarray])
     :type fmt:                   str
     """
+    stderr.write('--Starting {}--\r\n'.format(splitting_method_name));
     try:
         for measurement in measurements:
             if  path.basename(path.dirname(measurement)) in ("VSN-14-080-030", "VSN-14-080-031", "VSN-14-080-002_needsfix"):
                 continue;
             recording = get_recording_with_derived(measurement);
-            periods = splitting_method(recording);
-            statistics = statistic(recording, periods, best_signal(path.dirname(measurement)));
+            statistics = statistic(recording, best_signal(path.dirname(measurement)));
             measurement_name = path.basename(path.dirname(measurement));
             write(measurement_name, splitting_method_name, statistics, fmt);
     finally:
