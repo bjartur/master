@@ -3,6 +3,7 @@
 *.ndf
 *.ini
 *.txt
+*.csv
 *.ndb
 *.nef
 *.npf
