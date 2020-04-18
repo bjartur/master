@@ -1,7 +1,7 @@
 module Main where
 import Control.Applicative (liftA2)
 import Control.Monad (forM_)
-import Input
+import Input (CSV, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, (>$), (>>$))
 import System.Environment (getArgs)
 import System.FilePath (takeFileName, (</>))
 

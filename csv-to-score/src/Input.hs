@@ -1,4 +1,4 @@
-module Input (module Input, module Lib) where
+module Input( CSV, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, readFormerColumn, readLatterColumnAsDoubles, baselines, (>$), (>>$) ) where
 import Control.Applicative
 import Control.Monad
 import Lib
@@ -39,7 +39,7 @@ abrupts candidates pressures =
 
 timestamp :: ((Index,Count)-> Index)-> Int-> String-> [String]
 timestamp accessor n csv =
-                   nadirs n csv
+                   abruptNadirs n csv
                 >$ accessor
                 >$ getTimestamps csv
 
