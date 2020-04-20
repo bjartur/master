@@ -1,8 +1,9 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
+module Lib (increasing, decreasing, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, abrupts, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
 
 import Control.Arrow ((>>>))
+import Data.Function ((&))
 import Data.List.Safe ((!!))
 import Prelude hiding ((!!))
 
@@ -81,16 +82,26 @@ risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, coun
 declinesLongerThanThree :: [Double]-> [(Index,Count)]
 declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
--- Note: abrupt returns the empty list if it encounters an out-of-bounds index
--- or if the pressure right after the nadir is less than the reference.
--- Otherwise, it returns a single-item list containing the nadir passed in.
-abrupt :: [Double]-> [Double]-> (Int,(Index,Count))-> [(Index,Count)]
-abrupt pressures references (number,nadir) = do
-        pressure <- pressures !! indexAfter nadir
-        reference <- references !! number
-        if pressure < reference
-        then []
-        else [nadir]
+abrupts :: [Double]-> [(Index,Count)]-> [(Index,Count)]
+abrupts pressures candidates =
+  zip candidates (baselines pressures candidates)
+      & filter (abrupt pressures & uncurry)
+     >$ fst
+
+abrupt :: [Double]-> (Index,Count)-> Double-> Bool
+abrupt pressures nadir reference = do
+       let pressure = pressures !! indexAfter nadir
+       maybe False (reference <) pressure
+
+baselines :: [Double]-> [(Index,Count)]-> [Double]
+baselines pressures candidates = let
+            beginIndices = candidates >$ indexBefore
+            afterIndices = candidates >$ indexAfter
+            selectors = zipWith range (0:afterIndices) beginIndices :: [ [Double]-> [Double] ]
+    in
+            selectors
+         >$ ($ pressures)
+         >$ average
 
 indexBefore :: (Index,Count)-> Index
 indexBefore =      fst

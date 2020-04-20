@@ -227,10 +227,13 @@ main = hspec $ do
         describe "readLatterColumn" $ do
                 it "extracts numbers in scientific notation from small CSV files." $ do
                         readLatterColumnAsDoubles csvContainingNumbers `shouldBe` [-2.894930373863120749e-02,-7.567405304247912341e-02]
+        describe "indexAfter" $ do
+                it "returns one more than the index of the last breath in a given event" $ do
+                        indexAfter (0, 3) `shouldBe` 4
         describe "baselines" $ do
                 let pressures  = [-7.567405304247912341e-02,-7.564403304247913341e-02,1.2,1.1,1.0,-3.1e-01]
                 let candidates = declinesLongerThanThree pressures
-                let references = baselines candidates pressures
+                let references = baselines pressures candidates
                 it "calculates a mean before a decline." $ do
                     shouldBe
                        (
@@ -245,25 +248,37 @@ main = hspec $ do
                           & liftA2 (,) and length
                        )
                         (True, 1)
-                ofEqualLength declinesLongerThanThree (\pressures-> baselines (declinesLongerThanThree pressures) pressures)
+                ap ofEqualLength (ap baselines) declinesLongerThanThree
         describe "abrupt" $ do
                 it "dismisses a triangle." $ do
-                        examples (abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  [10])
-                                [
-                                        ( (0,(0,9)) , [] )
-                                ]
+                        abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] (0, 9) 5.5 `shouldBe` False
                 it "can notice an abrupt return to baseline" $ do
-                        examples (abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] [8.5])
-                                [
-                                        ( (0,(4,9)) , [(4,9)] )
-                                ]
+                        abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] (4, 9) 8.5 `shouldBe` True
+        describe "abrupts"$ do
                 it "only accepts or rejects candidate nadirs without introducing new ones" $
-                       (forAll :: (Show a, Testable prop) => Gen a -> (a -> prop) -> Property)
-                       (   randomNadirs 19
-                         >$ zip [(0::Int)..]
-                       )
-                       (uncreative $ \references candidates->
-                                do
-                                        candidate <-candidates
-                                        abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] references candidate
-                       )
+                       (forAll :: (Show a) => Gen a -> (a -> Bool) -> Property)
+                       (randomNadirs 19)
+                       (abrupts [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] >>= subset)
+                it "picks up a decrescendo starting at the beginning" $ do
+                        abrupts ([4,3..1] ++ [5]) [(0, 3)] `shouldBe` [(0, 3)]
+                it "dismisses a decrescendo without reversal at the very end" $ do
+                        abrupts [4,3..1] [(0, 3)] `shouldBe` []
+                it "dismisses a nadir not followed by an abrupt return to baseline" $ do
+                        let before =
+                                [5.978584292334780670e-02 ,5.812644961202821647e-02 ,5.604743960129447700e-02
+                                ,5.486488344840005638e-02 ,5.304336550321590849e-02 ,5.187034609348999126e-02]
+                        let between =
+                                [5.231857302240965069e-02 ,5.144119265090733861e-02 ,5.067825319742706031e-02
+                                ,5.106925966733570632e-02 ,5.156517031209788271e-02 ,4.953384401720665325e-02
+                                ,5.074501039960658405e-02 ,5.102157595149318242e-02 ,5.290031435568835760e-02
+                                ,5.185127260715298447e-02 ,5.189895632299550143e-02 ,5.022048952533889749e-02
+                                ,5.095481874931365868e-02 ,5.118370058535774703e-02 ,5.116462709902074024e-02
+                                ,5.143165590773883522e-02 ,5.281448366717182707e-02 ,5.258560183112774566e-02
+                                ,5.122184755803176059e-02 ,5.290985109885686100e-02 ,5.065917971109005352e-02
+                                ,4.960060121938617700e-02 ,5.199432375468053535e-02 ,5.162239077110890306e-02
+                                ,5.004882814830583643e-02 ,4.948616030136413629e-02]
+                        let descent = [5.199432375468053535e-02 ,5.162239077110890306e-02
+                                      ,5.004882814830583643e-02 ,4.948616030136413629e-02]
+                        let after = [4.953384401720665325e-02]
+                        abrupts (between ++ descent ++ after) [(length between - 1, length descent)] `shouldBe` []
+                        abrupts (before ++ between ++ descent ++ after) [(length between + length before - 1, length descent)] `shouldBe` []
