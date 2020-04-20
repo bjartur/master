@@ -9,7 +9,7 @@ import Input
 import Lib
 import Prelude hiding (readFile)
 import Test.Hspec
-import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), maxSuccess, NonEmptyList(..), Property, property, stdArgs, Testable, quickCheckWith, (==>))
+import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), listOf, maxSuccess, NonEmptyList(..), Property, property, resize, sized, stdArgs, Testable, quickCheckWith, (==>))
 
 
 ofAscendingListShouldBeAllTrue =
@@ -123,8 +123,8 @@ randomNadir beginning recordLength = do
         count <-choose(3, (recordLength-1)-start-1)
         return (start,count)
 
-randomNadirs :: Int-> Gen [(Index,Count)]
-randomNadirs recordLength = let
+randomNadirs :: Gen [(Index,Count)]
+randomNadirs = sized $ \recordLength-> let
             go index nadirs = if index > (recordLength-1)-3-1
                 then nadirs
                 else do
@@ -255,10 +255,12 @@ main = hspec $ do
                 it "can notice an abrupt return to baseline" $ do
                         abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] (4, 9) 8.5 `shouldBe` True
         describe "abrupts"$ do
-                it "only accepts or rejects candidate nadirs without introducing new ones" $
-                       (forAll :: (Show a) => Gen a -> (a -> Bool) -> Property)
-                       (randomNadirs 19)
-                       (abrupts [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] >>= subset)
+                it "only accepts or rejects candidate nadirs without introducing new ones" $ do
+                        forAll $ do
+                                pressures <- sized $ \size-> listOf arbitrary >$ take size
+                                candidates <- resize (length pressures) randomNadirs :: Gen [(Index, Count)]
+                                return (pressures, candidates)
+                       $ uncurry (\pressures-> (abrupts pressures >>= subset))
                 it "picks up a decrescendo starting at the beginning" $ do
                         abrupts ([4,3..1] ++ [5]) [(0, 3)] `shouldBe` [(0, 3)]
                 it "dismisses a decrescendo without reversal at the very end" $ do
@@ -282,3 +284,23 @@ main = hspec $ do
                         let after = [4.953384401720665325e-02]
                         abrupts (between ++ descent ++ after) [(length between - 1, length descent)] `shouldBe` []
                         abrupts (before ++ between ++ descent ++ after) [(length between + length before - 1, length descent)] `shouldBe` []
+        describe "abrupts <*> declinesLongerThan 3" $ do
+                it "rejects a sawtooth" $ do
+                  let sawtooth = [4,3..1]
+                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` []
+                  let sawtooth = [5,4..1]
+                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` []
+                it "accepts sawtooth" $ do
+                  let sawtooth = [4,3..1] ++ [5]
+                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` [(0, 3)]
+                  let sawtooth = [5,4..1] ++ [6]
+                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` [(0, 4)]
+                it "rejects every crescendo in a saw" $ do
+                  let sawtooth = [5,4..1]
+                  let saw = replicate 8 sawtooth & concat
+                  (abrupts <*> declinesLongerThan 3) saw `shouldBe` []
+                it "finds and accepts every crescendo in the mandible of a mountain lion" $ do
+                  let tooth = [5,4..1] ++ [6,3]
+                  let mandible = replicate 8 tooth & concat
+                  (abrupts <*> declinesLongerThan 3) mandible `shouldBe` take 8 (iterate (\(index,count)-> (index+count+3, count)) (0, 4))
+
