@@ -238,6 +238,8 @@ main = hspec $ do
                 it "extracts strings with and without spaces from small CSV files." $ do
                         readFormerColumn abcdef `shouldBe` ["a","cd"]
                         readFormerColumn csvContainingNumbers `shouldBe` replicate 2 "former column"
+                        readFormerColumn longCsv `shouldBe` replicate 6 "former column"
+                        readFormerColumn longerCsv `shouldBe` replicate 12 "former column"
         describe "readLatterColumn" $ do
                 it "extracts numbers in scientific notation from small CSV files." $ do
                         readLatterColumnAsDoubles csvContainingNumbers `shouldBe` [-2.894930373863120749e-02,-7.567405304247912341e-02]
