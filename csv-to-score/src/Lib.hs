@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (increasing, decreasing, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, abrupts, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
+module Lib (baseline, increasing, decreasing, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, abrupts, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
 
 import Control.Arrow ((>>>))
 import Data.Function ((&))
@@ -82,22 +82,44 @@ risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, coun
 declinesLongerThanThree :: [Double]-> [(Index,Count)]
 declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
-abrupts :: [Double]-> [(Index,Count)]-> [(Index,Count)]
-abrupts pressures candidates =
-  zip candidates (baselines pressures candidates)
-      & filter (abrupt pressures & uncurry)
-     >$ fst
+judge :: Int-> [[Double]-> (Index,Count)-> Double-> Bool]-> [Double]-> [(Index,Count)]-> [(Index,Count)]
+judge n additional_critera pressures all_candidates = let
+    nonEmpty (_, count) _ = 0 < count
+    criteria = nonEmpty : (additional_critera <*> [pressures])
+
+    continue :: [(Index,Count)]-> Index-> [(Index,Count)]
+    continue [] _ = []
+    continue (candidate:candidates) startOfBaseline = do
+      let reference = range startOfBaseline (indexBefore candidate) pressures & average
+      if and (criteria <*> [candidate] <*> [reference])
+      then candidate : continue candidates (indexAfter candidate)
+      else do
+        let (index, count) = candidate
+        if n < count
+        then continue ((index+1, count-1):candidates) startOfBaseline
+        else continue candidates startOfBaseline
+ in
+    continue all_candidates 0
+
+baseline :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
+baseline n = judge n [belowBaseline, abrupt]
+
+belowBaseline :: [Double]-> (Index,Count)-> Double-> Bool
+belowBaseline pressures (index,count) reference = all (reference >) (pressures & drop (index+1) & take count)
 
 abrupt :: [Double]-> (Index,Count)-> Double-> Bool
-abrupt pressures nadir reference = do
-       let pressure = pressures !! indexAfter nadir
+abrupt pressures decrescendo reference = do
+       let pressure = pressures !! indexAfter decrescendo
        maybe False (reference <) pressure
+
+abrupts :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
+abrupts n = judge n [abrupt]
 
 baselines :: [Double]-> [(Index,Count)]-> [Double]
 baselines pressures candidates = let
-            beginIndices = candidates >$ indexBefore
+            beforeIndices = candidates >$ indexBefore
             afterIndices = candidates >$ indexAfter
-            selectors = zipWith range (0:afterIndices) beginIndices :: [ [Double]-> [Double] ]
+            selectors = zipWith range (0:afterIndices) beforeIndices :: [ [Double]-> [Double] ]
     in
             selectors
          >$ ($ pressures)

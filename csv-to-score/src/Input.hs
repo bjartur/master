@@ -1,12 +1,15 @@
-module Input( CSV, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, readFormerColumn, readLatterColumnAsDoubles, (>$), (>>$) ) where
+module Input( CSV, decrescendoBelowBaselineTerminatedByReversal, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, readFormerColumn, readLatterColumnAsDoubles, (>$), (>>$) ) where
 import Control.Applicative
 import Lib
 
 type CSV = String
 
-nadirs :: Int-> CSV-> [(Index,Count)]
-nadirs n =           readLatterColumnAsDoubles
+decrescendos :: Int-> CSV-> [(Index,Count)]
+decrescendos n =           readLatterColumnAsDoubles
                 >$ declinesLongerThan n
+
+decrescendoBelowBaselineTerminatedByReversal :: Int-> CSV-> [(Index,Count)]
+decrescendoBelowBaselineTerminatedByReversal n = liftA2 (baseline n) readLatterColumnAsDoubles (decrescendos n)
 
 timestampsOfDeclineBeginning :: Int-> String-> [String]
 timestampsOfDeclineBeginning n =
@@ -17,12 +20,9 @@ timestampsOfDeclineEnd :: Int-> String-> [String]
 timestampsOfDeclineEnd n =
                    timestamp indexOfEndOf n
 
-abruptNadirs :: Int-> CSV-> [(Index,Count)]
-abruptNadirs n = liftA2 abrupts readLatterColumnAsDoubles (nadirs n)
-
 timestamp :: ((Index,Count)-> Index)-> Int-> String-> [String]
 timestamp accessor n csv =
-                   abruptNadirs n csv
+                   decrescendoBelowBaselineTerminatedByReversal n csv
                 >$ accessor
                 >$ getTimestamps csv
 

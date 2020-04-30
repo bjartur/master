@@ -25,7 +25,7 @@ main = do
   args <- getArgs
   if args `fewerThan` 2
     then mapM_ putStrLn ["csv2score version 1", "Usage: csv2score DESTINATION FILE..."]
-    else forM_ [2..5] $ \n-> score (tail args) n (head args </> "breaths" </> show n)
+    else forM_ [2..5] $ \n-> score (tail args) n (head args </> "baseline" </> show n)
 
 score:: [FilePath]-> Int-> FilePath-> IO ()
 score sources n destination = forM_ sources $ \source-> (readFile source >$ scoring n) >>= writeFile (destination </> takeFileName source)

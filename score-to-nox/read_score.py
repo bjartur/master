@@ -34,19 +34,19 @@ with open('../best_signal.py', 'rb') as file:
 
 if __name__ == '__main__':
     for n in ("2","3","4","5"):
-        paths = glob("D:\\Master\\autoscored\\breaths\\" + n + "\\*\\")
-        for filepath in paths:
-            name = path.basename(path.dirname(filepath))
-            if  name in ("VSN-14-080-030", "VSN-14-080-031", "VSN-14-080-002_needsfix"):
-                continue;
-            if(True):
-                stderr.write("Does the recording {} exist? ".format(filepath))
-                if(path.isdir(filepath)):
-                    stderr.write("Yes\n")
-                else:
-                    stderr.write("No\n")
-            recording = Recording(filepath, False)
-            base_scoring = 'PSGPes' if name != 'VSN-14-080-006' else 'PSG-Marta'
-            score = '..\\csv-to-score\\output\\breaths\\' + n + '\\' + name + '.txt'
-            mark_events(recording, score, base_scoring, best_signal(name), True)
-
+        for crescendo in ("baseline",):#,"unabrupt"):#,"breaths"):
+            paths = glob("D:\\Master\\autoscored\\" + crescendo + "\\" + n + "\\*\\")
+            for filepath in paths:
+                name = path.basename(path.dirname(filepath))
+                if  name in ("VSN-14-080-030", "VSN-14-080-031", "VSN-14-080-002_needsfix"):
+                    continue;
+                if(True):
+                    stderr.write("Does the recording {} exist? ".format(filepath))
+                    if(path.isdir(filepath)):
+                        stderr.write("Yes\n")
+                    else:
+                        stderr.write("No\n")
+                recording = Recording(filepath, False)
+                base_scoring = 'PSGPes' if name != 'VSN-14-080-006' else 'PSG-Marta'
+                score = '..\\csv-to-score\\output\\' + crescendo + '\\' + n + '\\' + name + '.txt'
+                mark_events(recording, score, base_scoring, best_signal(name), True)

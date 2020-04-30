@@ -7,7 +7,7 @@ import Data.List (sort, nub, foldl1')
 import Debug.Trace
 import Input
 import Lib
-import Prelude hiding (readFile)
+import Prelude
 import Test.Hspec
 import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), listOf, maxSuccess, NonEmptyList(..), Property, property, resize, sized, stdArgs, Testable, quickCheckWith, (==>))
 
@@ -149,6 +149,20 @@ longerCsv = "former column,-7.567405304247912341e-02\r\nformer column,-7.5644033
          ++ "former column,-3.14e-01\r\nformer column,-4.564403304247e-01\r\n"
          ++ "former column,1.2\r\nformer column,1.1\r\nformer column,1.0\r\nformer column,-3.1e-01\r\n"
 
+candidateBaseline007 :: IO CSV
+candidateBaseline007 = readFile "test/candidateBaseline007.csv"
+
+vsn007 = (>$) candidateBaseline007 (++unlines ["2014-12-03 00:59:46.012000,5.910873415838406586e-02"
+  ,"2014-12-03 00:59:48.332000,5.891799929501399802e-02"
+  ,"2014-12-03 00:59:50.952000,5.877494814748644714e-02"
+  ,"2014-12-03 00:59:53.611500,5.873680117481243357e-02"
+  ,"2014-12-03 00:59:56.251000,5.850791933876835216e-02"
+  ,"2014-12-03 00:59:59.171000,5.846023562292583520e-02"
+  ,"2014-12-03 01:00:01.931000,5.805015566668018934e-02"
+  ,"2014-12-03 01:00:04.631000,5.767822268310855705e-02"
+  ,"2014-12-03 01:00:07.331000,5.795478823499515542e-02"
+    ])
+
 main :: IO ()
 main = hspec $ do
         describe "increasing" $ do
@@ -255,16 +269,16 @@ main = hspec $ do
                 it "can notice an abrupt return to baseline" $ do
                         abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] (4, 9) 8.5 `shouldBe` True
         describe "abrupts"$ do
-                it "only accepts or rejects candidate nadirs without introducing new ones" $ do
+                it "only accepts, shortens or rejects candidate nadirs without introducing new ones" $ do
                         forAll $ do
                                 pressures <- sized $ \size-> listOf arbitrary >$ take size
                                 candidates <- resize (length pressures) randomNadirs :: Gen [(Index, Count)]
                                 return (pressures, candidates)
-                       $ uncurry (\pressures-> (abrupts pressures >>= subset))
+                       $ \(pressures,candidates)-> length (abrupts 3 pressures candidates) `shouldSatisfy` (<= length candidates)
                 it "picks up a decrescendo starting at the beginning" $ do
-                        abrupts ([4,3..1] ++ [5]) [(0, 3)] `shouldBe` [(0, 3)]
+                        abrupts 3 ([4,3..1] ++ [5]) [(0, 3)] `shouldBe` [(0, 3)]
                 it "dismisses a decrescendo without reversal at the very end" $ do
-                        abrupts [4,3..1] [(0, 3)] `shouldBe` []
+                        abrupts 3 [4,3..1] [(0, 3)] `shouldBe` []
                 it "dismisses a nadir not followed by an abrupt return to baseline" $ do
                         let before =
                                 [5.978584292334780670e-02 ,5.812644961202821647e-02 ,5.604743960129447700e-02
@@ -282,25 +296,29 @@ main = hspec $ do
                         let descent = [5.199432375468053535e-02 ,5.162239077110890306e-02
                                       ,5.004882814830583643e-02 ,4.948616030136413629e-02]
                         let after = [4.953384401720665325e-02]
-                        abrupts (between ++ descent ++ after) [(length between - 1, length descent)] `shouldBe` []
-                        abrupts (before ++ between ++ descent ++ after) [(length between + length before - 1, length descent)] `shouldBe` []
-        describe "abrupts <*> declinesLongerThan 3" $ do
-                it "rejects a sawtooth" $ do
+                        abrupts 3 (between ++ descent ++ after) [(length between - 1, length descent)] `shouldBe` []
+                        abrupts 3 (before ++ between ++ descent ++ after) [(length between + length before - 1, length descent)] `shouldBe` []
+        describe "liftA2 (<*>) abrupts declinesLongerThan 3" $ do
+                let search = liftA2 (<*>) abrupts declinesLongerThan 3
+                it "rejects a decline terminating the analysis period" $ do
                   let sawtooth = [4,3..1]
-                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` []
+                  search sawtooth `shouldBe` []
                   let sawtooth = [5,4..1]
-                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` []
-                it "accepts sawtooth" $ do
+                  search sawtooth `shouldBe` []
+                it "accepts a decrescendo followed by a jump to above the starting pressure" $ do
                   let sawtooth = [4,3..1] ++ [5]
-                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` [(0, 3)]
+                  search sawtooth `shouldBe` [(0, 3)]
                   let sawtooth = [5,4..1] ++ [6]
-                  (abrupts <*> declinesLongerThan 3) sawtooth `shouldBe` [(0, 4)]
-                it "rejects every crescendo in a saw" $ do
+                  search sawtooth `shouldBe` [(0, 4)]
+                it "finds baselines and short decrescendos in a saw blade" $ do
                   let sawtooth = [5,4..1]
                   let saw = replicate 8 sawtooth & concat
-                  (abrupts <*> declinesLongerThan 3) saw `shouldBe` []
+                  search saw `shouldBe` take 7 (iterate (\(index,_)-> (index+5, 3)) (1,3))
                 it "finds and accepts every crescendo in the mandible of a mountain lion" $ do
                   let tooth = [5,4..1] ++ [6,3]
                   let mandible = replicate 8 tooth & concat
-                  (abrupts <*> declinesLongerThan 3) mandible `shouldBe` take 8 (iterate (\(index,count)-> (index+count+3, count)) (0, 4))
+                  search mandible `shouldBe` take 8 (iterate (\(index,_)-> (index+7, 4)) (0, 4))
+        describe "decrescendoBelowBaselineTerminatedByReversal" $ do
+          it "ignores decrescendo not terminated by abrupt reversal" $ do
+            (>$) vsn007 (decrescendoBelowBaselineTerminatedByReversal 5) `shouldReturn` [(22,5)]
 
