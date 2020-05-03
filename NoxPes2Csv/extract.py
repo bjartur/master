@@ -8,6 +8,10 @@ from typing import List, Callable
 from numpy import ndarray, save, savetxt
 
 
+with open('../best_signal.py', 'rb') as file:
+    exec(file.read()); #def best_signal(name: str); def best_scoring_group
+
+
 def extract(measurements, splitting_method_name, statistic, fmt) -> None:
     """
     :type measurements:          List[str]
@@ -21,15 +25,12 @@ def extract(measurements, splitting_method_name, statistic, fmt) -> None:
             if  path.basename(path.dirname(measurement)) in ("VSN-14-080-030", "VSN-14-080-031", "VSN-14-080-002_needsfix"):
                 continue;
             recording = get_recording_with_derived(measurement);
-            statistics = statistic(recording, best_signal(path.dirname(measurement)));
             measurement_name = path.basename(path.dirname(measurement));
+            best_scoring_group(recording, measurement_name=measurement_name, log=True);
+            statistics = statistic(recording, best_signal(path.dirname(measurement)));
             write(measurement_name, splitting_method_name, statistics, fmt);
     finally:
         stderr.write('--Terminating--\r\n');
-
-
-with open('../best_signal.py', 'rb') as file:
-    exec(file.read()); #def best_signal(name: str)
 
 
 def csvwriter(filepath: str, data: ndarray, fmt: str="%.18e") -> Callable[[str], None]:

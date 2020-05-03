@@ -9,9 +9,6 @@ from os import path
 
 def mark_events(recording: Recording, score: str, base_scoring='PSGPes', signal='PES 3', log=False):
     with open(score, 'r', encoding='ascii') as lines:
-        if log:
-            stderr.write("base scoring: {}\n".format(base_scoring))
-        recording.set_active_scoring_group(base_scoring)
 
         for line in lines:
             row = line.strip().split(',')
@@ -34,7 +31,7 @@ with open('../best_signal.py', 'rb') as file:
 
 if __name__ == '__main__':
     for n in ("2","3","4","5"):
-        for crescendo in ("baseline",):#,"unabrupt"):#,"breaths"):
+        for crescendo in ("baseline","unabrupt","breaths"):
             paths = glob("D:\\Master\\autoscored\\" + crescendo + "\\" + n + "\\*\\")
             for filepath in paths:
                 name = path.basename(path.dirname(filepath))
@@ -47,6 +44,7 @@ if __name__ == '__main__':
                     else:
                         stderr.write("No\n")
                 recording = Recording(filepath, False)
-                base_scoring = 'PSGPes' if name != 'VSN-14-080-006' else 'PSG-Marta'
+                measurement_name = path.basename(path.dirname(filepath));
+                best_scoring_group(recording, measurement_name=measurement_name, log=True);
                 score = '..\\csv-to-score\\output\\' + crescendo + '\\' + n + '\\' + name + '.txt'
-                mark_events(recording, score, base_scoring, best_signal(name), True)
+                mark_events(recording, score, best_signal(name))
