@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (baseline, increasing, decreasing, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, abrupts, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
+module Lib (baseline, belowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, abrupts, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
 
 import Control.Arrow ((>>>))
 import Data.Function ((&))
@@ -82,8 +82,8 @@ risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, coun
 declinesLongerThanThree :: [Double]-> [(Index,Count)]
 declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
-judge :: Int-> [[Double]-> (Index,Count)-> Double-> Bool]-> [Double]-> [(Index,Count)]-> [(Index,Count)]
-judge n additional_critera pressures all_candidates = let
+judge :: [[Double]-> (Index,Count)-> Double-> Bool]-> Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
+judge additional_critera n pressures all_candidates = let
     nonEmpty (_, count) _ = 0 < count
     criteria = nonEmpty : (additional_critera <*> [pressures])
 
@@ -102,7 +102,7 @@ judge n additional_critera pressures all_candidates = let
     continue all_candidates 0
 
 baseline :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
-baseline n = judge n [belowBaseline, abrupt]
+baseline = judge [belowBaseline, abrupt]
 
 belowBaseline :: [Double]-> (Index,Count)-> Double-> Bool
 belowBaseline pressures (index,count) reference = all (reference >) (pressures & drop (index+1) & take count)
@@ -113,7 +113,7 @@ abrupt pressures decrescendo reference = do
        maybe False (reference <) pressure
 
 abrupts :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
-abrupts n = judge n [abrupt]
+abrupts = judge [abrupt]
 
 baselines :: [Double]-> [(Index,Count)]-> [Double]
 baselines pressures candidates = let

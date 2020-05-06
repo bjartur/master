@@ -320,7 +320,7 @@ main = hspec $ do
                   let tooth = [5,4..1] ++ [6,3]
                   let mandible = replicate 8 tooth & concat
                   search mandible `shouldBe` take 8 (iterate (\(index,_)-> (index+7, 4)) (0, 4))
-        describe "decrescendoBelowBaselineTerminatedByReversal" $ do
-          it "ignores decrescendo not terminated by abrupt reversal" $ do
-            (>$) vsn007 (decrescendoBelowBaselineTerminatedByReversal 5) `shouldReturn` [(22,5)]
+        describe "decrescendosFulfilling" $ do
+          it "ignores decrescendos not terminated by abrupt reversal" $ do
+            (>$) vsn007 (decrescendosFulfilling [belowBaseline, abrupt] 5) `shouldReturn` [(22,5)]
 
