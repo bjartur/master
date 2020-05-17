@@ -1,0 +1,17 @@
+---
+resolver: lts-14.27
+extra-deps:
+  - plots-0.1.1.2
+  - hashable-1.2.7.0
+
+flags:
+  diagrams:
+    svg: true
+    ps: false
+    rasterific: false
+    canvas: false
+    gtk: false
+    cairo: false
+
+packages:
+  - .

@@ -1,0 +1,43 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 1cc62ba86bf6038c4ac28f9e81f888985be9014fa33224c20869c6b8c6357649
+
+name:           plot
+version:        0.1.0.0
+homepage:       https://github.com/bjartur/Master/tree/master/csv-to-score#readme
+bug-reports:    https://github.com/bjartur/Master/tree/master/csv-to-score/issues
+author:         Bjartur Thorlacius
+maintainer:     bjt9@hi.is
+copyright:      Copyright (c) 2018–2020 Bjartur Thorlacius
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/bjartur/Master/tree/master/csv-to-score
+
+executable plot
+  main-is: Main.hs
+  other-modules:
+      Wilcoxon
+      Paths_plot
+  hs-source-dirs:
+      ./.
+  build-depends:
+      base >=4.12.0.0 && <4.14
+    , colour >=1.0.0 && <2.4
+    , diagrams-core >=1.4.2 && <1.5
+    , diagrams-lib <1.5
+    , diagrams-svg <1.5
+    , directory >=1.2.5.0 && <1.4
+    , filepath <1.5
+    , lens >=4.6 && <5.0
+    , linear >=1.20.9 && <1.21
+    , plots >=0.1.1.2
+    , semigroups <0.20
+    , statistics <=0.16 && >=0.15.2.0
+    , vector >=0.12.0.3 && <=0.13
+  default-language: Haskell2010
