@@ -24,7 +24,7 @@ import System.Directory( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName )
 
 numbers:: IO [(String, [Double])]
-numbers= liftA2 (:) kao autoscores
+numbers= liftA2 (++) autoscores $ sequence [kao, marta]
 
 countLines:: FilePath-> IO Double
 countLines= readFile <&> fmap lines <&> fmap length <&> fmap fromIntegral
@@ -34,13 +34,19 @@ fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
 
 autoscores:: IO [(String, [Double])]
 autoscores= traverse (tally fromScoreName) $
-  ["../csv-to-score/output/"] +/+ reverse ["unabrupt", "reversal", "baseline"] +/+ reverse (map pure ['2'..'5'])
+  ["../csv-to-score/output/"] +/+ ["unabrupt", "reversal", "baseline"] +/+ (map pure ['2'..'5'])
 
 fromKaoName:: FilePath-> Double
 fromKaoName= takeWhile (/='.') <&> read
 
 kao:: IO (String, [Double])
 kao= tally fromKaoName "../Nox2score/KAO/" <&> (_1 .~ "KAÓ")
+
+fromMartaName:: FilePath-> Double
+fromMartaName= drop (length "VSN-14-080-0") <&> fromKaoName
+
+marta:: IO (String, [Double])
+marta= tally fromMartaName "../Nox2score/Marta" <&> (_1 .~ "Marta")
 
 pairWith:: (a-> b)-> [a]-> [(b,a)]
 pairWith f= (map f >>= zip)
