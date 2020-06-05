@@ -10,7 +10,7 @@ import Data.List( intercalate, sort )
 import Diagrams.Backend.SVG( SVG, renderSVG )
 import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
-import Linear.V2( V2( V2 ) )
+import Linear.Vector( zero )
 import Plots.Axis( r2Axis, xAxis, xLabel, yAxis)
 import Plots.Axis.ColourBar( colourBar )
 import Plots.Axis.Labels( tickLabelPositions )
@@ -23,6 +23,13 @@ import Plots.Types.HeatMap( heatMap' )
 import System.Directory( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName )
 
+sublists:: IO [[(String,[Double])]]
+sublists = (traverse.traverse) (tally fromScoreName) (map (["../csv-to-score/output"]+/+) [
+    ["baseline/3"]
+  , ["unabrupt", "reversal", "baseline"] +/+ ["3"]
+  , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ map pure ['2'..'5'])
+  ])
+
 numbers:: IO [(String, [Double])]
 numbers= liftA2 (++) autoscores $ sequence [kao, marta]
 
@@ -34,7 +41,7 @@ fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
 
 autoscores:: IO [(String, [Double])]
 autoscores= traverse (tally fromScoreName) $
-  ["../csv-to-score/output/"] +/+ ["unabrupt", "reversal", "baseline"] +/+ (map pure ['2'..'5'])
+  ["../csv-to-score/output/"] +/+ ["unabrupt", "reversal", "baseline"] +/+ map pure ['2'..'5']
 
 fromKaoName:: FilePath-> Double
 fromKaoName= takeWhile (/='.') <&> read
@@ -84,22 +91,32 @@ plot colour distributions=
     colourBar . visible .= True
     heatMap' (distributions <&> snd)
 
-raw:: IO (Diagram SVG)
-raw= numbers <&> plot white
+raw:: [(String, [Double])]-> Diagram SVG
+raw= plot white
 
 normalize:: [Double]-> [Double]
 normalize list= map (/ sum list) list
 
-normalized:: IO (Diagram SVG)
-normalized= numbers <&> over (mapped._2) normalize <&> plot yellow
+normalized:: [(String, [Double])]-> Diagram SVG
+normalized= over (mapped._2) normalize <&> plot yellow
 
-draw:: IO (Diagram SVG)-> FilePath-> IO ()
-a `draw` b= a >>= renderSVG b (dims $ V2 1000 1000.0)
+render:: ([(String, [Double])]-> Diagram SVG)-> FilePath-> [(String, [Double])]-> IO ()
+render draw filename heats= renderSVG filename (dims zero) (draw heats)
 
 main:: IO ()
 main= do
-  draw raw "tally.heat.svg"
-  draw normalized "distribution.heat.svg"
+  numbers >>= render raw "tally.svg"
+  numbers >>= render normalized "tally.distribution.svg"
+  sequence [marta] >>= render raw "marta.svg"
+  sequence [marta,kao] >>= render raw "manual.svg"
+  sequence [marta,kao] >>= render normalized "manual.distribution.svg"
+  autoscores >>= render raw "autoscores.svg"
+  autoscores >>= render normalized "autoscores.distribution.svg"
+  lists <- sublists
+  sequence_ $ do
+    (n, sublist) <- zip [1::Int ..] lists
+    [ render raw ("raw" ++ show n ++ ".svg") sublist
+     ,render normalized ("distribution" ++ show n ++ ".svg") sublist]
 
 colourScheme:: Colour Double-> ColourMap
 colourScheme colour= colourMap [(0,colour), (1,red)]
@@ -108,3 +125,4 @@ colourScheme colour= colourMap [(0,colour), (1,red)]
 
 (+/+):: [FilePath]-> [FilePath]-> [FilePath]
 (+/+)= liftA2 (</>)
+infixr 6 +/+ -- one tighter than ++
