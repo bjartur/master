@@ -3,5 +3,8 @@ resolver: nightly-2019-10-21
 packages:
   - .
 
+extra-deps:
+  - data-interval-2.0.1
+  
 ghc-options:
   "$locals": -fno-warn-unused-do-bind

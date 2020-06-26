@@ -5,6 +5,7 @@ version: 0.0.0.0
 dependencies:
   - base < 4.14 && >= 2.10
   - filepath < 1.5 && >= 1.4
+  - data-interval >= 2.0
 
 executables:
   overlap:

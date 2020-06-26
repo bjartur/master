@@ -6,12 +6,17 @@ import Data.Char
 import Data.Function( on, (&) )
 import System.Environment( getArgs )
 import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy, (<++) )
+import qualified Data.Interval     as Interval
+import qualified Data.IntervalSet  as IntervalSet
+import Data.Interval (Extended(Finite), Boundary(Closed))
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
 infixl 1 >$
 
-type Interval= (DateTime, DateTime)
+type Interval  = Interval.Interval DateTime
+type Intervals = IntervalSet.IntervalSet DateTime 
+
 data DateTime= DateTime {
  year:: Int,
  month:: Int,
@@ -28,43 +33,38 @@ main= do
     then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER"]
     else
         (traverse readFile paths ::IO [String])
-    >>= (\[former,latter]-> correlation (parse former ::[Interval]) (parse latter ::[Interval])
+    >>= (\[former,latter]-> correlation (parse former :: Intervals) (parse latter :: Intervals)
                           & print)
 
-correlation:: [Interval]-> [Interval]-> Double
+correlation:: Intervals -> Intervals -> Double
 correlation one other= do
   let dividedBy = (/) `on` fromIntegral
-  let total= map measure(union one other) & sum
+  let total = measures (union one other)
   if total == 0
-  then 1.0
+  then undefined
   else overlaps one other `dividedBy` total
 
 -- @union ones others@ calculates a union of the given ascending lists of intervals, ordered by their start time.
 -- If each input list contains only disjoint intervals, the same will hold for the result.
 -- If the input is represented by exclusive intervals, so will the result be, and vice versa.
-union:: [Interval]-> [Interval]-> [Interval]
-union [] intervals= intervals
-union intervals []= intervals
-union ((start,stop):formers) ((beginning,end):latters)=
-  if      end < start      then (beginning,end) : union formers ((start,stop):latters)
-  else if stop < beginning then (start,stop) : union latters ((beginning,end):formers)
-  else                          (min start beginning, max stop end) : union formers latters
+union :: Intervals -> Intervals -> Intervals
+union = IntervalSet.union
 
 -- @overlaps ones others@ measures the intersection of the two given countable unions of intervals,
 -- assuming each argument is an ascending list of disjoint intervals.
-overlaps:: [Interval]-> [Interval]-> Int
-overlaps [] _= 0
-overlaps _ []= 0
-overlaps ((beginning,end):formers)((start,stop):latters)=
-  if      end < start      then overlaps ((start,stop):latters) formers
-  else if stop < beginning then overlaps latters ((beginning,end):formers)
-  else overlap (beginning,end)(start,stop)
-       + if end < stop
-         then overlaps formers ((end,stop):latters)
-         else overlaps ((stop,end):formers)latters
+overlaps:: Intervals -> Intervals -> Int
+overlaps a b = measures $ IntervalSet.intersection a b
 
-measure:: (DateTime, DateTime)-> Int
-measure(from, to)= let
+measure :: Interval -> Int
+measure i = let (Finite lower) = Interval.lowerBound i
+                (Finite upper) = Interval.upperBound i
+            in measure' (lower, upper)
+
+measures :: Intervals -> Int
+measures is = map measure (IntervalSet.toList is) & sum
+
+measure' :: (DateTime, DateTime)-> Int
+measure' (from, to)= let
   seconds accessor unit= unit * (accessor to - accessor from)
   increments= [1, 60, 60, 24, 365]
   accessors = [second, minute, hour, day, year]
@@ -72,23 +72,22 @@ measure(from, to)= let
   in
   zipWith seconds accessors units & sum
 
-overlap:: Interval-> Interval-> Int
-overlap (from, to) (start, end)= measure(max from start, min to end)
-
-parse:: String-> [Interval]
+parse:: String-> Intervals
 parse= readP_to_S file
     >$ last >$ fst
 
-file:: ReadP [ (DateTime, DateTime) ]
-file= some row <* eof
+file:: ReadP Intervals
+file = some row <* eof >$ IntervalSet.fromList
 
-row:: ReadP (DateTime, DateTime)
+row:: ReadP Interval
 row= do
   start <- dateTime
   expect ','
   end <- dateTime
   expect '\n' -- native line separator has already been translated to \n
-  return (start, end)
+  return $ Interval.interval
+    (Finite start, Closed)
+    (Finite end,   Closed)
 
 dateTime:: ReadP DateTime
 dateTime= do
