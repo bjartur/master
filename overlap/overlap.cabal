@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.32.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a986bae195bd449451ef95c97718aea5c35f597bd137d3e0e0941d99427989b6
+-- hash: de87a6a36cd2ea54682af45826482f682bd5197fd2388fb9dec4db5ccdc44cdd
 
 name:           overlap
 version:        0.0.0.0

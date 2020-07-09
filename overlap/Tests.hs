@@ -14,7 +14,7 @@ import Test.Hspec.Core.QuickCheck( modifyMaxSuccess )
 import Text.ParserCombinators.ReadP( eof, ReadP, readP_to_S )
 import Test.QuickCheck (Arbitrary, arbitrary, Gen, choose, property)
 
-import Main ( DateTime(..), Intervals, couple, correlation, dateTime, digit, file, period, measure, row, (>$) )
+import Main ( DateTime(..), Intervals, couple, correlation, dateTime, digit, file, period, measure, row, (>$), overlaps, union, measures )
 
 examples:: (Show a, Show b, Eq b)=> (a -> b)-> [(a,b)]-> Expectation
 examples f= (f >$ shouldBe) & uncurry & mapM_
@@ -167,6 +167,30 @@ main= hspec.modifyMaxSuccess(10*) $ do
         return $ do
           correlation disjoints empty `shouldNotBe` 1
           correlation empty disjoints `shouldNotBe` 1
+    describe "overlaps" $ do
+      it "identical interval sets overlap totally" $ do
+        let setA = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
+            setB = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
+        overlaps setA setB `shouldBe` 10
+      it "partially overlapping intervals" $ do
+        let setA = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 15)]
+            setB = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
+        overlaps setA setB `shouldBe` 10
+      it "non-overlapping sets should return 0 seconds overlap" $ do
+        let setA = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
+            setB = fromList [period (DateTime 2020 07 09 15 56 10) (DateTime 2020 07 09 15 56 20)]
+        overlaps setA setB `shouldBe` 0
+      it "1 sec overlapping sets" $ do
+        let setA = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
+            setB = fromList [period (DateTime 2020 07 09 15 56 09) (DateTime 2020 07 09 15 56 20)]
+        overlaps setA setB `shouldBe` 1
+    describe "unions" $ do
+      it "two 10s intervals that overlap 1s measures a total of 19s" $ do
+        let setA = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
+            setB = fromList [period (DateTime 2020 07 09 15 56 09) (DateTime 2020 07 09 15 56 19)]
+            setUnion = union setA setB
+        measures setUnion `shouldBe` 19
+
 
 instance Arbitrary DateTime where
   arbitrary= pure DateTime
