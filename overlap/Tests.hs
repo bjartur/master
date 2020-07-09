@@ -191,6 +191,18 @@ main= hspec.modifyMaxSuccess(10*) $ do
         return $ do
           correlation disjoints [] `shouldNotBe` 1
           correlation [] disjoints `shouldNotBe` 1
+    describe "unions" $ do
+      it "two 10s intervals that overlap 1s measures a total of 19s" $ do
+        let intervalA = ((DateTime 2020 07 09 15 56 00), (DateTime 2020 07 09 15 56 10))
+            intervalB = ((DateTime 2020 07 09 15 56 09), (DateTime 2020 07 09 15 56 19))
+            setUnion = union [intervalA] [intervalB]
+        (map measure setUnion & sum) `shouldBe` 19
+      it "unions should be disjoint" $ do
+        let setA = [ ((DateTime 2020 07 09 15 56 00), (DateTime 2020 07 09 15 56 10)) ]
+            setB = [ ((DateTime 2020 07 09 15 30 09), (DateTime 2020 07 09 15 30 19))
+                   , ((DateTime 2020 07 09 15 56 00), (DateTime 2020 07 09 15 56 10)) ]
+            setUnion = union setA setB
+        (map measure setUnion & sum) `shouldBe` 20
 
 instance Arbitrary DateTime where
   arbitrary= pure DateTime
