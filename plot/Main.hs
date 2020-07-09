@@ -1,7 +1,9 @@
 import Control.Applicative( liftA2 )
+import Control.DeepSeq ( ($!!) )
 import Control.Lens.Operators( (&~) )
 import Control.Lens.Setter( (.~), (.=), mapped, over, set )
 import Control.Lens.Tuple( _1, _2 )
+import Control.Monad ( forM )
 import Data.Colour( Colour )
 import Data.Colour.Names( black, blue, red, white, yellow )
 import Data.Functor( (<&>) )
@@ -40,8 +42,14 @@ fromScoreName:: FilePath-> Double
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
 
 autoscores:: IO [(String, [Double])]
-autoscores= traverse (tally fromScoreName) $
-  ["../csv-to-score/output/"] +/+ ["unabrupt", "reversal", "baseline"] +/+ map pure ['2'..'5']
+autoscores= do
+  let expandedPaths =
+        ["../csv-to-score/output/"]
+        +/+ ["unabrupt", "reversal", "baseline"]
+        +/+ map pure ['2'..'5']
+  forM expandedPaths $ \path -> do
+    (a,b) <- tally fromScoreName path
+    return $!! (a,b)
 
 fromKaoName:: FilePath-> Double
 fromKaoName= takeWhile (/='.') <&> read
@@ -67,7 +75,8 @@ tally enumerate directory= do
   let sorted = sort filtered
   let filenames = sorted <&> snd <&> (directory </>)
   let label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) & intercalate "#"
-  let values = traverse countLines filenames
+  let values :: IO [Double]
+      values = traverse countLines filenames
   values <&> (,) label
 
 
