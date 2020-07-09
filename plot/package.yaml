@@ -1,7 +1,7 @@
 ---
 name: plot
 version: 0.1.0.0
-github: "bjartur/Master/tree/master/csv-to-score"
+github: "bjartur/Master/tree/master/plot"
 author: "Bjartur Thorlacius"
 maintainer: "bjt9@hi.is"
 copyright: "Copyright (c) 2018–2020 Bjartur Thorlacius"
@@ -20,6 +20,7 @@ dependencies:
   - colour >= 1.0.0 && < 2.4
   - statistics <= 0.16 && >= 0.15.2.0
   - vector >= 0.12.0.3 && <= 0.13
+  - deepseq
 
 executables:
   plot:
