@@ -85,7 +85,11 @@ row= do
   expect ','
   end <- dateTime
   expect '\n' -- native line separator has already been translated to \n
-  return $ Interval.interval
+  return $ period start end
+
+period :: Ord r=> r-> r-> Interval.Interval r
+period start end=
+  Interval.interval
     (Finite start, Closed)
     (Finite end,   Closed)
 
