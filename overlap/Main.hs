@@ -31,11 +31,13 @@ main= do
   paths <- getArgs
   if paths `fewerThan` 2
     then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER"]
-    else
-        (traverse readFile paths ::IO [String])
-    >>= (\[former,latter]-> correlation (parse former :: Intervals) (parse latter :: Intervals)
-                          & print)
+    else do
+      [former, latter] <- traverse readFile paths >>$ parse
+      putStrLn $ "left:  " ++ show (onlyLeft former latter)
+      putStrLn $ "right: " ++ show (onlyLeft latter former)
+      putStrLn $ "intersection: " ++ show (correlation former latter)
 
+-- Ratio of measures that intersect on both sides over total
 correlation:: Intervals -> Intervals -> Double
 correlation one other= do
   let dividedBy = (/) `on` fromIntegral
@@ -43,6 +45,12 @@ correlation one other= do
   if total == 0
   then undefined
   else overlaps one other `dividedBy` total
+
+-- Ratio of measures on the left-hand side
+onlyLeft :: Intervals -> Intervals -> Double
+onlyLeft one other = (one `IntervalSet.difference` intersect & measures) `dividedBy` (measures $ union one other)
+  where intersect = IntervalSet.intersection one other
+        dividedBy = (/) `on` fromIntegral
 
 -- @union ones others@ calculates a union of the given ascending lists of intervals, ordered by their start time.
 -- If each input list contains only disjoint intervals, the same will hold for the result.
@@ -133,3 +141,9 @@ expected expectation reality= error ("\n\tExpected " ++ expectation ++ " but got
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
+
+(>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
+boxed >>$ function =
+                   boxed
+                >$ fmap function
+infixl 2 >>$
