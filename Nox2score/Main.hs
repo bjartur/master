@@ -1,8 +1,8 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module Main where
 
-import Control.Applicative (liftA2, some, (<|>) )
-import Control.Monad( guard, filterM, when )
+import Control.Applicative (liftA2, (<|>) )
+import Control.Monad( guard, filterM, replicateM, when )
 import Data.Char
 import Data.Function( (&) )
 import Data.Functor( (<&>), ($>) )
@@ -12,7 +12,7 @@ import System.Directory( getDirectoryContents )
 import System.Environment( getArgs )
 import System.Exit( die )
 import System.FilePath( takeFileName, (</>), (<.>) )
-import System.IO( Handle, IOMode(ReadMode, WriteMode), hGetContents, hLookAhead, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
+import System.IO( Handle, IOMode(ReadMode, WriteMode), hGetContents, hLookAhead, hPutStr, hSetEncoding, utf16le, utf8, withBinaryFile, withFile )
 import Text.ParserCombinators.ReadP( ReadP, char, eof, get, look, many, manyTill, optional, readP_to_S, satisfy, string, (<++) )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
@@ -33,8 +33,8 @@ make  destinationFolder inputPath= do
 
 convertAndSave:: FilePath-> String-> Handle-> IO ()
 convertAndSave destinationFolder date inputHandle= do
-     magic <- hLookAhead inputHandle
-     when(fromEnum magic == 0xff) $ hSetEncoding inputHandle utf16
+     utf16ByteOrderMark <- replicateM 2 (hLookAhead inputHandle)
+     when(map fromEnum utf16ByteOrderMark == [0xff, 0xfe]) $ hSetEncoding inputHandle utf16le
      input <- hGetContents inputHandle
      let output = convert input
      save destinationFolder date output
