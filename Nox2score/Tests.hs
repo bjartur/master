@@ -99,7 +99,7 @@ main= hspec $ do
           "29/12/2014 04:07:10,29/12/2014 04:07:37,,",
           ""])
           `shouldStartWith` [(DateTime 2014 12 29 3 16 17, DateTime 2014 12 29 3 16 44), (DateTime 2014 12 29 3 16 48, DateTime 2014 12 29 3 17 8)]
-    it "accepts the contents of an actual file as valid" $
+    it "accepts the contents of an actual file as valid" $ do
       parse file (intercalate "\r\n" [
         "Start Time,End Time,Sleep,",
         "[],[],[],",
@@ -133,7 +133,13 @@ main= hspec $ do
         "02/12/2014 03:20:27,02/12/2014 03:20:47,REM,",
         "02/12/2014 04:28:53,02/12/2014 04:29:15,Vaka,",
         ""
-      ]) `shouldStartWith` [(DateTime 2014 12 2 0 40 0, DateTime 2014 12 2 0 40 27)]
+        ]) `shouldStartWith` [(DateTime 2014 12 2 0 40 0, DateTime 2014 12 2 0 40 27)]
+      parse file (intercalate "\r\n" [
+        "Start Time,End Time,Sleep,",
+        "[],[],[],",
+        "12/11/2014 05:56:32,12/11/2014 05:56:49,REM,",
+        ""
+        ]) `shouldBe` [(DateTime 2014 11 12 5 56 32, DateTime 2014 11 12 5 56 49)]
     describe "recordingName" $ it "accepts recording names, if only, of the form VSN-14-080-0[0-2][3-9]" $ property $ do
       former <- choose('0','2')
       latter <- choose('3','9')

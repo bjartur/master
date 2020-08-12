@@ -12,7 +12,7 @@ import System.Directory( getDirectoryContents )
 import System.Environment( getArgs )
 import System.Exit( die )
 import System.FilePath( takeFileName, (</>), (<.>) )
-import System.IO( Handle, IOMode(ReadMode, WriteMode), hGetContents, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
+import System.IO( Handle, IOMode(ReadMode, WriteMode), hGetContents, hLookAhead, hPutStr, hSetEncoding, utf16, utf8, withBinaryFile, withFile )
 import Text.ParserCombinators.ReadP( ReadP, char, eof, get, look, many, manyTill, optional, readP_to_S, satisfy, string, (<++) )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
@@ -32,10 +32,12 @@ make  destinationFolder inputPath= do
   withBinaryFile inputPath ReadMode (convertAndSave destinationFolder date)
 
 convertAndSave:: FilePath-> String-> Handle-> IO ()
-convertAndSave destinationFolder date inputHandle=
-     hSetEncoding inputHandle utf16
-  >> hGetContents inputHandle >$ convert
-  >>= save destinationFolder date
+convertAndSave destinationFolder date inputHandle= do
+     magic <- hLookAhead inputHandle
+     when(fromEnum magic == 0xff) $ hSetEncoding inputHandle utf16
+     input <- hGetContents inputHandle
+     let output = convert input
+     save destinationFolder date output
 
 save:: FilePath-> String-> String-> IO ()
 save destinationFolder date output= do
@@ -113,7 +115,7 @@ file:: ReadP [ (DateTime, DateTime) ]
 file= do
   string "Start Time,End Time,Sleep,\r\n"
   string "[],[],[],\r\n"
-  body <- some row
+  body <- many row
   eof
   return body
 
