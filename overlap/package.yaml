@@ -6,10 +6,18 @@ dependencies:
   - base < 4.14 && >= 2.10
   - filepath < 1.5 && >= 1.4
   - data-interval >= 2.0
+  - lens >= 4.6 && < 5.0
+  - linear >= 1.20.9 && < 1.21
+  - plots
+  - diagrams-svg < 1.5
+  - diagrams-lib < 1.5
+  - diagrams-core >= 1.4.2 && < 1.5
+  - vector >= 0.12.0.3 && <= 0.13
 
 executables:
   overlap:
     main: Main.hs
+    other-modules: Plot
 
 tests:
   spec:

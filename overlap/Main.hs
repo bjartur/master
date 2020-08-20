@@ -9,6 +9,7 @@ import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy,
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite), Boundary(Closed))
+import Plot (renderOverlaps)
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -33,9 +34,14 @@ main= do
     then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER"]
     else do
       [former, latter] <- traverse readFile paths >>$ parse
-      putStrLn $ "left:  " ++ show (onlyLeft former latter)
-      putStrLn $ "right: " ++ show (onlyLeft latter former)
-      putStrLn $ "intersection: " ++ show (correlation former latter)
+      let left  = onlyLeft former latter
+          right = onlyLeft latter former
+          intersection = correlation former latter
+      putStrLn $ "left:  " ++ show left
+      putStrLn $ "right: " ++ show right
+      putStrLn $ "intersection: " ++ show intersection
+      renderOverlaps "overlaps.svg" [("left", [left,intersection,right], "right")]
+      putStrLn "Wrote overlaps.svg"
 
 -- Ratio of measures that intersect on both sides over total
 correlation:: Intervals -> Intervals -> Double
