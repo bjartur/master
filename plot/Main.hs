@@ -26,7 +26,7 @@ import System.Directory( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName )
 
 sublists:: IO [[(String,[Double])]]
-sublists = (traverse.traverse) (tally fromScoreName) (map (["../csv-to-score/output"]+/+) [
+sublists = (traverse.traverse) tally (map (["../csv-to-score/output"]+/+) [
     ["baseline/3"]
   , ["unabrupt", "reversal", "baseline"] +/+ ["3"]
   , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ map pure ['2'..'5'])
@@ -48,28 +48,22 @@ autoscores= do
         +/+ ["unabrupt", "reversal", "baseline"]
         +/+ map pure ['2'..'5']
   forM expandedPaths $ \path -> do
-    (a,b) <- tally fromScoreName path
+    (a,b) <- tally path
     return $!! (a,b)
 
-fromKaoName:: FilePath-> Double
-fromKaoName= takeWhile (/='.') <&> read
-
 kao:: IO (String, [Double])
-kao= tally fromKaoName "../Nox2score/KAO/" <&> (_1 .~ "KAÓ")
-
-fromMartaName:: FilePath-> Double
-fromMartaName= drop (length "VSN-14-080-0") <&> fromKaoName
+kao= tally "../Nox2score/output/KAÓ/" <&> (_1 .~ "KAÓ")
 
 marta:: IO (String, [Double])
-marta= tally fromMartaName "../Nox2score/Marta" <&> (_1 .~ "Marta")
+marta= tally "../Nox2score/output/Marta" <&> (_1 .~ "Marta")
 
 pairWith:: (a-> b)-> [a]-> [(b,a)]
 pairWith f= (map f >>= zip)
 
-tally:: (FilePath-> Double)-> FilePath-> IO (String, [Double])
-tally enumerate directory= do
+tally:: FilePath-> IO (String, [Double])
+tally directory= do
   scorePaths <- listDirectory directory
-  let enumerated = pairWith enumerate scorePaths
+  let enumerated = pairWith fromScoreName scorePaths
   let forbid = on (liftA2 (&&)) (/=)
   let filtered = filter (fst <&> forbid 13 14) enumerated
   let sorted = sort filtered
