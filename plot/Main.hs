@@ -23,7 +23,7 @@ import Plots.Style( ColourMap, axisColourMap, colourMap, infColour, negInfColour
 import Plots.Types( visible )
 import Plots.Types.HeatMap( heatMap' )
 import System.Directory( listDirectory )
-import System.FilePath( (</>), splitDirectories, takeFileName )
+import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 
 -- Represent number of lines in a file
 data PathLines = PathLines { _path :: FilePath, _lines :: Double }
@@ -118,6 +118,12 @@ normalized= over (mapped._2) normalize <&> plot yellow
 
 normalized' = normalized . discardPath
 
+-- Divides number of events by `tst` of recording
+perhour = plot white . map (\(n,pc) -> (n, map divideTst pc))
+  where
+    divideTst :: PathLines -> Double
+    divideTst (PathLines name c) = c / tst (takeBaseName name)
+
 render:: ([(String, [PathLines])]-> Diagram SVG)-> FilePath-> [(String, [PathLines])]-> IO ()
 render draw filename heats= renderSVG filename (dims zero) (draw heats)
 
@@ -125,6 +131,7 @@ main:: IO ()
 main= do
   numbers >>= render raw "tally.svg"
   numbers >>= render normalized' "tally.distribution.svg"
+  numbers >>= render perhour "tally.perhour.svg"
   sequence [marta] >>= render raw "marta.svg"
   sequence [marta,kao] >>= render raw "manual.svg"
   sequence [marta,kao] >>= render normalized' "manual.distribution.svg"
@@ -144,3 +151,35 @@ colourScheme colour= colourMap [(0,colour), (1,red)]
 (+/+):: [FilePath]-> [FilePath]-> [FilePath]
 (+/+)= liftA2 (</>)
 infixr 6 +/+ -- one tighter than ++
+
+-- Data on the length of recordings
+--  TST = Total Sleep Time
+tst :: String -- recording name
+    -> Double -- length in hours
+tst "VSN-14-080-001" = 7 + 3/60
+tst "VSN-14-080-005" = 6 + 3/60
+tst "VSN-14-080-006" = 4 + 5/60
+tst "VSN-14-080-007" = 6 + 8/60
+tst "VSN-14-080-008" = 5 + 3/60
+tst "VSN-14-080-009" = 5 + 1/60
+tst "VSN-14-080-010" = 6 + 3/60
+tst "VSN-14-080-004" = 6 + 8/60
+tst "VSN-14-080-003" = 7 + 8/60
+tst "VSN-14-080-011" = 1 + 4/60
+tst "VSN-14-080-012" = 6 + 6/60
+tst "VSN-14-080-015" = 4 + 3/60
+tst "VSN-14-080-016" = 7 + 4/60
+tst "VSN-14-080-017" = 7 + 0/60
+tst "VSN-14-080-018" = 5 + 2/60
+tst "VSN-14-080-019" = 7 + 5/60
+tst "VSN-14-080-020" = 6 + 9/60
+tst "VSN-14-080-021" = 7 + 6/60
+tst "VSN-14-080-022" = 7 + 9/60
+tst "VSN-14-080-023" = 7 + 5/60
+tst "VSN-14-080-024" = 6 + 8/60
+tst "VSN-14-080-025" = 6 + 6/60
+tst "VSN-14-080-026" = 6 + 9/60
+tst "VSN-14-080-027" = 5 + 1/60
+tst "VSN-14-080-028" = 7 + 6/60
+tst "VSN-14-080-029" = 6 + 7/60
+tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
