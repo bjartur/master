@@ -23,25 +23,32 @@ import Plots.Style( ColourMap, axisColourMap, colourMap, infColour, negInfColour
 import Plots.Types( visible )
 import Plots.Types.HeatMap( heatMap' )
 import System.Directory( listDirectory )
-import System.FilePath( (</>), splitDirectories, takeFileName )
+import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 
-sublists:: IO [[(String,[Double])]]
+-- Represent number of lines in a file
+data PathLines = PathLines { _path :: FilePath, _lines :: Double }
+  deriving Show
+
+sublists:: IO [[(String,[PathLines])]]
 sublists = (traverse.traverse) tally (map (["../csv-to-score/output"]+/+) [
     ["baseline/3"]
   , ["unabrupt", "reversal", "baseline"] +/+ ["3"]
   , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ map pure ['2'..'5'])
   ])
 
-numbers:: IO [(String, [Double])]
-numbers= liftA2 (++) autoscores $ sequence [kao, marta]
+numbers:: IO [(String, [PathLines])]
+numbers= liftA2 (++) autoscores (sequence [kao, marta])
 
-countLines:: FilePath-> IO Double
-countLines= readFile <&> fmap lines <&> fmap length <&> fmap fromIntegral
+countLines :: FilePath -> IO PathLines
+countLines path = do
+  contents <- readFile path
+  let lineCount = fromIntegral . length . lines $ contents
+  pure $ PathLines path lineCount
 
 fromScoreName:: FilePath-> Double
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
 
-autoscores:: IO [(String, [Double])]
+autoscores:: IO [(String, [PathLines])]
 autoscores= do
   let expandedPaths =
         ["../csv-to-score/output/"]
@@ -49,12 +56,12 @@ autoscores= do
         +/+ map pure ['2'..'5']
   forM expandedPaths $ \path -> do
     (a,b) <- tally path
-    return $!! (a,b)
+    return (a,b)
 
-kao:: IO (String, [Double])
+kao:: IO (String, [PathLines])
 kao= tally "../Nox2score/output/KAÓ/" <&> (_1 .~ "technologist")
 
-marta:: IO (String, [Double])
+marta:: IO (String, [PathLines])
 marta= tally "../Nox2score/output/Marta" <&> (_1 .~ "technician")
 
 pairWith:: (a-> b)-> [a]-> [(b,a)]
@@ -66,7 +73,7 @@ rename "reversal"= "Medium"
 rename "baseline"= "Complex"
 rename other= other
 
-tally:: FilePath-> IO (String, [Double])
+tally :: FilePath -> IO (String, [PathLines])
 tally directory= do
   scorePaths <- listDirectory directory
   let enumerated = pairWith fromScoreName scorePaths
@@ -75,10 +82,14 @@ tally directory= do
   let sorted = sort filtered
   let filenames = sorted <&> snd <&> (directory </>)
   let label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
-  let values :: IO [Double]
+  let values :: IO [PathLines]
       values = traverse countLines filenames
   values <&> (,) label
 
+-- Extracts the _lines portion of this structure
+discardPath :: [(String, [PathLines])]
+            -> [(String, [Double])]
+discardPath = map $ \(a,b) -> (a, map _lines b)
 
 plot:: Colour Double-> [(String, [Double])]-> Diagram SVG
 plot colour distributions=
@@ -100,8 +111,10 @@ plot colour distributions=
     colourBar . visible .= True
     heatMap' (distributions <&> snd)
 
-raw:: [(String, [Double])]-> Diagram SVG
-raw= plot white
+plot' c= plot c . discardPath
+
+raw:: [(String, [PathLines])]-> Diagram SVG
+raw= plot' white
 
 normalize:: [Double]-> [Double]
 normalize list= map (/ sum list) list
@@ -109,23 +122,32 @@ normalize list= map (/ sum list) list
 normalized:: [(String, [Double])]-> Diagram SVG
 normalized= over (mapped._2) normalize <&> plot yellow
 
-render:: ([(String, [Double])]-> Diagram SVG)-> FilePath-> [(String, [Double])]-> IO ()
+normalized' = normalized . discardPath
+
+-- Divides number of events by `tst` of recording
+perhour = plot white . map (\(n,pc) -> (n, map divideTst pc))
+  where
+    divideTst :: PathLines -> Double
+    divideTst (PathLines name c) = c / tst (takeBaseName name)
+
+render:: ([(String, [PathLines])]-> Diagram SVG)-> FilePath-> [(String, [PathLines])]-> IO ()
 render draw filename heats= renderSVG filename (dims zero) (draw heats)
 
 main:: IO ()
 main= do
   numbers >>= render raw "tally.svg"
-  numbers >>= render normalized "tally.distribution.svg"
+  numbers >>= render normalized' "tally.distribution.svg"
+  numbers >>= render perhour "tally.perhour.svg"
   sequence [marta] >>= render raw "marta.svg"
   sequence [marta,kao] >>= render raw "manual.svg"
-  sequence [marta,kao] >>= render normalized "manual.distribution.svg"
+  sequence [marta,kao] >>= render normalized' "manual.distribution.svg"
   autoscores >>= render raw "autoscores.svg"
-  autoscores >>= render normalized "autoscores.distribution.svg"
+  autoscores >>= render normalized' "autoscores.distribution.svg"
   lists <- sublists
   sequence_ $ do
     (n, sublist) <- zip [1::Int ..] lists
     [ render raw ("raw" ++ show n ++ ".svg") sublist
-     ,render normalized ("distribution" ++ show n ++ ".svg") sublist]
+     ,render normalized' ("distribution" ++ show n ++ ".svg") sublist]
 
 colourScheme:: Colour Double-> ColourMap
 colourScheme colour= colourMap [(0,colour), (1,red)]
@@ -135,3 +157,35 @@ colourScheme colour= colourMap [(0,colour), (1,red)]
 (+/+):: [FilePath]-> [FilePath]-> [FilePath]
 (+/+)= liftA2 (</>)
 infixr 6 +/+ -- one tighter than ++
+
+-- Data on the length of recordings
+--  TST = Total Sleep Time
+tst :: String -- recording name
+    -> Double -- length in hours
+tst "VSN-14-080-001" = 7 + 3/60
+tst "VSN-14-080-005" = 6 + 3/60
+tst "VSN-14-080-006" = 4 + 5/60
+tst "VSN-14-080-007" = 6 + 8/60
+tst "VSN-14-080-008" = 5 + 3/60
+tst "VSN-14-080-009" = 5 + 1/60
+tst "VSN-14-080-010" = 6 + 3/60
+tst "VSN-14-080-004" = 6 + 8/60
+tst "VSN-14-080-003" = 7 + 8/60
+tst "VSN-14-080-011" = 1 + 4/60
+tst "VSN-14-080-012" = 6 + 6/60
+tst "VSN-14-080-015" = 4 + 3/60
+tst "VSN-14-080-016" = 7 + 4/60
+tst "VSN-14-080-017" = 7 + 0/60
+tst "VSN-14-080-018" = 5 + 2/60
+tst "VSN-14-080-019" = 7 + 5/60
+tst "VSN-14-080-020" = 6 + 9/60
+tst "VSN-14-080-021" = 7 + 6/60
+tst "VSN-14-080-022" = 7 + 9/60
+tst "VSN-14-080-023" = 7 + 5/60
+tst "VSN-14-080-024" = 6 + 8/60
+tst "VSN-14-080-025" = 6 + 6/60
+tst "VSN-14-080-026" = 6 + 9/60
+tst "VSN-14-080-027" = 5 + 1/60
+tst "VSN-14-080-028" = 7 + 6/60
+tst "VSN-14-080-029" = 6 + 7/60
+tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
