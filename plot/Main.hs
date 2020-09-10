@@ -52,13 +52,19 @@ autoscores= do
     return $!! (a,b)
 
 kao:: IO (String, [Double])
-kao= tally "../Nox2score/output/KAÓ/" <&> (_1 .~ "KAÓ")
+kao= tally "../Nox2score/output/KAÓ/" <&> (_1 .~ "technologist")
 
 marta:: IO (String, [Double])
-marta= tally "../Nox2score/output/Marta" <&> (_1 .~ "Marta")
+marta= tally "../Nox2score/output/Marta" <&> (_1 .~ "technician")
 
 pairWith:: (a-> b)-> [a]-> [(b,a)]
 pairWith f= (map f >>= zip)
+
+rename:: String-> String
+rename "unabrupt"= "Simple"
+rename "reversal"= "Medium"
+rename "baseline"= "Complex"
+rename other= other
 
 tally:: FilePath-> IO (String, [Double])
 tally directory= do
@@ -68,7 +74,7 @@ tally directory= do
   let filtered = filter (fst <&> forbid 13 14) enumerated
   let sorted = sort filtered
   let filenames = sorted <&> snd <&> (directory </>)
-  let label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) & intercalate "#"
+  let label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
   let values :: IO [Double]
       values = traverse countLines filenames
   values <&> (,) label
