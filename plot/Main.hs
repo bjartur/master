@@ -7,7 +7,7 @@ import Data.Colour( Colour )
 import Data.Colour.Names( black, blue, red, white, yellow )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
-import Data.List( sort )
+import Data.List( sort, sortBy )
 import Diagrams.Backend.SVG( SVG, renderSVG )
 import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
@@ -44,7 +44,7 @@ countLines path = do
   let lineCount = fromIntegral . length . lines $ contents
   pure $ PathLines path lineCount
 
-fromScoreName:: FilePath-> Double
+fromScoreName:: FilePath-> Int
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
 
 autoscores:: IO [(String, [PathLines])]
@@ -75,7 +75,8 @@ rename other= other
 tally :: FilePath -> IO (String, [PathLines])
 tally directory= do
   scorePaths <- listDirectory directory
-  let enumerated = pairWith fromScoreName scorePaths
+  let enumerated :: [(Int,FilePath)]
+      enumerated = pairWith fromScoreName scorePaths
   let forbid = on (liftA2 (&&)) (/=)
   let filtered = filter (fst <&> forbid 13 14) enumerated
   let sorted = sort filtered
@@ -84,6 +85,9 @@ tally directory= do
   let values :: IO [PathLines]
       values = traverse countLines filenames
   values <&> (,) label
+
+volunteerSeverity:: (String, [PathLines])-> (String, [PathLines])-> Ordering
+volunteerSeverity = flip compare `on` (sum . map _lines . snd)
 
 -- Extracts the _lines portion of this structure
 discardPath :: [(String, [PathLines])]
@@ -133,7 +137,10 @@ perhour = plot white . map (\(n,pc) -> (n, map divideTst pc))
     divideTst (PathLines name c) = c / tst (takeBaseName name)
 
 render:: ([(String, [PathLines])]-> Diagram SVG)-> FilePath-> [(String, [PathLines])]-> IO ()
-render draw filename heats= renderSVG filename (dims zero) (draw heats)
+render draw filename heats=
+  renderSVG filename
+ (dims zero)
+ (sortBy volunteerSeverity heats & draw)
 
 main:: IO ()
 main= do
