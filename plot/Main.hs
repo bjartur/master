@@ -1,5 +1,4 @@
 import Control.Applicative( liftA2 )
-import Control.DeepSeq ( ($!!) )
 import Control.Lens.Operators( (&~) )
 import Control.Lens.Setter( (.~), (.=), mapped, over, set )
 import Control.Lens.Tuple( _1, _2 )
@@ -8,7 +7,7 @@ import Data.Colour( Colour )
 import Data.Colour.Names( black, blue, red, white, yellow )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
-import Data.List( intercalate, sort )
+import Data.List( sort )
 import Diagrams.Backend.SVG( SVG, renderSVG )
 import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
@@ -111,6 +110,7 @@ plot colour distributions=
     colourBar . visible .= True
     heatMap' (distributions <&> snd)
 
+plot':: Colour Double-> [(String, [PathLines])]-> Diagram SVG
 plot' c= plot c . discardPath
 
 raw:: [(String, [PathLines])]-> Diagram SVG
@@ -122,9 +122,11 @@ normalize list= map (/ sum list) list
 normalized:: [(String, [Double])]-> Diagram SVG
 normalized= over (mapped._2) normalize <&> plot yellow
 
+normalized':: [(String, [PathLines])]-> Diagram SVG
 normalized' = normalized . discardPath
 
 -- Divides number of events by `tst` of recording
+perhour:: [(String, [PathLines])]-> Diagram SVG
 perhour = plot white . map (\(n,pc) -> (n, map divideTst pc))
   where
     divideTst :: PathLines -> Double
