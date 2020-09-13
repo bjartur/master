@@ -7,7 +7,7 @@ import Data.Colour( Colour )
 import Data.Colour.Names( black, blue, red, white, yellow )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
-import Data.List( sort, sortBy )
+import Data.List( transpose, sortBy, sortOn )
 import Diagrams.Backend.SVG( SVG, renderSVG )
 import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
@@ -25,7 +25,7 @@ import System.Directory( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 
 -- Represent number of lines in a file
-data PathLines = PathLines { _path :: FilePath, _lines :: Double }
+data PathLines = PathLines { _path :: FilePath, _lines :: Int }
   deriving Show
 
 sublists:: IO [[(String,[PathLines])]]
@@ -79,20 +79,16 @@ tally directory= do
       enumerated = pairWith fromScoreName scorePaths
   let forbid = on (liftA2 (&&)) (/=)
   let filtered = filter (fst <&> forbid 13 14) enumerated
-  let sorted = sort filtered
-  let filenames = sorted <&> snd <&> (directory </>)
+  let filenames = filtered <&> snd <&> (directory </>)
   let label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
   let values :: IO [PathLines]
       values = traverse countLines filenames
   values <&> (,) label
 
-volunteerSeverity:: (String, [PathLines])-> (String, [PathLines])-> Ordering
-volunteerSeverity = flip compare `on` (sum . map _lines . snd)
-
 -- Extracts the _lines portion of this structure
 discardPath :: [(String, [PathLines])]
             -> [(String, [Double])]
-discardPath = map $ \(a,b) -> (a, map _lines b)
+discardPath = over (mapped._2.mapped) (fromIntegral._lines)
 
 plot:: Colour Double-> [(String, [Double])]-> Diagram SVG
 plot colour distributions=
@@ -134,16 +130,38 @@ perhour:: [(String, [PathLines])]-> Diagram SVG
 perhour = plot white . map (\(n,pc) -> (n, map divideTst pc))
   where
     divideTst :: PathLines -> Double
-    divideTst (PathLines name c) = c / tst (takeBaseName name)
+    divideTst (PathLines name c) = fromIntegral c / tst (takeBaseName name)
 
 render:: ([(String, [PathLines])]-> Diagram SVG)-> FilePath-> [(String, [PathLines])]-> IO ()
 render draw filename heats=
   renderSVG filename
  (dims zero)
- (sortBy volunteerSeverity heats & draw)
+ (rank heats & draw)
+
+sensitivity:: (String, [PathLines])-> Int
+sensitivity = snd <&> map _lines <&> sum
+
+severity:: [(String, PathLines)]-> Int
+severity= map (snd <&> _lines) <&> sum
+
+rank:: [(String, [PathLines])]-> [(String, [PathLines])]
+rank heats= do
+  let transposed :: [[(String, PathLines)]]
+      transposed =
+          heats & ascending sensitivity
+        & map (\(label, list)-> map ((,) label) list)
+        & transpose;
+  ascending severity transposed
+        & transpose
+        & map (\list-> (list&head&fst, map snd list));
 
 main:: IO ()
 main= do
+  heats <- numbers <&> rank :: IO [(String, [PathLines])]
+  putStrLn "SENSITIVITY"
+  heats <&> sensitivity & print
+  putStrLn "TALLY OF PES CRESCENDOS"
+  (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
   numbers >>= render raw "tally.svg"
   numbers >>= render normalized' "tally.distribution.svg"
   numbers >>= render perhour "tally.perhour.svg"
@@ -166,6 +184,12 @@ colourScheme colour= colourMap [(0,colour), (1,red)]
 (+/+):: [FilePath]-> [FilePath]-> [FilePath]
 (+/+)= liftA2 (</>)
 infixr 6 +/+ -- one tighter than ++
+
+ascending:: Ord order=> (a-> order)-> [a]-> [a]
+ascending accessor= sortBy (flip compare `on` accessor)
+
+descending:: Ord order=> (a-> order)-> [a]-> [a]
+descending= sortOn
 
 -- Data on the length of recordings
 --  TST = Total Sleep Time

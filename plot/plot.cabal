@@ -22,6 +22,7 @@ source-repository head
 executable plot
   main-is: Main.hs
   other-modules:
+      Wilcoxon
       Paths_plot
   hs-source-dirs:
       ./.
