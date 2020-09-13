@@ -148,10 +148,10 @@ rank:: [(String, [PathLines])]-> [(String, [PathLines])]
 rank heats= do
   let transposed :: [[(String, PathLines)]]
       transposed =
-          heats & ascending sensitivity
+          heats & descending sensitivity
         & map (\(label, list)-> map ((,) label) list)
         & transpose;
-  ascending severity transposed
+  descending severity transposed
         & transpose
         & map (\list-> (list&head&fst, map snd list));
 
@@ -185,11 +185,8 @@ colourScheme colour= colourMap [(0,colour), (1,red)]
 (+/+)= liftA2 (</>)
 infixr 6 +/+ -- one tighter than ++
 
-ascending:: Ord order=> (a-> order)-> [a]-> [a]
-ascending accessor= sortBy (flip compare `on` accessor)
-
 descending:: Ord order=> (a-> order)-> [a]-> [a]
-descending= sortOn
+descending accessor= sortBy (flip compare `on` accessor)
 
 -- Data on the length of recordings
 --  TST = Total Sleep Time
