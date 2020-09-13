@@ -7,7 +7,7 @@ import Data.Colour( Colour )
 import Data.Colour.Names( black, blue, red, white, yellow )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
-import Data.List( transpose, sortBy, sortOn )
+import Data.List( transpose, sortBy )
 import Diagrams.Backend.SVG( SVG, renderSVG )
 import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
@@ -29,14 +29,20 @@ data PathLines = PathLines { _path :: FilePath, _lines :: Int }
   deriving Show
 
 sublists:: IO [[(String,[PathLines])]]
-sublists = (traverse.traverse) tally (map (["../csv-to-score/output"]+/+) [
+sublists = liftA2 (+++)
+  (sequence[manual])
+  $ (traverse.traverse) tally $ map (["../csv-to-score/output"]+/+) [
     ["baseline/3"]
   , ["unabrupt", "reversal", "baseline"] +/+ ["3"]
   , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ map pure ['2'..'5'])
-  ])
+  ]
+
+-- a bit like a Cartesian product, but concatenating instead of pairing
+(+++):: [[a]]-> [[a]]-> [[a]]
+(+++)= liftA2 (++)
 
 numbers:: IO [(String, [PathLines])]
-numbers= liftA2 (++) autoscores (sequence [kao, marta])
+numbers= liftA2 (++) autoscores manual
 
 countLines :: FilePath -> IO PathLines
 countLines path = do
@@ -46,6 +52,9 @@ countLines path = do
 
 fromScoreName:: FilePath-> Int
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
+
+manual:: IO [(String, [PathLines])]
+manual= sequence [kao, marta]
 
 autoscores:: IO [(String, [PathLines])]
 autoscores= do
