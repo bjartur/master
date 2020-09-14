@@ -25,16 +25,16 @@ import System.Directory( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 
 -- Represent number of lines in a file
-data PathLines = PathLines { _path :: FilePath, _lines :: Int }
-  deriving Show
+type PathLines = (FilePath, Int)
 
 sublists:: IO [[(String,[PathLines])]]
 sublists = liftA2 (+++)
   (sequence[manual])
-  $ (traverse.traverse) tally $ map (["../csv-to-score/output"]+/+) [
+  $ (traverse.traverse) countAllLines $ map (["../csv-to-score/output"]+/+) [
     ["baseline/3"]
   , ["unabrupt", "reversal", "baseline"] +/+ ["3"]
-  , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ map pure ['2'..'5'])
+  , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ ["2","3","4","5"])
+  , (["unabrupt"] +/+ ["3","4","5"]) ++ (["reversal","baseline"] +/+ ["2","3","4","5"])
   ]
 
 -- a bit like a Cartesian product, but concatenating instead of pairing
@@ -47,8 +47,8 @@ numbers= liftA2 (++) autoscores manual
 countLines :: FilePath -> IO PathLines
 countLines path = do
   contents <- readFile path
-  let lineCount = fromIntegral . length . lines $ contents
-  pure $ PathLines path lineCount
+  let lineCount = length . lines $ contents
+  pure (path, lineCount)
 
 fromScoreName:: FilePath-> Int
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
@@ -63,14 +63,14 @@ autoscores= do
         +/+ ["unabrupt", "reversal", "baseline"]
         +/+ map pure ['2'..'5']
   forM expandedPaths $ \path -> do
-    (a,b) <- tally path
+    (a,b) <- countAllLines path
     return (a,b)
 
 kao:: IO (String, [PathLines])
-kao= tally "../Nox2score/output/KAÓ/" <&> (_1 .~ "technologist")
+kao= countAllLines "../Nox2score/output/KAÓ/" <&> (_1 .~ "technologist")
 
 marta:: IO (String, [PathLines])
-marta= tally "../Nox2score/output/Marta" <&> (_1 .~ "technician")
+marta= countAllLines "../Nox2score/output/Marta" <&> (_1 .~ "technician")
 
 pairWith:: (a-> b)-> [a]-> [(b,a)]
 pairWith f= (map f >>= zip)
@@ -81,8 +81,8 @@ rename "reversal"= "Medium"
 rename "baseline"= "Complex"
 rename other= other
 
-tally :: FilePath -> IO (String, [PathLines])
-tally directory= do
+countAllLines :: FilePath -> IO (String, [(FilePath, Int)])
+countAllLines directory= do
   scorePaths <- listDirectory directory
   let enumerated :: [(Int,FilePath)]
       enumerated = pairWith fromScoreName scorePaths
@@ -94,10 +94,15 @@ tally directory= do
       values = traverse countLines filenames
   values <&> (,) label
 
--- Extracts the _lines portion of this structure
-discardPath :: [(String, [PathLines])]
+tally:: [(String, [PathLines])]
             -> [(String, [Double])]
-discardPath = over (mapped._2.mapped) (fromIntegral._lines)
+tally= over (mapped._2.mapped) (fromIntegral.snd)
+
+hourly:: [(String, [PathLines])] -> [(String, [Double])]
+hourly= over (mapped._2.mapped) perhour
+
+perhour :: PathLines -> Double
+perhour (polysomnogram, linecount) = fromIntegral linecount / tst (takeBaseName polysomnogram)
 
 plot:: Colour Double-> [(String, [Double])]-> Diagram SVG
 plot colour distributions=
@@ -119,11 +124,8 @@ plot colour distributions=
     colourBar . visible .= True
     heatMap' (distributions <&> snd)
 
-plot':: Colour Double-> [(String, [PathLines])]-> Diagram SVG
-plot' c= plot c . discardPath
-
-raw:: [(String, [PathLines])]-> Diagram SVG
-raw= plot' white
+raw:: [(String, [Double])]-> Diagram SVG
+raw= plot white
 
 normalize:: [Double]-> [Double]
 normalize list= map (/ sum list) list
@@ -131,31 +133,21 @@ normalize list= map (/ sum list) list
 normalized:: [(String, [Double])]-> Diagram SVG
 normalized= over (mapped._2) normalize <&> plot yellow
 
-normalized':: [(String, [PathLines])]-> Diagram SVG
-normalized' = normalized . discardPath
-
--- Divides number of events by `tst` of recording
-perhour:: [(String, [PathLines])]-> Diagram SVG
-perhour = plot white . map (\(n,pc) -> (n, map divideTst pc))
-  where
-    divideTst :: PathLines -> Double
-    divideTst (PathLines name c) = fromIntegral c / tst (takeBaseName name)
-
-render:: ([(String, [PathLines])]-> Diagram SVG)-> FilePath-> [(String, [PathLines])]-> IO ()
+render:: ([(String, [Double])]-> Diagram SVG)-> FilePath-> [(String, [Double])]-> IO ()
 render draw filename heats=
   renderSVG filename
  (dims zero)
  (rank heats & draw)
 
-sensitivity:: (String, [PathLines])-> Int
-sensitivity = snd <&> map _lines <&> sum
+sensitivity:: Num score=> (String, [score])-> score
+sensitivity = snd <&> sum
 
-severity:: [(String, PathLines)]-> Int
-severity= map (snd <&> _lines) <&> sum
+severity:: Num score=> [(String, score)]-> score
+severity= map snd <&> sum
 
-rank:: [(String, [PathLines])]-> [(String, [PathLines])]
+rank:: [(String, [Double])]-> [(String, [Double])]
 rank heats= do
-  let transposed :: [[(String, PathLines)]]
+  let -- transposed :: [[(String, (FilePath, score))]] -- score is a scoped type variable
       transposed =
           heats & descending sensitivity
         & map (\(label, list)-> map ((,) label) list)
@@ -166,24 +158,25 @@ rank heats= do
 
 main:: IO ()
 main= do
-  heats <- numbers <&> rank :: IO [(String, [PathLines])]
+  heats <- numbers <&> tally <&> rank :: IO [(String, [Double])]
   putStrLn "SENSITIVITY"
   heats <&> sensitivity & print
   putStrLn "TALLY OF PES CRESCENDOS"
   (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
-  numbers >>= render raw "tally.svg"
-  numbers >>= render normalized' "tally.distribution.svg"
-  numbers >>= render perhour "tally.perhour.svg"
-  sequence [marta] >>= render raw "marta.svg"
-  sequence [marta,kao] >>= render raw "manual.svg"
-  sequence [marta,kao] >>= render normalized' "manual.distribution.svg"
-  autoscores >>= render raw "autoscores.svg"
-  autoscores >>= render normalized' "autoscores.distribution.svg"
-  lists <- sublists
+
+  numbers <&> tally >>= render raw "tally.svg"
+  numbers <&> tally >>= render normalized "tally.distribution.svg"
+  numbers <&> hourly >>= render raw "perhour.svg"
+  sequence [marta] <&> hourly >>= render raw "marta.svg"
+  sequence [marta,kao] <&> hourly >>= render raw "manual.svg"
+  sequence [marta,kao] <&> hourly >>= render normalized "manual.distribution.svg"
+  autoscores <&> hourly >>= render raw "autoscores.svg"
+  autoscores <&> hourly >>= render normalized "autoscores.distribution.svg"
+  lists <- sublists <&> (map hourly)
   sequence_ $ do
     (n, sublist) <- zip [1::Int ..] lists
     [ render raw ("raw" ++ show n ++ ".svg") sublist
-     ,render normalized' ("distribution" ++ show n ++ ".svg") sublist]
+     ,render normalized ("distribution" ++ show n ++ ".svg") sublist]
 
 colourScheme:: Colour Double-> ColourMap
 colourScheme colour= colourMap [(0,colour), (1,red)]
@@ -197,10 +190,10 @@ infixr 6 +/+ -- one tighter than ++
 descending:: Ord order=> (a-> order)-> [a]-> [a]
 descending accessor= sortBy (flip compare `on` accessor)
 
--- Data on the length of recordings
+-- Data on the length of polysomnograms
 --  TST = Total Sleep Time
-tst :: String -- recording name
-    -> Double -- length in hours
+tst :: String -- polysomnogram name
+    -> Double -- length in hours (rounded to ten minutes)
 tst "VSN-14-080-001" = 7 + 3/60
 tst "VSN-14-080-005" = 6 + 3/60
 tst "VSN-14-080-006" = 4 + 5/60
