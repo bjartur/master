@@ -191,33 +191,36 @@ descending:: Ord order=> (a-> order)-> [a]-> [a]
 descending accessor= sortBy (flip compare `on` accessor)
 
 -- Data on the length of polysomnograms
---  TST = Total Sleep Time
+--  TST = Total Sleep Time (for each record)
+-- the total total is around 167 hours.
 tst :: String -- polysomnogram name
-    -> Double -- length in hours (rounded to ten minutes)
-tst "VSN-14-080-001" = 7 + 3/60
-tst "VSN-14-080-005" = 6 + 3/60
-tst "VSN-14-080-006" = 4 + 5/60
-tst "VSN-14-080-007" = 6 + 8/60
-tst "VSN-14-080-008" = 5 + 3/60
-tst "VSN-14-080-009" = 5 + 1/60
-tst "VSN-14-080-010" = 6 + 3/60
-tst "VSN-14-080-004" = 6 + 8/60
+    -> Double -- length in hours
+tst "VSN-14-080-001" = 7 + 23/60
+tst "VSN-14-080-005" = 6 + 53/60
+tst "VSN-14-080-006" = 4 + 55/60
+tst "VSN-14-080-007" = 6 + 38/60
+tst "VSN-14-080-008" = 5 +  3/60
+tst "VSN-14-080-009" = 5 + 41/60
+tst "VSN-14-080-010" = 6 + 33/60
+tst "VSN-14-080-004" = 6 + 58/60
 tst "VSN-14-080-003" = 7 + 8/60
-tst "VSN-14-080-011" = 1 + 4/60
-tst "VSN-14-080-012" = 6 + 6/60
-tst "VSN-14-080-015" = 4 + 3/60
-tst "VSN-14-080-016" = 7 + 4/60
-tst "VSN-14-080-017" = 7 + 0/60
-tst "VSN-14-080-018" = 5 + 2/60
-tst "VSN-14-080-019" = 7 + 5/60
-tst "VSN-14-080-020" = 6 + 9/60
-tst "VSN-14-080-021" = 7 + 6/60
-tst "VSN-14-080-022" = 7 + 9/60
-tst "VSN-14-080-023" = 7 + 5/60
-tst "VSN-14-080-024" = 6 + 8/60
-tst "VSN-14-080-025" = 6 + 6/60
-tst "VSN-14-080-026" = 6 + 9/60
-tst "VSN-14-080-027" = 5 + 1/60
-tst "VSN-14-080-028" = 7 + 6/60
-tst "VSN-14-080-029" = 6 + 7/60
+tst "VSN-14-080-011" = 1 + 44/60
+tst "VSN-14-080-012" = 6 + 16/60
+tst "VSN-14-080-015" = 4 + 23/60
+tst "VSN-14-080-016" = 7 + 24/60
+tst "VSN-14-080-017" = 7 + 40/60
+tst "VSN-14-080-018" = 5 + 32/60
+tst "VSN-14-080-019" = 7 +  5/60
+tst "VSN-14-080-020" = 6 + 49/60
+tst "VSN-14-080-021" = 7 + 36/60
+tst "VSN-14-080-022" = 7 + 19/60
+tst "VSN-14-080-023" = 7 + 15/60
+tst "VSN-14-080-024" = 6 + 58/60
+tst "VSN-14-080-025" = 6 + 56/60
+tst "VSN-14-080-026" = 6 + 59/60
+tst "VSN-14-080-027" = 5 + 41/60
+tst "VSN-14-080-028" = 7 + 26/60
+tst "VSN-14-080-029" = 6 + 27/60
+tst "total" = 166.7
 tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
+
