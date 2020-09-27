@@ -160,7 +160,8 @@ main:: IO ()
 main= do
   heats <- numbers <&> tally <&> rank :: IO [(String, [Double])]
   putStrLn "SENSITIVITY"
-  heats <&> sensitivity & print
+  putStrLn "The number of minutes between esophageal crescendos, by criteria"
+  over (mapped._2) ((60 *) . (tst "total" /) . sum) heats & mapM_ (\(label, meanInterval)-> label ++ "\t" ++ show meanInterval & putStrLn)
   putStrLn "TALLY OF PES CRESCENDOS"
   (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
 
