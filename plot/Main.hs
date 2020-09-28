@@ -109,12 +109,7 @@ plot colour distributions=
   renderAxis $ r2Axis &~ do
     axisExtend .= noExtend
     xLabel .= "Participating sleeper"
-    xAxis . tickLabelPositions .= [(0.5, "#1")
-                                  ,(5.5, "#6"{-7-})
-                                  ,(10.5, "#11"{-12-})
-                                  ,(15.5, "#16"{-19-})
-                                  ,(20.5, "#21"{-24-})
-                                  ,(25.5, "#26"{-29-})]
+    xAxis . tickLabelPositions .= []
     xAxis . majorTicks . visible .= False
     xAxis . minorTicks . visible .= False
     yAxis . tickLabelPositions .= zip [0.5..] (distributions <&> fst)
