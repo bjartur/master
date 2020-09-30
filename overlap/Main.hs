@@ -3,12 +3,15 @@ module Main where
 
 import Control.Applicative( liftA2, some )
 import Data.Char
+import Data.List ( subsequences )
 import Data.Function( on, (&) )
 import System.Environment( getArgs )
 import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy, (<++) )
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite), Boundary(Closed))
+import Plot (renderOverlaps)
+import System.FilePath( takeFileName )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -26,16 +29,41 @@ data DateTime= DateTime {
  second:: Int
 } deriving (Eq, Ord, Show)
 
+combinations :: [a] -> [(a,a)]
+combinations = map pair . filter length2 . subsequences
+  where
+    length2 list = length list == 2
+    pair [e1,e2] = (e1,e2)
+
 main:: IO ()
 main= do
   paths <- getArgs
   if paths `fewerThan` 2
-    then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER"]
+    then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
     else do
-      [former, latter] <- traverse readFile paths >>$ parse
-      putStrLn $ "left:  " ++ show (onlyLeft former latter)
-      putStrLn $ "right: " ++ show (onlyLeft latter former)
-      putStrLn $ "intersection: " ++ show (correlation former latter)
+      csvs <- readPaths paths
+      overlaps <- mapM (uncurry doPair) (combinations csvs)
+      renderOverlaps "overlaps.svg" overlaps
+      putStrLn "Wrote overlaps.svg"
+      return ()
+
+readPaths :: [String] -> IO [(String, Intervals)]
+readPaths = mapM $ \path -> do
+  contents <- readFile path
+  let name = takeFileName path
+      parsed = parse contents
+  return (name,parsed)
+
+doPair :: (String, Intervals) -> (String, Intervals)
+       -> IO (([Char], [Double], [Char]))
+doPair (fName, former) (lName, latter) = do
+  let left  = onlyLeft former latter
+      right = onlyLeft latter former
+      intersection = correlation former latter
+  putStrLn $ "left (" ++ fName ++ "):  " ++ show left
+  putStrLn $ "right (" ++ lName ++ "): " ++ show right
+  putStrLn $ "intersection: " ++ show intersection
+  return (fName, [left,intersection,right], lName)
 
 -- Ratio of measures that intersect on both sides over total
 correlation:: Intervals -> Intervals -> Double
@@ -141,9 +169,3 @@ expected expectation reality= error ("\n\tExpected " ++ expectation ++ " but got
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
-
-(>>$) :: (Functor l, Functor m)=> l (m a)-> (a-> b)-> l (m b)
-boxed >>$ function =
-                   boxed
-                >$ fmap function
-infixl 2 >>$
