@@ -9,6 +9,7 @@ import Data.Functor( (<&>) )
 import Data.Function( (&), on )
 import System.Directory ( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
+import qualified Data.IntervalSet  as IntervalSet
 
 import Bjartur.Types
 import Bjartur.CSV ( parse )
@@ -21,8 +22,72 @@ import Bjartur.CSV ( parse )
 (+/+)= liftA2 (</>)
 infixr 6 +/+ -- one tighter than ++
 
-numbers:: IO [(String, [PathLines])]
-numbers= liftA2 (++) autoscores manual
+-- (was countAllLines)
+-- Given a score directory, return a label and list of all
+-- applicable CSV files it contains.
+score :: FilePath -> IO (String, [FilePath])
+score directory= do
+  scorePaths <- listDirectory directory
+  let enumerated :: [(Int,FilePath)]
+      enumerated = pairWith fromScoreName scorePaths
+  let forbid = on (liftA2 (&&)) (/=)
+  let filtered = filter (fst <&> forbid 13 14) enumerated
+  let filenames = filtered <&> snd <&> (directory </>)
+  let label :: String
+      label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
+  let values :: IO [FilePath]
+      values = traverse pure filenames
+  values <&> (,) label
+
+-- Gathers scores from ../csv-to-score using `score`
+autoscores :: IO [(String, [FilePath])]
+autoscores = do
+  let expandedPaths =
+        ["../csv-to-score/output/"]
+        +/+ ["unabrupt", "reversal", "baseline"]
+        +/+ map pure ['2'..'5']
+  forM expandedPaths score
+
+-- Gathers scores for KAÓ form ../Nox2score
+kao :: IO (String, [FilePath])
+kao = score "../Nox2score/output/KAÓ/" <&> (_1 .~ "technologist")
+marta:: IO (String, [FilePath])
+marta= score "../Nox2score/output/Marta" <&> (_1 .~ "technician")
+manual :: IO [(String, [FilePath])]
+manual = sequence [kao, marta]
+
+-- Paths to all CSV files grouped by PES classifier
+-- Joins `autoscores'`, `kao` and `marta`
+scores :: IO [(String, [FilePath])]
+scores = liftA2 (++) autoscores manual
+
+-- Paths to all CSV files grouped by PES classifier, but with lines counted
+--numbers:: IO [(String, [PathLines])]
+--numbers= liftA2 (++) autoscores manual
+
+-- Alternate version of `numbers` built on `scores`
+numbers :: IO [(String, [PathLines])]
+numbers = scores >>= 
+    mapM (mapM (mapM countLines))
+--  ^- map outer list
+--        ^- map snd of tuple
+--              ^- map list of PathLines
+
+-- Like `autoscores` but with line counts
+autoscoresLines :: IO [(String, [PathLines])]
+autoscoresLines = autoscores >>= mapM (mapM (mapM countLines))
+
+-- Like `marta` but with line counts
+martaLines :: IO (String, [PathLines])
+martaLines = marta >>= mapM (mapM countLines)
+
+kaoLines :: IO (String, [PathLines])
+kaoLines = kao >>= mapM (mapM countLines)
+
+-- One big IntervalSet out of all CSV files for each classifier
+intervals :: IO [(String, Intervals)]
+intervals = scores >>= mapM ( mapM $ \paths -> 
+  mapM readIntervals' paths >>= return . IntervalSet.unions ) 
 
 countLines :: FilePath -> IO PathLines
 countLines path = do
@@ -34,25 +99,6 @@ countLines path = do
 fromScoreName:: FilePath-> Int
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
 
-manual:: IO [(String, [PathLines])]
-manual= sequence [kao, marta]
-
-autoscores:: IO [(String, [PathLines])]
-autoscores= do
-  let expandedPaths =
-        ["../csv-to-score/output/"]
-        +/+ ["unabrupt", "reversal", "baseline"]
-        +/+ map pure ['2'..'5']
-  forM expandedPaths $ \path -> do
-    (a,b) <- countAllLines path
-    return (a,b)
-
-kao:: IO (String, [PathLines])
-kao= countAllLines "../Nox2score/output/KAÓ/" <&> (_1 .~ "technologist")
-
-marta:: IO (String, [PathLines])
-marta= countAllLines "../Nox2score/output/Marta" <&> (_1 .~ "technician")
-
 pairWith:: (a-> b)-> [a]-> [(b,a)]
 pairWith f= (map f >>= zip)
 
@@ -61,23 +107,6 @@ rename "unabrupt"= "Simple"
 rename "reversal"= "Medium"
 rename "baseline"= "Complex"
 rename other= other
-
-countAllLines :: FilePath -> IO (String, [(FilePath, Int)])
-countAllLines directory= do
-  scorePaths <- listDirectory directory
-  let enumerated :: [(Int,FilePath)]
-      enumerated = pairWith fromScoreName scorePaths
-  let forbid = on (liftA2 (&&)) (/=)
-  let filtered = filter (fst <&> forbid 13 14) enumerated
-  let filenames = filtered <&> snd <&> (directory </>)
-  let label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
-  let values :: IO [PathLines]
-      values = traverse countLines filenames
-  values <&> (,) label
-
-tally:: [(String, [PathLines])]
-            -> [(String, [Double])]
-tally= over (mapped._2.mapped) (fromIntegral.snd)
 
 -- Data on the length of polysomnograms
 --  TST = Total Sleep Time (for each record)
@@ -113,34 +142,6 @@ tst "VSN-14-080-029" = 6 + 27/60
 tst "total" = 166.7
 tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
 
--- (was countAllLines)
--- Given a score directory, return a label and list of all
--- applicable CSV files it contains.
-score :: FilePath -> IO (String, [FilePath])
-score directory= do
-  scorePaths <- listDirectory directory
-  let enumerated :: [(Int,FilePath)]
-      enumerated = pairWith fromScoreName scorePaths
-  let forbid = on (liftA2 (&&)) (/=)
-  let filtered = filter (fst <&> forbid 13 14) enumerated
-  let filenames = filtered <&> snd <&> (directory </>)
-  let label :: String
-      label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
-  let values :: IO [FilePath]
-      values = traverse pure filenames
-  values <&> (,) label
-
--- (was autoscores)
-autoscores' :: IO [(String, [FilePath])]
-autoscores' = do
-  let expandedPaths =
-        ["../csv-to-score/output/"]
-        +/+ ["unabrupt", "reversal", "baseline"]
-        +/+ map pure ['2'..'5']
-  forM expandedPaths $ \path -> do
-    (a,b) <- score path
-    return (a,b)
-
 readIntervals :: FilePath -> IO (String, Intervals)
 readIntervals "marta" = do
   intervals <- parse <$> readCSVDirectory "../Nox2score/output/Marta"
@@ -153,6 +154,8 @@ readIntervals path = do
   let name = takeFileName path
       parsed = parse contents
   return (name,parsed)
+
+readIntervals' path = readFile path <&> parse
 
 -- concatenated contents of all csv files in a directory
 -- EXCEPT those that end with 013.csv and 014.csv

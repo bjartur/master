@@ -103,11 +103,11 @@ main= do
   numbers <&> tally >>= render raw "tally.svg"
   numbers <&> tally >>= render normalized "tally.distribution.svg"
   numbers <&> hourly >>= render raw "perhour.svg"
-  sequence [marta] <&> hourly >>= render raw "marta.svg"
-  sequence [marta,kao] <&> hourly >>= render raw "manual.svg"
-  sequence [marta,kao] <&> hourly >>= render normalized "manual.distribution.svg"
-  autoscores <&> hourly >>= render raw "autoscores.svg"
-  autoscores <&> hourly >>= render normalized "autoscores.distribution.svg"
+  sequence [martaLines] <&> hourly >>= render raw "marta.svg"
+  sequence [martaLines,kaoLines] <&> hourly >>= render raw "manual.svg"
+  sequence [martaLines,kaoLines] <&> hourly >>= render normalized "manual.distribution.svg"
+  autoscoresLines <&> hourly >>= render raw "autoscores.svg"
+  autoscoresLines <&> hourly >>= render normalized "autoscores.distribution.svg"
   lists <- sublists <&> (map hourly)
   sequence_ $ do
     (n, sublist) <- zip [1::Int ..] lists
@@ -121,3 +121,7 @@ colourScheme colour= colourMap [(0,colour), (1,red)]
 
 descending:: Ord order=> (a-> order)-> [a]-> [a]
 descending accessor= sortBy (flip compare `on` accessor)
+
+tally:: [(String, [PathLines])]
+            -> [(String, [Double])]
+tally= over (mapped._2.mapped) (fromIntegral.snd)

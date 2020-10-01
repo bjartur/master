@@ -14,7 +14,7 @@ import Data.Interval (Extended(Finite), Boundary(Closed))
 import Plot (renderOverlaps)
 
 import Bjartur.Types
-import Bjartur.Records ( autoscores', readIntervals )
+import Bjartur.Records ( intervals, readIntervals )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -26,18 +26,6 @@ combinations = map pair . filter length2 . subsequences
     length2 list = length list == 2
     pair [e1,e2] = (e1,e2)
 
-allscores :: IO [(String, Intervals)]
-allscores = do
-  marta <- readIntervals "marta"
-  kao   <- readIntervals "kao"
-  as <- autoscores'
-  ai <- forM as $ \(name, paths) -> do
-    r <- mapM readIntervals paths
-    let intervals :: [Intervals]
-        intervals = map snd r
-    return (name, IntervalSet.unions intervals)
-  return $ [marta] ++ [kao] ++ ai
-
 main:: IO ()
 main= do
   paths <- getArgs
@@ -45,7 +33,7 @@ main= do
     then 
       --mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
       do
-        scores <- allscores
+        scores <- intervals
         forM (combinations scores) $ \(a@(nameLeft, scoresLeft), b@(nameRight, scoresRight)) -> do
           let outPath = "output/" ++ nameLeft ++ "-" ++ nameRight ++ ".svg"
           putStrLn $ "Writing " ++ outPath
