@@ -21,6 +21,7 @@ dependencies:
   - statistics <= 0.16 && >= 0.15.2.0
   - vector >= 0.12.0.3 && <= 0.13
   - deepseq
+  - bjartur-lib
 
 executables:
   plot:

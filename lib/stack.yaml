@@ -1,12 +1,7 @@
+---
 resolver: lts-16.12
-
-packages:
-  - .
-
 extra-deps:
-  - ../lib
   - data-interval-2.0.1
-  - plots-0.1.1.2
 
 flags:
   diagrams:
@@ -17,5 +12,5 @@ flags:
     gtk: false
     cairo: false
 
-ghc-options:
-  "$locals": -fno-warn-unused-do-bind
+packages:
+  - .

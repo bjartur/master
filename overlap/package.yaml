@@ -4,10 +4,11 @@ version: 0.0.0.0
 
 dependencies:
   - base < 4.14 && >= 2.10
+  - bjartur-lib
   - filepath < 1.5 && >= 1.4
   - data-interval >= 2.0
   - lens >= 4.6 && < 5.0
-  - linear >= 1.20.9 && < 1.21
+  - linear >= 1.20.9 && < 1.22
   - plots
   - diagrams-svg < 1.5
   - diagrams-lib < 1.5

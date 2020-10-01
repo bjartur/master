@@ -2,6 +2,7 @@
 module Main where
 
 import Control.Applicative( liftA2, some )
+import Control.Monad ( forM )
 import Data.Char
 import Data.List ( subsequences )
 import Data.Function( on, (&) )
@@ -11,23 +12,13 @@ import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite), Boundary(Closed))
 import Plot (renderOverlaps)
-import System.FilePath( takeFileName )
+
+import Bjartur.Types
+import Bjartur.Records ( autoscores', readIntervals )
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
 infixl 1 >$
-
-type Interval  = Interval.Interval DateTime
-type Intervals = IntervalSet.IntervalSet DateTime 
-
-data DateTime= DateTime {
- year:: Int,
- month:: Int,
- day:: Int,
- hour:: Int,
- minute:: Int,
- second:: Int
-} deriving (Eq, Ord, Show)
 
 combinations :: [a] -> [(a,a)]
 combinations = map pair . filter length2 . subsequences
@@ -35,24 +26,39 @@ combinations = map pair . filter length2 . subsequences
     length2 list = length list == 2
     pair [e1,e2] = (e1,e2)
 
+allscores :: IO [(String, Intervals)]
+allscores = do
+  marta <- readIntervals "marta"
+  kao   <- readIntervals "kao"
+  as <- autoscores'
+  ai <- forM as $ \(name, paths) -> do
+    r <- mapM readIntervals paths
+    let intervals :: [Intervals]
+        intervals = map snd r
+    return (name, IntervalSet.unions intervals)
+  return $ [marta] ++ [kao] ++ ai
+
 main:: IO ()
 main= do
   paths <- getArgs
   if paths `fewerThan` 2
-    then mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
+    then 
+      --mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
+      do
+        scores <- allscores
+        forM (combinations scores) $ \(a@(nameLeft, scoresLeft), b@(nameRight, scoresRight)) -> do
+          let outPath = "output/" ++ nameLeft ++ "-" ++ nameRight ++ ".svg"
+          putStrLn $ "Writing " ++ outPath
+          overlaps <- doPair a b
+          renderOverlaps outPath [overlaps]
+        return ()
     else do
-      csvs <- readPaths paths
-      overlaps <- mapM (uncurry doPair) (combinations csvs)
+      intervalss <- mapM readIntervals paths
+      overlaps <- mapM (uncurry doPair) (combinations intervalss)
       renderOverlaps "overlaps.svg" overlaps
       putStrLn "Wrote overlaps.svg"
-      return ()
+  return ()
 
-readPaths :: [String] -> IO [(String, Intervals)]
-readPaths = mapM $ \path -> do
-  contents <- readFile path
-  let name = takeFileName path
-      parsed = parse contents
-  return (name,parsed)
 
 doPair :: (String, Intervals) -> (String, Intervals)
        -> IO (([Char], [Double], [Char]))
@@ -107,65 +113,6 @@ measure' (from, to)= let
   units= [1..length increments] >$ flip take increments >$ product
   in
   zipWith seconds accessors units & sum
-
-parse:: String-> Intervals
-parse= readP_to_S file
-    >$ last >$ fst
-
-file:: ReadP Intervals
-file = some row <* eof >$ IntervalSet.fromList
-
-row:: ReadP Interval
-row= do
-  start <- dateTime
-  expect ','
-  end <- dateTime
-  expect '\n' -- native line separator has already been translated to \n
-  return $ period start end
-
-period :: Ord r=> r-> r-> Interval.Interval r
-period start end=
-  Interval.interval
-    (Finite start, Closed)
-    (Finite end,   Closed)
-
-dateTime:: ReadP DateTime
-dateTime= do
-  year <- liftA2 (+) (fmap (100*) couple) couple
-  expect '-'
-  month <- couple
-  expect '-'
-  day <- couple
-  expect ' '
-  hour <- couple
-  expect ':'
-  minute <- couple
-  expect ':'
-  second <- couple
-  expect '.'
-  centisecond <- couple
-  couple
-  couple
-  return $ DateTime year month day hour minute (if centisecond >= 50 then second + 1 else second)
-
-couple:: ReadP Int
-couple=
-  (do
-    tens <- digit
-    singles <- digit
-    return (tens*10 + singles)
-  ) <++ (sequence[get,get] >>= expected "a couple of digits")
-
-digit:: ReadP Int
-digit= satisfy isDigit
-  >$ ord
-  >$ \ascii-> ascii-48
-
-expect:: Char-> ReadP Char
-expect character= char character <++ (get >>= expected (show character))
-
-expected:: Show a=> String-> a-> ReadP bottom
-expected expectation reality= error ("\n\tExpected " ++ expectation ++ " but got " ++ show reality ++ "!\n")
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
