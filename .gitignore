@@ -1,4 +1,8 @@
-
+*/.stack-work
+overlap/output/*
+stack.yaml.lock
+*.cabal
+*.DS_Store
 *.xml
 *.ndf
 *.ini
