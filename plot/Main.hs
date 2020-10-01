@@ -1,4 +1,5 @@
 import Control.Applicative( liftA2 )
+import Control.DeepSeq ( ($!!) )
 import Control.Lens.Operators( (&~) )
 import Control.Lens.Setter( (.~), (.=), mapped, over, set )
 import Control.Lens.Tuple( _1, _2 )
@@ -48,7 +49,7 @@ countLines :: FilePath -> IO PathLines
 countLines path = do
   contents <- readFile path
   let lineCount = length . lines $ contents
-  pure (path, lineCount)
+  pure $!! (path, lineCount)
 
 fromScoreName:: FilePath-> Int
 fromScoreName= takeFileName <&> drop (length "VSN-14-080-0") <&> take 2 <&> read
