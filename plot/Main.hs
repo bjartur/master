@@ -28,15 +28,16 @@ import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 import Bjartur.Types ( PathLines )
 import Bjartur.Records
 
-sublists:: IO [[(String,[PathLines])]]
-sublists = liftA2 (+++)
-  (sequence[manual])
-  $ (traverse.traverse) countAllLines $ map (["../csv-to-score/output"]+/+) [
-    ["baseline/3"]
-  , ["unabrupt", "reversal", "baseline"] +/+ ["3"]
-  , (["unabrupt", "reversal"] +/+ ["3"]) ++ (["baseline"] +/+ ["2","3","4","5"])
-  , (["unabrupt"] +/+ ["3","4","5"]) ++ (["reversal","baseline"] +/+ ["2","3","4","5"])
-  ]
+sublists :: [(String,[PathLines])] -> [[(String,[PathLines])]]
+sublists all =
+  [ choose ["technologist", "technician", "Complex3"]
+  , choose ["technologist", "technician", "Simple3", "Medium3", "Complex3"]
+  , choose ["technologist", "technician", "Simple3", "Medium3", "Complex3", "Complex4", "Complex5"]
+  , choose ["technologist", "technician", "Simple3", "Simple4", "Simple5",
+            "Medium2", "Medium3", "Medium4", "Medium5",
+            "Complex2", "Complex3", "Complex4", "Complex5"] ]
+  where
+    choose sel = filter (\(name,_) -> name `elem` sel) all
 
 hourly:: [(String, [PathLines])] -> [(String, [Double])]
 hourly= over (mapped._2.mapped) perhour
@@ -108,7 +109,7 @@ main= do
   sequence [martaLines,kaoLines] <&> hourly >>= render normalized "manual.distribution.svg"
   autoscoresLines <&> hourly >>= render raw "autoscores.svg"
   autoscoresLines <&> hourly >>= render normalized "autoscores.distribution.svg"
-  lists <- sublists <&> (map hourly)
+  lists <- numbers <&> sublists <&> (map hourly)
   sequence_ $ do
     (n, sublist) <- zip [1::Int ..] lists
     [ render raw ("raw" ++ show n ++ ".svg") sublist
