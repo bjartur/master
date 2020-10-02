@@ -11,6 +11,7 @@ import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy,
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite), Boundary(Closed))
+import System.FilePath ( takeFileName )
 import Plot (renderOverlaps)
 
 import Bjartur.Types
@@ -41,7 +42,10 @@ main= do
           renderOverlaps outPath [overlaps]
         return ()
     else do
-      intervalss <- mapM readIntervals paths
+      intervalss <- forM paths $ \path -> do
+        let name = takeFileName path
+        intervals <- readIntervals path
+        pure (name, intervals)
       overlaps <- mapM (uncurry doPair) (combinations intervalss)
       renderOverlaps "overlaps.svg" overlaps
       putStrLn "Wrote overlaps.svg"

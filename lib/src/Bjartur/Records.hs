@@ -87,7 +87,7 @@ kaoLines = kao >>= mapM (mapM countLines)
 -- One big IntervalSet out of all CSV files for each classifier
 intervals :: IO [(String, Intervals)]
 intervals = scores >>= mapM ( mapM $ \paths -> 
-  mapM readIntervals' paths >>= return . IntervalSet.unions ) 
+  mapM readIntervals paths >>= return . IntervalSet.unions )
 
 countLines :: FilePath -> IO PathLines
 countLines path = do
@@ -142,30 +142,5 @@ tst "VSN-14-080-029" = 6 + 27/60
 tst "total" = 166.7
 tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
 
-readIntervals :: FilePath -> IO (String, Intervals)
-readIntervals "marta" = do
-  intervals <- parse <$> readCSVDirectory "../Nox2score/output/Marta"
-  return ("marta", intervals)
-readIntervals "kao"  = do
-  intervals <- parse <$> readCSVDirectory "../Nox2score/output/KAÓ"
-  return ("kao", intervals)
-readIntervals path = do
-  contents <- readFile path
-  let name = takeFileName path
-      parsed = parse contents
-  return (name,parsed)
-
-readIntervals' path = readFile path <&> parse
-
--- concatenated contents of all csv files in a directory
--- EXCEPT those that end with 013.csv and 014.csv
-readCSVDirectory :: String -> IO String
-readCSVDirectory dir = do
-  csvs <- filter forbidden <$> listDirectory dir
-  readed <- mapM (\path -> readFile (dir </> path)) csvs
-  return $ concat readed
-  where
-    forbidden :: String -> Bool
-    forbidden s =
-      let end = snd $ splitAt (length s - 7) s 
-        in not $ end == "013.csv" || end == "014.csv"
+readIntervals :: FilePath -> IO Intervals
+readIntervals path = readFile path <&> parse
