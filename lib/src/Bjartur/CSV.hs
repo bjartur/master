@@ -1,4 +1,4 @@
-module Bjartur.CSV ( parse ) where
+module Bjartur.CSV where
 
 import Bjartur.Types
 
@@ -27,12 +27,6 @@ row= do
   end <- dateTime
   expect '\n' -- native line separator has already been translated to \n
   return $ period start end
-
-period :: Ord r=> r-> r-> Interval.Interval r
-period start end=
-  Interval.interval
-    (Finite start, Closed)
-    (Finite end,   Closed)
 
 dateTime:: ReadP DateTime
 dateTime= do

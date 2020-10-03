@@ -13,10 +13,21 @@ dependencies:
   - lens
   - directory
   - filepath
+  - QuickCheck
 
 library:
   source-dirs: src
   exposed-modules:
     - Bjartur.Types
     - Bjartur.Records
+    - Bjartur.CSV
 
+tests:
+  bjartur-lib-tests:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - bjartur-lib
+      - hspec
+      - hspec-core
+      - QuickCheck
