@@ -61,11 +61,13 @@ doPair (fName, former) (lName, latter) = do
   putStrLn $ "left (" ++ fName ++ "):  " ++ show left
   putStrLn $ "right (" ++ lName ++ "): " ++ show right
   putStrLn $ "intersection: " ++ show intersection
-  putStrLn $ "accordance: " ++ show (accordance left intersection right)
+  putStrLn $ "coefficient: " ++ show (coefficient left intersection right)
   return (fName, [left,intersection,right], lName)
 
-accordance :: (Fractional n, Ord n) => n -> n -> n -> n
-accordance l o r = o / (o + min l r)
+-- Overlap coefficient
+-- https://en.wikipedia.org/wiki/Overlap_coefficient
+coefficient :: (Fractional n, Ord n) => n -> n -> n -> n
+coefficient l o r = o / (o + min l r)
 
 -- Ratio of measures that intersect on both sides over total
 correlation:: Intervals -> Intervals -> Double
