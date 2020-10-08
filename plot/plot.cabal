@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 058f34cd224f70973f610d82e1803b9e0fc095d61cc53a660ebce079452d4745
+-- hash: 18852763627530c0d5a56e67c839389e8b03008a31b3b5d7fee70a5605688564
 
 name:           plot
 version:        0.1.0.0
@@ -28,6 +28,7 @@ executable plot
       ./.
   build-depends:
       base >=4.12.0.0 && <4.14
+    , bjartur-lib
     , colour >=1.0.0 && <2.4
     , deepseq
     , diagrams-core >=1.4.2 && <1.5

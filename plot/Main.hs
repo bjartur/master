@@ -1,11 +1,8 @@
-import Control.Applicative( liftA2 )
-import Control.DeepSeq ( ($!!) )
 import Control.Lens.Operators( (&~) )
-import Control.Lens.Setter( (.~), (.=), mapped, over, set )
-import Control.Lens.Tuple( _1, _2 )
-import Control.Monad ( forM )
+import Control.Lens.Setter( (.=), mapped, over, set )
+import Control.Lens.Tuple( _2 )
 import Data.Colour( Colour )
-import Data.Colour.Names( black, blue, red, white, yellow )
+import Data.Colour.Names( black, brown, pink, red, white, yellow )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
 import Data.List( transpose, sortBy )
@@ -45,8 +42,8 @@ hourly= over (mapped._2.mapped) perhour
 perhour :: PathLines -> Double
 perhour (polysomnogram, linecount) = fromIntegral linecount / tst (takeBaseName polysomnogram)
 
-plot:: Colour Double-> [(String, [Double])]-> Diagram SVG
-plot colour distributions=
+plot:: [(Rational, Colour Double)]-> [(String, [Double])]-> Diagram SVG
+plot colours distributions=
   renderAxis $ r2Axis &~ do
     axisExtend .= noExtend
     xLabel .= "Participating sleeper"
@@ -56,18 +53,21 @@ plot colour distributions=
     yAxis . tickLabelPositions .= zip [0.5..] (distributions <&> fst)
     yAxis . majorTicks . visible .= False
     yAxis . minorTicks . visible .= False
-    axisColourMap .= colourScheme colour
+    axisColourMap .= colourScheme colours
     colourBar . visible .= True
     heatMap' (distributions <&> snd)
 
 raw:: [(String, [Double])]-> Diagram SVG
-raw= plot white
+raw= plot [(0,white), (1/3, pink), (2/3, red), (1,brown)]
+
+logscale:: [(String, [Double])]-> Diagram SVG
+logscale= over (mapped._2.mapped) (logBase 10) <&> plot [(0,white), (1/3, pink), (2/3, red), (1,brown)]
 
 normalize:: [Double]-> [Double]
 normalize list= map (/ sum list) list
 
 normalized:: [(String, [Double])]-> Diagram SVG
-normalized= over (mapped._2) normalize <&> plot yellow
+normalized= over (mapped._2) normalize <&> plot [(0,yellow), (1,brown)]
 
 render:: ([(String, [Double])]-> Diagram SVG)-> FilePath-> [(String, [Double])]-> IO ()
 render draw filename heats=
@@ -102,8 +102,10 @@ main= do
   (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
 
   numbers <&> tally >>= render raw "tally.svg"
+  numbers <&> tally >>= render logscale "tally.log.svg"
   numbers <&> tally >>= render normalized "tally.distribution.svg"
   numbers <&> hourly >>= render raw "perhour.svg"
+  numbers <&> hourly >>= render logscale "perhour.log.svg"
   sequence [martaLines] <&> hourly >>= render raw "marta.svg"
   sequence [martaLines,kaoLines] <&> hourly >>= render raw "manual.svg"
   sequence [martaLines,kaoLines] <&> hourly >>= render normalized "manual.distribution.svg"
@@ -115,10 +117,10 @@ main= do
     [ render raw ("raw" ++ show n ++ ".svg") sublist
      ,render normalized ("distribution" ++ show n ++ ".svg") sublist]
 
-colourScheme:: Colour Double-> ColourMap
-colourScheme colour= colourMap [(0,colour), (1,red)]
+colourScheme:: [(Rational, Colour Double)]-> ColourMap
+colourScheme colours= colourMap colours
   & set infColour black
-  & set negInfColour blue
+  & set negInfColour (colours & head & snd)
 
 descending:: Ord order=> (a-> order)-> [a]-> [a]
 descending accessor= sortBy (flip compare `on` accessor)
