@@ -35,6 +35,15 @@ main= do
       --mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
       do
         scores <- intervals
+        -- Calculate the coefficient of all classifier sets
+        putStrLn $ "coefficient of all classifiers: "
+                 ++ show (coefficient' (map snd scores))
+        forM scores $ \score -> do
+          let (name,_) = score
+          let dropped = filter (/= score) scores
+          putStrLn $ "coefficient without classifier " ++ name ++ ": "q
+                    ++ show (coefficient' (map snd dropped))
+        --
         forM (combinations scores) $ \(a@(nameLeft, scoresLeft), b@(nameRight, scoresRight)) -> do
           let outPath = "output/" ++ nameLeft ++ "-" ++ nameRight ++ ".svg"
           putStrLn $ "Writing " ++ outPath
@@ -68,6 +77,14 @@ doPair (fName, former) (lName, latter) = do
 -- https://en.wikipedia.org/wiki/Overlap_coefficient
 coefficient :: (Fractional n, Ord n) => n -> n -> n -> n
 coefficient l o r = o / (o + min l r)
+
+-- Overlap coefficient for multiple sets
+coefficient' :: Fractional a => [Intervals] -> a
+coefficient' intervals =
+  let sets = intervals
+      counter = measures $ IntervalSet.intersections sets
+      denomin = foldl1 min $ map measures sets
+  in (fromIntegral counter / fromIntegral denomin)
 
 -- Ratio of measures that intersect on both sides over total
 correlation:: Intervals -> Intervals -> Double
