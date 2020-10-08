@@ -19,22 +19,21 @@ import Plots.Axis.Ticks( majorTicks, minorTicks )
 import Plots.Style( ColourMap, axisColourMap, colourMap, infColour, negInfColour )
 import Plots.Types( visible )
 import Plots.Types.HeatMap( heatMap' )
-import System.Directory( listDirectory )
-import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
+import System.FilePath( takeBaseName )
 
 import Bjartur.Types ( PathLines )
 import Bjartur.Records
 
 sublists :: [(String,[PathLines])] -> [[(String,[PathLines])]]
-sublists all =
-  [ choose ["technologist", "technician", "Complex3"]
-  , choose ["technologist", "technician", "Simple3", "Medium3", "Complex3"]
-  , choose ["technologist", "technician", "Simple3", "Medium3", "Complex3", "Complex4", "Complex5"]
-  , choose ["technologist", "technician", "Simple3", "Simple4", "Simple5",
+sublists universe =
+  [ lookups ["technologist", "technician", "Complex3"]
+  , lookups ["technologist", "technician", "Simple3", "Medium3", "Complex3"]
+  , lookups ["technologist", "technician", "Simple3", "Medium3", "Complex3", "Complex4", "Complex5"]
+  , lookups ["technologist", "technician", "Simple3", "Simple4", "Simple5",
             "Medium2", "Medium3", "Medium4", "Medium5",
             "Complex2", "Complex3", "Complex4", "Complex5"] ]
   where
-    choose sel = filter (\(name,_) -> name `elem` sel) all
+    lookups keys = filter (\(key,_) -> key `elem` keys) universe
 
 hourly:: [(String, [PathLines])] -> [(String, [Double])]
 hourly= over (mapped._2.mapped) perhour
