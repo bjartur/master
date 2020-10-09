@@ -2,9 +2,9 @@
 module Main where
 
 import Control.Applicative( liftA2, some )
-import Control.Monad ( forM )
+import Control.Monad ( forM, forM_ )
 import Data.Char
-import Data.List ( subsequences )
+import Data.List ( subsequences, tails )
 import Data.Function( on, (&) )
 import System.Environment( getArgs )
 import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy, (<++) )
@@ -21,49 +21,43 @@ import Bjartur.Records ( intervals, readIntervals )
 (>$)= flip fmap
 infixl 1 >$
 
-combinations :: [a] -> [(a,a)]
-combinations = map pair . filter length2 . subsequences
-  where
-    length2 list = length list == 2
-    pair [e1,e2] = (e1,e2)
+combinations:: [a] -> [(a,a)]
+combinations list= [(x,y) | (x:ys) <- tails list, y <- ys]
 
 main:: IO ()
 main= do
   paths <- getArgs
   if paths `fewerThan` 2
-    then 
-      --mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
-      do
-        scores <- intervals
-        -- Calculate the coefficient of all classifier sets
-        putStrLn $ "coefficient of all classifiers: "
-                 ++ show (coefficient' (map snd scores))
-        forM scores $ \score -> do
-          let (name,_) = score
-          let dropped = filter (/= score) scores
-          putStrLn $ "coefficient without classifier " ++ name ++ ": "q
-                    ++ show (coefficient' (map snd dropped))
-        --
-        forM (combinations scores) $ \(a@(nameLeft, scoresLeft), b@(nameRight, scoresRight)) -> do
-          let outPath = "output/" ++ nameLeft ++ "-" ++ nameRight ++ ".svg"
-          putStrLn $ "Writing " ++ outPath
-          overlaps <- doPair a b
-          renderOverlaps outPath [overlaps]
-        return ()
+    then do
+      mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
+      scores <- intervals
+      -- Calculate the coefficient of all classifier sets
+      putStrLn $ "coefficient of all classifiers: "
+                ++ show (coefficient' scores)
+      forM_ scores $ \score -> do
+        let (name,_) = score
+        let dropped = filter (/= score) scores
+        putStrLn $ "coefficient without classifier " ++ name ++ ": "
+                  ++ show (coefficient' dropped)
+      --
+      forM_ (combinations scores) $ \(a, b) -> do
+        (leftName, stats, rightName) <- statistics a b
+        let outPath = "output/" ++ leftName ++ "-" ++ rightName ++ ".svg"
+        putStrLn $ "Writing " ++ outPath
+        renderOverlaps outPath [(leftName, stats, rightName)]
     else do
       intervalss <- forM paths $ \path -> do
         let name = takeFileName path
         intervals <- readIntervals path
         pure (name, intervals)
-      overlaps <- mapM (uncurry doPair) (combinations intervalss)
+      overlaps <- mapM (uncurry statistics) (combinations intervalss)
       renderOverlaps "overlaps.svg" overlaps
       putStrLn "Wrote overlaps.svg"
-  return ()
 
 
-doPair :: (String, Intervals) -> (String, Intervals)
-       -> IO (([Char], [Double], [Char]))
-doPair (fName, former) (lName, latter) = do
+statistics :: (String, Intervals) -> (String, Intervals)
+       -> IO (([Char], (Double,Double,Double), [Char]))
+statistics (fName, former) (lName, latter) = do
   let left  = onlyLeft former latter
       right = onlyLeft latter former
       intersection = correlation former latter
@@ -71,7 +65,7 @@ doPair (fName, former) (lName, latter) = do
   putStrLn $ "right (" ++ lName ++ "): " ++ show right
   putStrLn $ "intersection: " ++ show intersection
   putStrLn $ "coefficient: " ++ show (coefficient left intersection right)
-  return (fName, [left,intersection,right], lName)
+  return (fName, (left,intersection,right), lName)
 
 -- Overlap coefficient
 -- https://en.wikipedia.org/wiki/Overlap_coefficient
@@ -79,9 +73,9 @@ coefficient :: (Fractional n, Ord n) => n -> n -> n -> n
 coefficient l o r = o / (o + min l r)
 
 -- Overlap coefficient for multiple sets
-coefficient' :: Fractional a => [Intervals] -> a
+coefficient' :: [(label, Intervals)]-> Double
 coefficient' intervals =
-  let sets = intervals
+  let sets = map snd intervals
       counter = measures $ IntervalSet.intersections sets
       denomin = foldl1 min $ map measures sets
   in (fromIntegral counter / fromIntegral denomin)

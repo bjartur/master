@@ -9,12 +9,12 @@ import Plots.Types.Bar (groupedBars, onBars, labelBars,  multiBars, stackedBars 
 import Plots.Axis( r2Axis, xAxis, xLabel, yAxis)
 import Plots.Axis.Render( renderAxis )
 
-drawOverlaps :: [(String,[Double],String)] -> Diagram SVG
+drawOverlaps :: [(String,(Double,Double,Double),String)] -> Diagram SVG
 drawOverlaps nums = renderAxis $ r2Axis &~ do
     -- Transpose nums in to series of left, overlap, right
-    let lefts = map (\(_, [l,_,_] ,_) -> l) nums
-    let overlaps = map (\(_, [_,o,_], _) -> o) nums
-    let rights = map (\(_, [_,_,r] ,_) -> r) nums
+    let lefts = map (\(_, (l,_,_) ,_) -> l) nums
+    let overlaps = map (\(_, (_,o,_), _) -> o) nums
+    let rights = map (\(_, (_,_,r) ,_) -> r) nums
     let series = [ ("Lefts", lefts)
                  , ("Overlaps", overlaps)
                  , ("Rights", rights) ]
@@ -23,5 +23,5 @@ drawOverlaps nums = renderAxis $ r2Axis &~ do
         labelBars $ map (\(a,_,b) -> a ++ " " ++ b) nums
         stackedBars
 
-renderOverlaps :: String -> [(String,[Double],String)] -> IO ()
+renderOverlaps :: String -> [(String,(Double,Double,Double),String)] -> IO ()
 renderOverlaps filename = renderSVG filename (dims zero) . drawOverlaps

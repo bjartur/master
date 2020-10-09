@@ -23,7 +23,7 @@ executables:
 tests:
   spec:
     main: Tests.hs
-    other-modules: Main
+    other-modules: Main Plot
     dependencies:
     - hspec
     - QuickCheck
