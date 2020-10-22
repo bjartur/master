@@ -1,16 +1,13 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind -fno-warn-name-shadowing #-}
 module Main where
 
-import Control.Applicative( liftA2, some )
 import Control.Monad ( forM, forM_ )
-import Data.Char
-import Data.List ( subsequences, tails )
+import Data.List ( tails )
 import Data.Function( on, (&) )
 import System.Environment( getArgs )
-import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy, (<++) )
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
-import Data.Interval (Extended(Finite), Boundary(Closed))
+import Data.Interval (Extended(Finite))
 import System.FilePath ( takeFileName )
 import Plot (renderOverlaps)
 
