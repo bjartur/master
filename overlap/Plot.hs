@@ -6,7 +6,8 @@ import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
 import Linear.Vector( zero )
 import Plots.Types.Bar (groupedBars, onBars, labelBars,  multiBars, stackedBars )
-import Plots.Axis( r2Axis, xAxis, xLabel, yAxis)
+import Plots.Axis( r2Axis, xAxis, xLabel, yAxis )
+import Plots.Types ( key )
 import Plots.Axis.Render( renderAxis )
 
 drawOverlaps :: [(String,(Double,Double,Double),String)] -> Diagram SVG
@@ -15,13 +16,15 @@ drawOverlaps nums = renderAxis $ r2Axis &~ do
     let lefts = map (\(_, (l,_,_) ,_) -> l) nums
     let overlaps = map (\(_, (_,o,_), _) -> o) nums
     let rights = map (\(_, (_,_,r) ,_) -> r) nums
-    let series = [ ("Lefts", lefts)
-                 , ("Overlaps", overlaps)
-                 , ("Rights", rights) ]
+    let series = reverse $
+            [ ("Lefts", lefts)
+            , ("Overlaps", overlaps)
+            , ("Rights", rights) ]
 
     multiBars series snd $ do
         labelBars $ map (\(a,_,b) -> a ++ " " ++ b) nums
         stackedBars
+        onBars $ \(n,_) -> key n
 
 renderOverlaps :: String -> [(String,(Double,Double,Double),String)] -> IO ()
 renderOverlaps filename = renderSVG filename (dims zero) . drawOverlaps
