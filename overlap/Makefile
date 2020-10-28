@@ -18,6 +18,6 @@ endef
 #)
 
 #all : output/breaths/*/*.txt
-test_results.txt : Main.hs overlap.cabal package.yaml stack.yaml
+test_results.txt : Main.hs Plot.hs overlap.cabal package.yaml stack.yaml
 	stack build --test >test_results.txt
 .PHONY : all
