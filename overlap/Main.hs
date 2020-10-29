@@ -1,13 +1,14 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind -fno-warn-name-shadowing #-}
 module Main where
 
-import Control.Monad ( forM, forM_ )
+import Control.Monad ( forM, forM_, when )
 import Data.List ( tails )
 import Data.Function( on, (&) )
 import System.Environment( getArgs )
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite))
+import System.Exit ( exitFailure )
 import System.FilePath ( takeFileName )
 import Plot (renderOverlaps)
 
@@ -24,32 +25,28 @@ combinations list= [(x,y) | (x:ys) <- tails list, y <- ys]
 main:: IO ()
 main= do
   paths <- getArgs
-  if paths `fewerThan` 2
-    then do
-      mapM_ putStrLn ["Overlap version 0", "Usage: overlap ONE OTHER [MORE ...]"]
-      scores <- intervals
-      -- Calculate the coefficient of all classifier sets
-      putStrLn $ "coefficient of all classifiers: "
-                ++ show (coefficient' scores)
-      forM_ scores $ \score -> do
-        let (name,_) = score
-        let dropped = filter (/= score) scores
-        putStrLn $ "coefficient without classifier " ++ name ++ ": "
-                  ++ show (coefficient' dropped)
-      --
-      forM_ (combinations scores) $ \(a, b) -> do
-        (leftName, stats, rightName) <- statistics a b
-        let outPath = "output/" ++ leftName ++ "-" ++ rightName ++ ".svg"
-        putStrLn $ "Writing " ++ outPath
-        renderOverlaps outPath [(leftName, stats, rightName)]
-    else do
-      intervalss <- forM paths $ \path -> do
+  when (length paths == 1)
+    (do putStrLn "Usage: overlap [ONE OTHER..]"; exitFailure)
+
+  scores <- if null paths then intervals else
+      forM paths $ \path -> (do
         let name = takeFileName path
         intervals <- readIntervals path
-        pure (name, intervals)
-      overlaps <- mapM (uncurry statistics) (combinations intervalss)
-      renderOverlaps "overlaps.svg" overlaps
-      putStrLn "Wrote overlaps.svg"
+        pure (name, intervals))
+      -- Calculate the coefficient of all classifier sets
+  putStrLn $ "coefficient of all classifiers: "
+            ++ show (coefficient' scores)
+  forM_ scores $ \score -> (do
+    let (name,_) = score
+    let dropped = filter (/= score) scores
+    putStrLn $ "coefficient without classifier " ++ name ++ ": "
+              ++ show (coefficient' dropped))
+  --
+  forM_ (combinations scores) $ \(a, b) -> (do
+    (leftName, stats, rightName) <- statistics a b
+    let outPath = "output/" ++ leftName ++ "-" ++ rightName ++ ".svg"
+    putStrLn $ "Writing " ++ outPath
+    renderOverlaps outPath leftName stats rightName)
 
 
 statistics :: (String, Intervals) -> (String, Intervals)
