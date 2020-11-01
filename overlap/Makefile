@@ -17,7 +17,8 @@ endef
 #    $(eval $(compare_to_3breaths)) \
 #)
 
-#all : output/breaths/*/*.txt
+all : test_results.txt
+	stack exec overlap -- --leave1out
 test_results.txt : Main.hs Plot.hs overlap.cabal package.yaml stack.yaml
 	stack build --test >test_results.txt
 .PHONY : all

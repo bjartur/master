@@ -8,7 +8,6 @@ import System.Environment( getArgs )
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite))
-import System.Exit ( exitFailure )
 import System.FilePath ( takeFileName )
 import Plot (renderOverlaps)
 
@@ -25,28 +24,33 @@ combinations list= [(x,y) | (x:ys) <- tails list, y <- ys]
 main:: IO ()
 main= do
   paths <- getArgs
-  when (length paths == 1)
-    (do putStrLn "Usage: overlap [ONE OTHER..]"; exitFailure)
-
-  scores <- if null paths then intervals else
+  let leave1out = length paths == 1
+  scores <- if length paths < 2 then intervals else
       forM paths $ \path -> (do
         let name = takeFileName path
         intervals <- readIntervals path
         pure (name, intervals))
-      -- Calculate the coefficient of all classifier sets
-  putStrLn $ "coefficient of all classifiers: "
-            ++ show (coefficient' scores)
-  forM_ scores $ \score -> (do
+
+-- Calculate the coefficient of all classifier sets
+  putStrLn (scores & summary)
+  when leave1out $ forM_ scores $ \score -> (do
     let (name,_) = score
     let dropped = filter (/= score) scores
-    putStrLn $ "coefficient without classifier " ++ name ++ ": "
-              ++ show (coefficient' dropped))
-  --
-  forM_ (combinations scores) $ \(a, b) -> (do
-    (leftName, stats, rightName) <- statistics a b
+    putStrLn $ "without classifier " ++ name ++ " (whose mean interval length is " ++ (score & snd & meanIntervalLength & show) ++ "):\t"
+              ++ summary dropped)
+
+  putStrLn ""
+
+  stats <- traverse (uncurry statistics) (combinations scores)
+
+-- Bars, side-by-side
+  forM_ stats $ \(leftName, percentages, rightName) -> (do
     let outPath = "output/" ++ leftName ++ "-" ++ rightName ++ ".svg"
     putStrLn $ "Writing " ++ outPath
-    renderOverlaps outPath leftName stats rightName)
+    renderOverlaps outPath leftName percentages rightName)
+
+  putStrLn ""
+  print stats
 
 
 statistics :: (String, Intervals) -> (String, Intervals)
@@ -67,17 +71,18 @@ coefficient :: (Fractional n, Ord n) => n -> n -> n -> n
 coefficient l o r = o / (o + min l r)
 
 -- Overlap coefficient for multiple sets
-coefficient' :: [(label, Intervals)]-> Double
-coefficient' intervals =
+summary :: [(label, Intervals)]-> String
+summary intervals =
   let sets = map snd intervals
-      counter = measures $ IntervalSet.intersections sets
-      denomin = foldl1 min $ map measures sets
-  in (fromIntegral counter / fromIntegral denomin)
+      intersectionInSeconds = measures $ IntervalSet.intersections sets
+      leastSensitiveMethodInSeconds = foldl1 min $ map measures sets
+      statistic = fromIntegral intersectionInSeconds / fromIntegral leastSensitiveMethodInSeconds
+  in
+    "intersection: " ++ show intersectionInSeconds ++ " seconds\t" ++ "overlap coefficient: " ++ show statistic
 
 -- Ratio of measures that intersect on both sides over total
 correlation:: Intervals -> Intervals -> Double
 correlation one other= do
-  let dividedBy = (/) `on` fromIntegral
   let total = measures (union one other)
   if total == 0
   then undefined
@@ -87,8 +92,8 @@ correlation one other= do
 onlyLeft :: Intervals -> Intervals -> Double
 onlyLeft one other = (one `IntervalSet.difference` intersect & measures) `dividedBy` (measures $ union one other)
   where intersect = IntervalSet.intersection one other
-        dividedBy = (/) `on` fromIntegral
 
+dividedBy = (/) `on` fromIntegral
 -- @union ones others@ calculates a union of the given ascending lists of intervals, ordered by their start time.
 -- If each input list contains only disjoint intervals, the same will hold for the result.
 -- If the input is represented by exclusive intervals, so will the result be, and vice versa.
@@ -107,6 +112,11 @@ measure i = let (Finite lower) = Interval.lowerBound i
 
 measures :: Intervals -> Int
 measures is = map measure (IntervalSet.toList is) & sum
+
+meanIntervalLength :: Intervals -> Double
+meanIntervalLength = IntervalSet.toList
+  >$ map measure
+  >$ (\list-> sum list `dividedBy` length list)
 
 measure' :: (DateTime, DateTime)-> Int
 measure' (from, to)= let
