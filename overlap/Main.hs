@@ -63,7 +63,7 @@ main= do
   putStrLn $ head reversed >$ (\(_,_,rightName) -> rightName) & ("":) & intercalate "\t"
   let table = reversed >$ liftA2 (,) (head >$ (\(leftName,_,_) -> leftName)) (map (\(_,(left,jaccard,right),_)-> jaccard / (jaccard + min left right))) :: [(String, [Number])]
   let rows = table >$ fmap (map formatPercentage >$ intercalate "\t") :: [(String, String)]
-  let indented = zipWith (\n (leftName, row) -> (leftName ++ "\t" ++ row)) [1..] rows
+  let indented = map (\(leftName, row) -> (leftName ++ "\t" ++ row)) rows
   mapM_ putStrLn $ indented
 
 
