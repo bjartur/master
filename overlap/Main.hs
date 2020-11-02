@@ -1,18 +1,22 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind -fno-warn-name-shadowing #-}
 module Main where
 
-import Control.Monad ( forM, forM_, when )
-import Data.List ( tails )
-import Data.Function( on, (&) )
+import Control.Applicative ( liftA2 )
+import Control.Monad ( forM, forM_, unless, when )
+import Data.Function( (&), on )
+import Data.List( inits, intercalate, tails )
+import Data.Ratio( (%), Ratio )
 import System.Environment( getArgs )
 import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite))
 import System.FilePath ( takeFileName )
-import Plot (renderOverlaps)
+import Plot (formatPercentage, renderOverlaps)
 
 import Bjartur.Types
 import Bjartur.Records ( intervals, readIntervals )
+
+type Number = Ratio Int
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
@@ -50,11 +54,21 @@ main= do
     renderOverlaps outPath leftName percentages rightName)
 
   putStrLn ""
-  print stats
+
+  let rowLengths = [14-1, 14-2 .. 1]
+  unless (length stats == sum rowLengths) $ error $ "Miscalculation: expected " ++ show (sum rowLengths) ++ " overlap coefficients, but found " ++ show (length stats) ++ "!"
+  let keepsAndSkips = zip rowLengths (inits rowLengths) & map (fmap sum) :: [(Int, Int)]
+  let listsOfTriplets = keepsAndSkips >$ (\(keep, skip)-> drop skip stats & take keep) :: [[(String, (Number, Number, Number), String)]]
+  let reversed = map reverse listsOfTriplets
+  putStrLn $ head reversed >$ (\(_,_,rightName) -> rightName) & ("":) & intercalate "\t"
+  let table = reversed >$ liftA2 (,) (head >$ (\(leftName,_,_) -> leftName)) (map (\(_,(left,jaccard,right),_)-> jaccard / (jaccard + min left right))) :: [(String, [Number])]
+  let rows = table >$ fmap (map formatPercentage >$ intercalate "\t") :: [(String, String)]
+  let indented = zipWith (\n (leftName, row) -> (leftName ++ "\t" ++ row)) [1..] rows
+  mapM_ putStrLn $ indented
 
 
 statistics :: (String, Intervals) -> (String, Intervals)
-       -> IO (([Char], (Double,Double,Double), [Char]))
+       -> IO (([Char], (Number,Number,Number), [Char]))
 statistics (fName, former) (lName, latter) = do
   let left  = onlyLeft former latter
       right = onlyLeft latter former
@@ -62,13 +76,13 @@ statistics (fName, former) (lName, latter) = do
   putStrLn $ "left (" ++ fName ++ "):  " ++ show left
   putStrLn $ "right (" ++ lName ++ "): " ++ show right
   putStrLn $ "intersection: " ++ show intersection
-  putStrLn $ "coefficient: " ++ show (coefficient left intersection right)
+  putStrLn $ "coefficient: " ++ show (coefficient former latter)
   return (fName, (left,intersection,right), lName)
 
 -- Overlap coefficient
 -- https://en.wikipedia.org/wiki/Overlap_coefficient
-coefficient :: (Fractional n, Ord n) => n -> n -> n -> n
-coefficient l o r = o / (o + min l r)
+coefficient :: Intervals -> Intervals -> Number
+coefficient former latter = measures (IntervalSet.intersection former latter) `dividedBy` on min measures former latter
 
 -- Overlap coefficient for multiple sets
 summary :: [(label, Intervals)]-> String
@@ -76,12 +90,12 @@ summary intervals =
   let sets = map snd intervals
       intersectionInSeconds = measures $ IntervalSet.intersections sets
       leastSensitiveMethodInSeconds = foldl1 min $ map measures sets
-      statistic = fromIntegral intersectionInSeconds / fromIntegral leastSensitiveMethodInSeconds
+      statistic = fromIntegral intersectionInSeconds / fromIntegral leastSensitiveMethodInSeconds :: Number
   in
     "intersection: " ++ show intersectionInSeconds ++ " seconds\t" ++ "overlap coefficient: " ++ show statistic
 
 -- Ratio of measures that intersect on both sides over total
-correlation:: Intervals -> Intervals -> Double
+correlation:: Intervals -> Intervals -> Number
 correlation one other= do
   let total = measures (union one other)
   if total == 0
@@ -89,11 +103,12 @@ correlation one other= do
   else overlaps one other `dividedBy` total
 
 -- Ratio of measures on the left-hand side
-onlyLeft :: Intervals -> Intervals -> Double
+onlyLeft :: Intervals -> Intervals -> Number
 onlyLeft one other = (one `IntervalSet.difference` intersect & measures) `dividedBy` (measures $ union one other)
   where intersect = IntervalSet.intersection one other
 
-dividedBy = (/) `on` fromIntegral
+dividedBy :: Int -> Int -> Number
+dividedBy = (/) `on` (%1)
 -- @union ones others@ calculates a union of the given ascending lists of intervals, ordered by their start time.
 -- If each input list contains only disjoint intervals, the same will hold for the result.
 -- If the input is represented by exclusive intervals, so will the result be, and vice versa.
@@ -113,7 +128,7 @@ measure i = let (Finite lower) = Interval.lowerBound i
 measures :: Intervals -> Int
 measures is = map measure (IntervalSet.toList is) & sum
 
-meanIntervalLength :: Intervals -> Double
+meanIntervalLength :: Intervals -> Number
 meanIntervalLength = IntervalSet.toList
   >$ map measure
   >$ (\list-> sum list `dividedBy` length list)
