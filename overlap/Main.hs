@@ -104,8 +104,7 @@ correlation one other= do
 
 -- Ratio of measures on the left-hand side
 onlyLeft :: Intervals -> Intervals -> Number
-onlyLeft one other = (one `IntervalSet.difference` intersect & measures) `dividedBy` (measures $ union one other)
-  where intersect = IntervalSet.intersection one other
+onlyLeft one other = (one `IntervalSet.difference` other & measures) `dividedBy` (measures $ union one other)
 
 dividedBy :: Int -> Int -> Number
 dividedBy = (/) `on` (%1)
