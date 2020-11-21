@@ -27,24 +27,29 @@ elements `fewerThan` n = null $ drop (n-1) elements
 main :: IO ()
 main = do
   args <- getArgs
-  let options = takeWhile ("--" `isPrefixOf`) args & takeWhile ("--" /=)
+  let longOptions = takeWhile ("--" `isPrefixOf`) args & takeWhile ("--" /=)
   let parseFlags flags = case flags of {
-    ("--unabrupt":_) -> [];
-    ("--reversal":_) -> [abrupt];
-    (('-':'n':_):rest) -> parseFlags rest;
-    _ -> [belowBaseline,abrupt];
+    ["--unabrupt"] -> [];
+    ["--simple"] -> [];
+    ["--reversal"] -> [abrupt];
+    ["--medium"] -> [abrupt];
+    ["--baseline"] -> [belowBaseline,abrupt];
+    ["--complex"] -> [belowBaseline,abrupt];
   }
-  let criteria = parseFlags options
-  let Just positionals = stripPrefix options args
-  let paths = (if head positionals == "--" then tail else id) positionals
-  if paths `fewerThan` 2 || length options > 2
+  let shortOptions = takeWhile ("--" /=) args & dropWhile ("--" `isPrefixOf`) & takeWhile ("-" `isPrefixOf`)
+  let parseOptions ['-':'n':number] = if number == "0" then [2..5] else [read number :: Int]
+
+  let positionals = dropWhile (\argument-> argument /= "--" && "-" `isPrefixOf` argument) args
+  let paths = (if take 1 positionals == ["--"] then drop 1 else id) positionals
+
+  if paths `fewerThan` 2 || length longOptions > 1 || length shortOptions > 1
   then mapM_ putStrLn ["csv2score version 1"
                       , "Usage: csv2score [--unabrupt|--reversal|--baseline] [-nN] [--] DESTINATION FILE..."
                       , "If no method is specified, baseline is used by default."
                       , "Reversal drops the requirement that every nadir be under baseline."
                       , "Unabrupt additionally drops the requirement that a crescendo be followed by an nadir above baseline."
-                      , "The only legal value for  N is 0 which represents varying the the minimum number of increases in negative pressure from 2 to 5."]
-  else forM_ [2..5] $ \n-> score (criteria) (tail paths) n (head paths </> show n)
+                      , "The only legal value for N is 0 which represents varying the the minimum number of increases in negative pressure from 2 to 5."]
+  else forM_ (parseOptions shortOptions) $ \n-> score (parseFlags longOptions) (tail paths) n (head paths </> show n)
 
 score:: [[Double]-> (Index,Count)-> Double-> Bool]-> [FilePath]-> Int-> FilePath-> IO ()
 score criteria sources n destination = forM_ sources $ \source-> (readFile source >$ scoring criteria n) >>= writeFile (destination </> takeFileName source)
