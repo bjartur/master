@@ -14,7 +14,7 @@ import System.FilePath ( takeFileName )
 import Plot (formatPercentage, renderOverlaps)
 
 import Bjartur.Types
-import Bjartur.Records ( intervals, readIntervals )
+import Bjartur.Records ( intervals, readIntervals, tst )
 
 type Number = Ratio Int
 
@@ -77,6 +77,16 @@ statistics (fName, former) (lName, latter) = do
   putStrLn $ "right (" ++ lName ++ "): " ++ show right
   putStrLn $ "intersection: " ++ show intersection
   putStrLn $ "coefficient: " ++ show (coefficient former latter)
+  let both = measures(IntervalSet.intersection former latter)
+  let neither = round(60*60*tst "total") - measures(IntervalSet.union former latter)
+  let trueFormerFalseLatter = measures(former `IntervalSet.difference` latter)
+  let trueLatterFalseFormer = measures(latter `IntervalSet.difference` former)
+  putStrLn $ fName ++ "\t( "
+          ++ show trueFormerFalseLatter
+          ++ " ( " ++ show both ++ " ) "
+          ++ show trueLatterFalseFormer
+          ++ " )\t" ++ lName
+          ++ "\t[" ++ show neither ++ "]"
   return (fName, (left,intersection,right), lName)
 
 -- Overlap coefficient
