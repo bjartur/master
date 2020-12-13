@@ -1,5 +1,8 @@
 .ONESHELL:
 methods := unabrupt reversal baseline
+.PRECIOUS: $(foreach method,$(methods), \
+		$(wildcard D:/Master/autoscored/$(method)/[2-5]/VSN-14-080-0??/Data.ndb) \
+	)
 all: $(foreach method,$(methods), \
 		$(wildcard D:/Master/autoscored/$(method)/[2-5]/VSN-14-080-0??/Data.ndb) \
 	)
