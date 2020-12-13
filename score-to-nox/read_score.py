@@ -31,7 +31,7 @@ with open('../best_signal.py', 'rb') as file:
 
 if __name__ == '__main__':
     for n in ("2","3","4","5"):
-        for crescendo in ("baseline","unabrupt","breaths"):
+        for crescendo in ("baseline","unabrupt","unabrupt"):
             paths = glob("D:\\Master\\autoscored\\" + crescendo + "\\" + n + "\\*\\")
             for filepath in paths:
                 name = path.basename(path.dirname(filepath))
