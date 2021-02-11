@@ -19,6 +19,6 @@ endef
 
 all : test_results.txt
 	stack exec overlap -- --leave1out
-test_results.txt : Main.hs Plot.hs overlap.cabal package.yaml stack.yaml
+test_results.txt : Main.hs Plot.hs overlap.cabal package.yaml stack.yaml ../lib/src/Bjartur/Records.hs
 	stack build --test >test_results.txt
 .PHONY : all
