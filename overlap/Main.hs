@@ -14,7 +14,7 @@ import System.FilePath ( takeFileName )
 import Plot (formatPercentage, renderOverlaps)
 
 import Bjartur.Types
-import Bjartur.Records ( intervals, readIntervals, tst )
+import Bjartur.Records ( autoscoredIntervals, intervals, readIntervals, tst )
 
 type Number = Ratio Int
 
@@ -36,7 +36,10 @@ main= do
         pure (name, intervals))
 
 -- Calculate the coefficient of all classifier sets
+  putStr "Manual and automatic scoring: "
   putStrLn (scores & summary)
+  putStr "Programmatic scoring: "
+  autoscoredIntervals >$ summary >>= putStrLn
   when leave1out $ forM_ scores $ \score -> (do
     let (name,_) = score
     let dropped = filter (/= score) scores

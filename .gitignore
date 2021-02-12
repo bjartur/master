@@ -6,6 +6,7 @@ stack.yaml.lock
 *.ndf
 *.ini
 *.txt
+!overlap/report.txt
 *.csv
 *.ndb
 *.nef

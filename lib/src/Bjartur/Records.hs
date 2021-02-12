@@ -84,10 +84,17 @@ martaLines = marta >>= mapM (mapM countLines)
 kaoLines :: IO (String, [PathLines])
 kaoLines = kao >>= mapM (mapM countLines)
 
+listIntervals :: IO [(String, [FilePath])] -> IO [(String, Intervals)]
+listIntervals = (>>= mapM ( mapM $ \paths ->
+  mapM readIntervals paths >>= return . IntervalSet.unions ))
+
 -- One big IntervalSet out of all CSV files for each classifier
 intervals :: IO [(String, Intervals)]
-intervals = scores >>= mapM ( mapM $ \paths -> 
-  mapM readIntervals paths >>= return . IntervalSet.unions )
+intervals = listIntervals scores
+
+-- -||- but only autoscores
+autoscoredIntervals :: IO [(String, Intervals)]
+autoscoredIntervals = listIntervals autoscores
 
 countLines :: FilePath -> IO PathLines
 countLines path = do
