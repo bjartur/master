@@ -2,7 +2,8 @@
 module Main where
 
 import Control.Applicative ( liftA2 )
-import Control.Monad ( forM, forM_, unless, when )
+import Control.Monad ( forM, forM_, when )
+import Data.Char( toUpper )
 import Data.Function( (&), on )
 import Data.List( inits, intercalate, tails )
 import Data.Ratio( (%), Ratio )
@@ -48,7 +49,9 @@ main= do
 
   putStrLn ""
 
-  stats <- traverse (uncurry statistics) (combinations scores)
+  let (detailedSummaries, stats) = map (uncurry statistics) (combinations scores) & unzip :: ([String], [(String, (Number, Number, Number), String)])
+  mapM_ putStr detailedSummaries
+  mapM_ (putStr . uncurry absoluteStatistics) (combinations scores)
 
 -- Bars, side-by-side
   forM_ stats $ \(leftName, percentages, rightName) -> (do
@@ -56,46 +59,64 @@ main= do
     putStrLn $ "Writing " ++ outPath
     renderOverlaps outPath leftName percentages rightName)
 
-  putStrLn ""
+  let calculate (label,statistic)= (label, stats >$ (\(leftName, (left,intersectionOverUnion,right), rightName)-> (leftName, statistic left intersectionOverUnion right, rightName)))
+  let jaccards _ intersectionOverUnion _= intersectionOverUnion
+  mapM_ (putStr . tabulate . calculate) [("Jaccard", jaccards), ("Overlap coefficient", coefficient)]
 
-  let rowLengths = [14-1, 14-2 .. 1]
-  unless (length stats == sum rowLengths) $ error $ "Miscalculation: expected " ++ show (sum rowLengths) ++ " overlap coefficients, but found " ++ show (length stats) ++ "!"
-  let keepsAndSkips = zip rowLengths (inits rowLengths) & map (fmap sum) :: [(Int, Int)]
-  let listsOfTriplets = keepsAndSkips >$ (\(keep, skip)-> drop skip stats & take keep) :: [[(String, (Number, Number, Number), String)]]
-  let reversed = map reverse listsOfTriplets
-  putStrLn $ head reversed >$ (\(_,_,rightName) -> rightName) & ("":) & intercalate "\t"
-  let table = reversed >$ liftA2 (,) (head >$ (\(leftName,_,_) -> leftName)) (map (\(_,(left,jaccard,right),_)-> jaccard / (jaccard + min left right))) :: [(String, [Number])]
-  let rows = table >$ fmap (map formatPercentage >$ intercalate "\t") :: [(String, String)]
-  let indented = map (\(leftName, row) -> (leftName ++ "\t" ++ row)) rows
-  mapM_ putStrLn $ indented
+tabulate:: (String, [(String, Number, String)])-> String
+tabulate (title, coefficients)=
+  "\n" ++ map toUpper title ++ "\n" ++ let
+    rowLengths = [14-1, 14-2 .. 1]
+    keepsAndSkips = if length coefficients /= sum rowLengths
+      then error("Miscalculation: expected " ++ show (sum rowLengths) ++ " coefficients, but found " ++ show (length coefficients) ++ "!")
+      else zip rowLengths (inits rowLengths) & map (fmap sum) :: [(Int, Int)]
+    listsOfTriplets = keepsAndSkips >$ (\(keep, skip)-> drop skip coefficients & take keep) :: [[(String, Number, String)]]
+    reversed = map reverse listsOfTriplets :: [[(String, Number, String)]]
+    header = head reversed >$ (\(_,_,rightName) -> rightName) & ("":) & intercalate "\t" :: String
+    table = reversed >$ liftA2 (,) (head >$ (\(leftName,_,_) -> leftName)) (map (\(_,statistic,_)-> statistic)) :: [(String, [Number])]
+    rows = table >$ fmap (map formatPercentage >$ intercalate "\t") :: [(String, String)]
+    indented = map (\(leftName, row) -> (leftName ++ "\t" ++ row)) rows
+    in header ++ "\n" ++ intercalate "\n" indented ++ "\n"
 
+-- combined sleep time of all polysomnograms in seconds
+totalSleepTime:: Int
+totalSleepTime= round(60 * 60 * tst "total")
 
-statistics :: (String, Intervals) -> (String, Intervals)
-       -> IO (([Char], (Number,Number,Number), [Char]))
-statistics (fName, former) (lName, latter) = do
-  let left  = onlyLeft former latter
-      right = onlyLeft latter former
-      intersection = correlation former latter
-  putStrLn $ "left (" ++ fName ++ "):  " ++ show left
-  putStrLn $ "right (" ++ lName ++ "): " ++ show right
-  putStrLn $ "intersection: " ++ show intersection
-  putStrLn $ "coefficient: " ++ show (coefficient former latter)
-  let both = measures(IntervalSet.intersection former latter)
-  let neither = round(60*60*tst "total") - measures(IntervalSet.union former latter)
-  let trueFormerFalseLatter = measures(former `IntervalSet.difference` latter)
-  let trueLatterFalseFormer = measures(latter `IntervalSet.difference` former)
-  putStrLn $ fName ++ "\t( "
-          ++ show trueFormerFalseLatter
+statistics:: (String, Intervals)-> (String, Intervals)-> (String, (String, (Number,Number,Number), String) )
+statistics (leftName, left) (rightName, right) =
+  let former = onlyLeft left right
+      intersectionOverUnion = jaccard left right
+      latter = 1 - former - intersectionOverUnion
+  in seq(if latter==onlyLeft right left then () else error $ "latter - onlyLeft right left = " ++ show (latter - onlyLeft right left))
+  (
+      "left (" ++ leftName ++ "):  " ++ show former ++ "\t" ++
+      "jaccard: " ++ show intersectionOverUnion ++ "\t" ++
+      "right (" ++ rightName ++ "): " ++ show latter ++ "\t" ++
+      "overlap coefficient: " ++ show (coefficient former intersectionOverUnion latter) ++
+      "\n"
+   ,
+      (leftName, (former,intersectionOverUnion,latter), rightName)
+  )
+
+absoluteStatistics:: (String, Intervals)-> (String, Intervals)-> String
+absoluteStatistics (leftName, left) (rightName, right)=
+  let both = measures(IntervalSet.intersection left right)
+      neither = totalSleepTime - measures(IntervalSet.union left right)
+      trueLeftFalseRight = measures(left `IntervalSet.difference` right)
+      trueRightFalseLeft = measures(right `IntervalSet.difference` left)
+  in seq (if totalSleepTime == both + trueLeftFalseRight + trueRightFalseLeft + neither then () else undefined)
+    leftName ++ "\t( "
+          ++ show trueLeftFalseRight
           ++ " ( " ++ show both ++ " ) "
-          ++ show trueLatterFalseFormer
-          ++ " )\t" ++ lName
+          ++ show trueRightFalseLeft
+          ++ " )\t" ++ rightName
           ++ "\t[" ++ show neither ++ "]"
-  return (fName, (left,intersection,right), lName)
+          ++ "\n"
 
 -- Overlap coefficient
 -- https://en.wikipedia.org/wiki/Overlap_coefficient
-coefficient :: Intervals -> Intervals -> Number
-coefficient former latter = measures (IntervalSet.intersection former latter) `dividedBy` on min measures former latter
+coefficient :: Number-> Number-> Number-> Number
+coefficient left intersection right= intersection / (intersection + min left right)
 
 -- Overlap coefficient for multiple sets
 summary :: [(label, Intervals)]-> String
@@ -107,9 +128,10 @@ summary intervals =
   in
     "intersection: " ++ show intersectionInSeconds ++ " seconds\t" ++ "overlap coefficient: " ++ show statistic
 
--- Ratio of measures that intersect on both sides over total
-correlation:: Intervals -> Intervals -> Number
-correlation one other= do
+
+-- on measures (/) (union one other) (intersection one other)
+jaccard :: Intervals -> Intervals -> Number
+jaccard one other = do
   let total = measures (union one other)
   if total == 0
   then undefined
