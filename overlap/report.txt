@@ -306,17 +306,18 @@ Complex5	0%	0%
 technologist	20%
 
 OVERLAP COEFFICIENT
-	technician	technologist	Complex5	Complex4	Complex3	Complex2	Medium5	Medium4	Medium3	Medium2	Simple5	Simple4	Simple3
-Simple2	54%	49%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%
-Simple3	39%	35%	100%	100%	100%	53%	100%	100%	100%	46%	100%	100%
-Simple4	33%	29%	100%	100%	47%	22%	100%	100%	42%	24%	100%
-Simple5	39%	37%	100%	49%	20%	8%	100%	40%	25%	21%
-Medium2	14%	10%	78%	77%	74%	83%	42%	56%	73%
-Medium3	21%	14%	52%	69%	75%	40%	53%	74%
-Medium4	30%	20%	52%	57%	28%	14%	73%
-Medium5	36%	28%	52%	30%	14%	6%
-Complex2	20%	21%	96%	68%	68%
-Complex3	35%	40%	76%	74%
-Complex4	39%	52%	96%
-Complex5	59%	68%
-technologist	34%
+		12%	12%	0%	0%	0%	2%	2%	3%	6%	11%	4%	8%	18%
+		technician	technologist	Complex5	Complex4	Complex3	Complex2	Medium5	Medium4	Medium3	Medium2	Simple5	Simple4	Simple3
+35%	Simple2	54%	49%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%
+18%	Simple3	39%	35%	100%	100%	100%	53%	100%	100%	100%	46%	100%	100%
+8%	Simple4	33%	29%	100%	100%	47%	22%	100%	100%	42%	24%	100%
+4%	Simple5	39%	37%	100%	49%	20%	8%	100%	40%	25%	21%
+11%	Medium2	14%	10%	78%	77%	74%	83%	42%	56%	73%
+6%	Medium3	21%	14%	52%	69%	75%	40%	53%	74%
+3%	Medium4	30%	20%	52%	57%	28%	14%	73%
+2%	Medium5	36%	28%	52%	30%	14%	6%
+2%	Complex2	20%	21%	96%	68%	68%
+0%	Complex3	35%	40%	76%	74%
+0%	Complex4	39%	52%	96%
+0%	Complex5	59%	68%
+12%	technologist	34%

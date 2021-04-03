@@ -2,7 +2,7 @@
 module Main where
 
 import Control.Applicative ( liftA2 )
-import Control.Monad ( forM, forM_, when )
+import Control.Monad ( forM, forM_ )
 import Data.Char( toUpper )
 import Data.Function( (&), on )
 import Data.List( inits, intercalate, tails )
@@ -25,6 +25,10 @@ infixl 1 >$
 
 combinations:: [a] -> [(a,a)]
 combinations list= [(x,y) | (x:ys) <- tails list, y <- ys]
+
+when:: Monoid m=> Bool-> m-> m
+when True m= m
+when False _= mempty
 
 main:: IO ()
 main= do
@@ -49,40 +53,49 @@ main= do
 
   putStrLn ""
 
-  let (detailedSummaries, stats) = map (uncurry statistics) (combinations scores) & unzip :: ([String], [(String, (Number, Number, Number), String)])
+  let (detailedSummaries, stats) = map (uncurry statistics) (combinations scores) & unzip ::([String], [(Ratio Int, String, (Number, Number, Number), String, Ratio Int)])
   mapM_ putStr detailedSummaries
   mapM_ (putStr . uncurry absoluteStatistics) (combinations scores)
 
 -- Bars, side-by-side
-  forM_ stats $ \(leftName, percentages, rightName) -> (do
+  forM_ stats $ \(_, leftName, percentages, rightName, _) -> (do
     let outPath = "output/" ++ leftName ++ "-" ++ rightName ++ ".svg"
     putStrLn $ "Writing " ++ outPath
     renderOverlaps outPath leftName percentages rightName)
 
-  let calculate (label,statistic)= (label, stats >$ (\(leftName, (left,intersectionOverUnion,right), rightName)-> (leftName, statistic left intersectionOverUnion right, rightName)))
+  let calculate (label,statistic)= (label, stats >$ (\(l, leftName, (left,intersectionOverUnion,right), rightName, r)-> (l, leftName, statistic left intersectionOverUnion right, rightName, r)))
   let jaccards _ intersectionOverUnion _= intersectionOverUnion
-  mapM_ (putStr . tabulate . calculate) [("Jaccard", jaccards), ("Overlap coefficient", coefficient)]
+  let report frameProportions = putStr . tabulate frameProportions . calculate
+  report False ("Jaccard", jaccards)
+  report True ("Overlap coefficient", coefficient)
 
-tabulate:: (String, [(String, Number, String)])-> String
-tabulate (title, coefficients)=
+indent:: Int-> [String]-> String
+indent indent= intercalate "\t" >$ (replicate indent '\t' ++)
+
+tabulate:: Bool-> (String, [(Ratio Int, String, Number, String, Ratio Int)])-> String
+tabulate frameProportions (title, coefficients)=
   "\n" ++ map toUpper title ++ "\n" ++ let
     rowLengths = [14-1, 14-2 .. 1]
     keepsAndSkips = if length coefficients /= sum rowLengths
       then error("Miscalculation: expected " ++ show (sum rowLengths) ++ " coefficients, but found " ++ show (length coefficients) ++ "!")
-      else zip rowLengths (inits rowLengths) & map (fmap sum) :: [(Int, Int)]
-    listsOfTriplets = keepsAndSkips >$ (\(keep, skip)-> drop skip coefficients & take keep) :: [[(String, Number, String)]]
-    reversed = map reverse listsOfTriplets :: [[(String, Number, String)]]
-    header = head reversed >$ (\(_,_,rightName) -> rightName) & ("":) & intercalate "\t" :: String
-    table = reversed >$ liftA2 (,) (head >$ (\(leftName,_,_) -> leftName)) (map (\(_,statistic,_)-> statistic)) :: [(String, [Number])]
-    rows = table >$ fmap (map formatPercentage >$ intercalate "\t") :: [(String, String)]
+      else zip rowLengths (inits rowLengths) & map (fmap sum) ::[(Int, Int)]
+    listsOfTriplets = keepsAndSkips >$ (\(keep, skip)-> drop skip coefficients & take keep) ::[[(Ratio Int, String, Number, String, Ratio Int)]]
+    reversed = map reverse listsOfTriplets :: [[(Ratio Int, String, Number, String, Ratio Int)]]
+    top = head reversed >$ (\(_,_,_,_,proportion)-> formatPercentage proportion) & indent 2 ::String
+    header = head reversed >$ (\(_,_,_,rightName,_)-> rightName) & indent (if frameProportions then 2 else 1) ::String
+    table = reversed >$ liftA2 (,)
+      (head >$ (\(proportion,leftName,_,_,_)-> when frameProportions (formatPercentage proportion ++ "\t") ++ leftName))
+      (map (\(_,_,statistic,_,_)-> statistic))
+        ::[(String, [Number])]
+    rows = table >$ fmap (map formatPercentage >$ intercalate "\t") ::[(String, String)]
     indented = map (\(leftName, row) -> (leftName ++ "\t" ++ row)) rows
-    in header ++ "\n" ++ intercalate "\n" indented ++ "\n"
+    in when frameProportions (top ++ "\n") ++ header ++ "\n" ++ intercalate "\n" indented ++ "\n"
 
 -- combined sleep time of all polysomnograms in seconds
 totalSleepTime:: Int
 totalSleepTime= round(60 * 60 * tst "total")
 
-statistics:: (String, Intervals)-> (String, Intervals)-> (String, (String, (Number,Number,Number), String) )
+statistics:: (String, Intervals)-> (String, Intervals)-> (String, (Ratio Int, String, (Number,Number,Number), String, Ratio Int) )
 statistics (leftName, left) (rightName, right) =
   let former = onlyLeft left right
       intersectionOverUnion = jaccard left right
@@ -95,7 +108,7 @@ statistics (leftName, left) (rightName, right) =
       "overlap coefficient: " ++ show (coefficient former intersectionOverUnion latter) ++
       "\n"
    ,
-      (leftName, (former,intersectionOverUnion,latter), rightName)
+      (measures left % totalSleepTime, leftName, (former,intersectionOverUnion,latter), rightName, measures right % totalSleepTime)
   )
 
 absoluteStatistics:: (String, Intervals)-> (String, Intervals)-> String
