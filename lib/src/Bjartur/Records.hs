@@ -36,7 +36,7 @@ score directory= do
   let label :: String
       label = directory & splitDirectories & ((length <&> (subtract 2)) >>= drop) <&> rename & concat
   let values :: IO [FilePath]
-      values = traverse pure filenames
+      values = pure filenames
   values <&> (,) label
 
 -- Gathers scores from ../csv-to-score using `score`
@@ -61,11 +61,6 @@ manual = sequence [kao, marta]
 scores :: IO [(String, [FilePath])]
 scores = liftA2 (++) autoscores manual
 
--- Paths to all CSV files grouped by PES classifier, but with lines counted
---numbers:: IO [(String, [PathLines])]
---numbers= liftA2 (++) autoscores manual
-
--- Alternate version of `numbers` built on `scores`
 numbers :: IO [(String, [PathLines])]
 numbers = scores >>= 
     mapM (mapM (mapM countLines))
@@ -86,7 +81,7 @@ kaoLines = kao >>= mapM (mapM countLines)
 
 listIntervals :: IO [(String, [FilePath])] -> IO [(String, Intervals)]
 listIntervals = (>>= mapM ( mapM $ \paths ->
-  mapM readIntervals paths >>= return . IntervalSet.unions ))
+  mapM readIntervals paths <&> IntervalSet.unions ))
 
 -- One big IntervalSet out of all CSV files for each classifier
 intervals :: IO [(String, Intervals)]
