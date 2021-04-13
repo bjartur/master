@@ -1,11 +1,14 @@
+import Control.Applicative( liftA2 )
 import Control.Lens.Operators( (&~) )
 import Control.Lens.Setter( (.=), mapped, over, set )
 import Control.Lens.Tuple( _2 )
+import Data.Char( toUpper )
 import Data.Colour( Colour )
 import Data.Colour.Names( black, brown, pink, red, white, yellow )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
-import Data.List( transpose, sortBy )
+import Data.List( inits, intercalate, transpose, sortBy, tails )
+import Data.Vector( fromList )
 import Diagrams.Backend.SVG( SVG, renderSVG )
 import Diagrams.Core.Types( Diagram )
 import Diagrams.Size( dims )
@@ -19,10 +22,51 @@ import Plots.Axis.Ticks( majorTicks, minorTicks )
 import Plots.Style( ColourMap, axisColourMap, colourMap, infColour, negInfColour )
 import Plots.Types( visible )
 import Plots.Types.HeatMap( heatMap' )
+import Statistics.Correlation.Kendall( kendall )
 import System.FilePath( takeBaseName )
 
 import Bjartur.Types ( PathLines )
 import Bjartur.Records
+
+kendallTable:: [(String, [PathLines])]-> String
+kendallTable= pairs <&> tabulate "Kendall rank coefficients"
+
+pairs:: [(String, [PathLines])]-> [(String, Double, String)]
+pairs = combinationsWith (\(xPattern, xScores) (yPattern, yScores)-> (xPattern, merges xScores yScores & tau, yPattern))
+
+combinationsWith:: (a-> a-> b)-> [a] -> [b]
+combinationsWith function list= [function x y | (x:ys) <- tails list, y <- ys]
+
+merges:: [PathLines]-> [PathLines]-> [(Int, Int)]
+merges= zipWith merge
+
+merge:: PathLines-> PathLines-> (Int, Int)
+merge (path, n) (path', m)= if on (==) fromScoreName path path' then (n, m) else error "Record mismatch!"
+
+tau:: [(Int, Int)]-> Double
+tau list= kendall (fromList list)
+
+formatPercentage :: Double -> String
+formatPercentage number = ((number*100 & round :: Int) & show) ++ "%"
+
+tabulate:: String-> [(String, Double, String)]-> String
+tabulate title kendalls=
+  map toUpper title ++ "\n" ++ let
+    rowLengths = [14-1, 14-2 .. 1]
+    keepsAndSkips = if length kendalls /= sum rowLengths
+      then error("Miscalculation: expected " ++ show (sum rowLengths) ++ " coefficients, but found " ++ show (length kendalls) ++ "!")
+      else zip rowLengths (inits rowLengths <&> sum) ::[(Int, Int)]
+    listsOfTriplets = keepsAndSkips <&> (\(keep, skip)-> drop skip kendalls & take keep) ::[[(String, Double, String)]]
+    reversed = map reverse listsOfTriplets :: [[(String, Double, String)]]
+    header = head reversed <&> (\(_,_,rightName)-> rightName) & intercalate "\t" & ('\t':) ::String
+    table = reversed <&> liftA2 (,)
+      (head <&> (\(leftName,_,_)-> leftName))
+      (map (\(_,statistic,_)-> statistic))
+        ::[(String, [Double])]
+    rows = table <&> fmap (map formatPercentage <&> intercalate "\t") ::[(String, String)]
+    indented = map (\(leftName, row) -> (leftName ++ "\t" ++ row)) rows
+    in header ++ "\n" ++ intercalate "\n" indented ++ "\n"
+
 
 sublists :: [(String,[PathLines])] -> [[(String,[PathLines])]]
 sublists universe =
@@ -72,7 +116,7 @@ render:: ([(String, [Double])]-> Diagram SVG)-> FilePath-> [(String, [Double])]-
 render draw filename heats=
   renderSVG filename
  (dims zero)
- (rank heats & draw)
+ (arrange heats & draw)
 
 sensitivity:: Num score=> (String, [score])-> score
 sensitivity = snd <&> sum
@@ -80,8 +124,8 @@ sensitivity = snd <&> sum
 severity:: Num score=> [(String, score)]-> score
 severity= map snd <&> sum
 
-rank:: [(String, [Double])]-> [(String, [Double])]
-rank heats= do
+arrange:: [(String, [Double])]-> [(String, [Double])]
+arrange heats= do
   let -- transposed :: [[(String, (FilePath, score))]] -- score is a scoped type variable
       transposed =
           heats & descending sensitivity
@@ -93,23 +137,26 @@ rank heats= do
 
 main:: IO ()
 main= do
-  heats <- numbers <&> tally <&> rank :: IO [(String, [Double])]
-  putStrLn "SENSITIVITY"
-  putStrLn "The number of minutes between esophageal crescendos, by criteria"
+  heats <- numbers <&> tally <&> arrange :: IO [(String, [Double])]
+  putStrLn"SENSITIVITY"
+  putStrLn"The number of minutes between esophageal crescendos, by criteria"
   over (mapped._2) ((60 *) . (tst "total" /) . sum) heats & mapM_ (\(label, meanInterval)-> label ++ "\t" ++ show meanInterval & putStrLn)
-  putStrLn "TALLY OF PES CRESCENDOS"
+  putStrLn""
+  putStrLn"TALLY OF PES CRESCENDOS"
   (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
+  putStrLn""
+  mapM_(kendallTable <$> numbers >>=) [putStr, writeFile"../kendall.rank.coefficients.txt"]
 
-  numbers <&> tally >>= render raw "tally.svg"
-  numbers <&> tally >>= render logscale "tally.log.svg"
-  numbers <&> tally >>= render normalized "tally.distribution.svg"
-  numbers <&> hourly >>= render raw "perhour.svg"
-  numbers <&> hourly >>= render logscale "perhour.log.svg"
-  sequence [martaLines] <&> hourly >>= render raw "marta.svg"
-  sequence [martaLines,kaoLines] <&> hourly >>= render raw "manual.svg"
-  sequence [martaLines,kaoLines] <&> hourly >>= render normalized "manual.distribution.svg"
-  autoscoresLines <&> hourly >>= render raw "autoscores.svg"
-  autoscoresLines <&> hourly >>= render normalized "autoscores.distribution.svg"
+  numbers <&> tally >>= render raw"tally.svg"
+  numbers <&> tally >>= render logscale"tally.log.svg"
+  numbers <&> tally >>= render normalized"tally.distribution.svg"
+  numbers <&> hourly >>= render raw"perhour.svg"
+  numbers <&> hourly >>= render logscale"perhour.log.svg"
+  sequence [martaLines] <&> hourly >>= render raw"marta.svg"
+  sequence [martaLines,kaoLines] <&> hourly >>= render raw"manual.svg"
+  sequence [martaLines,kaoLines] <&> hourly >>= render normalized"manual.distribution.svg"
+  autoscoresLines <&> hourly >>= render raw"autoscores.svg"
+  autoscoresLines <&> hourly >>= render normalized"autoscores.distribution.svg"
   lists <- numbers <&> sublists <&> (map hourly)
   sequence_ $ do
     (n, sublist) <- zip [1::Int ..] lists
