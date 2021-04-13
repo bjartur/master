@@ -7,6 +7,7 @@ import Control.Lens.Tuple( _1, _2 )
 import Control.Monad ( forM )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
+import Data.List( sort )
 import System.Directory ( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 import qualified Data.IntervalSet  as IntervalSet
@@ -27,7 +28,7 @@ infixr 6 +/+ -- one tighter than ++
 -- applicable CSV files it contains.
 score :: FilePath -> IO (String, [FilePath])
 score directory= do
-  scorePaths <- listDirectory directory
+  scorePaths <- listDirectory directory <&> sort
   let enumerated :: [(Int,FilePath)]
       enumerated = pairWith fromScoreName scorePaths
   let forbid = on (liftA2 (&&)) (/=)
