@@ -145,6 +145,9 @@ main= do
   putStrLn"TALLY OF PES CRESCENDOS"
   (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
   putStrLn""
+  let mean xs = sum xs / (length xs & fromIntegral)
+  putStrLn . ("Mean Kendall's rank correlation:\t"++)
+    =<< (numbers <&> pairs <&> map (\(_,x,_)->x) <&> mean <&> formatPercentage)
   mapM_(kendallTable <$> numbers >>=) [putStr, writeFile"../kendall.rank.coefficients.txt"]
 
   numbers <&> tally >>= render raw"tally.svg"
