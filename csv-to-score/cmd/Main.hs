@@ -2,7 +2,7 @@ module Main where
 import Control.Applicative (liftA2)
 import Control.Monad (forM_)
 import Data.Function ((&))
-import Data.List (isPrefixOf, stripPrefix)
+import Data.List (isPrefixOf)
 import Input (CSV, Count, Index, abrupt, belowBaseline, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, (>$), (>>$))
 import System.Environment (getArgs)
 import System.FilePath (takeFileName, (</>))
@@ -24,20 +24,27 @@ scoring =
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
 
+parseFlags:: [String]-> [[Double] -> (Index, Count) -> Double -> Bool]
+parseFlags flags = case flags of {
+  ["--unabrupt"] -> [];
+  ["--simple"]   -> [];
+  ["--reversal"] -> [abrupt];
+  ["--medium"]   -> [abrupt];
+  ["--baseline"] -> [belowBaseline,abrupt];
+  ["--complex"]  -> [belowBaseline,abrupt];
+  _              -> error "Unrecognized commandline flag!"
+}
+
+parseOptions:: [String]-> [Int]
+parseOptions ['-':'n':number] = if number == "0" then [2..5] else [read number :: Int]
+parseOptions [] = [2..5]
+parseOptions _ = error "Unrecognized commandline option!"
+
 main :: IO ()
 main = do
   args <- getArgs
   let longOptions = takeWhile ("--" `isPrefixOf`) args & takeWhile ("--" /=)
-  let parseFlags flags = case flags of {
-    ["--unabrupt"] -> [];
-    ["--simple"] -> [];
-    ["--reversal"] -> [abrupt];
-    ["--medium"] -> [abrupt];
-    ["--baseline"] -> [belowBaseline,abrupt];
-    ["--complex"] -> [belowBaseline,abrupt];
-  }
   let shortOptions = takeWhile ("--" /=) args & dropWhile ("--" `isPrefixOf`) & takeWhile ("-" `isPrefixOf`)
-  let parseOptions ['-':'n':number] = if number == "0" then [2..5] else [read number :: Int]
 
   let positionals = dropWhile (\argument-> argument /= "--" && "-" `isPrefixOf` argument) args
   let paths = (if take 1 positionals == ["--"] then drop 1 else id) positionals

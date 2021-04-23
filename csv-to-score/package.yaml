@@ -19,13 +19,17 @@ dependencies:
   - base >= 4.7 && < 5
 
 
-
 library:
   source-dirs: src
   dependencies:
-  - listsafe
+    - listsafe
 
 executables:
+  10sec:
+    main:                Main.hs
+    source-dirs:         10sec
+    dependencies:
+      - bjartur-lib
   csv-to-score:
     main:                Main.hs
     source-dirs:         cmd
