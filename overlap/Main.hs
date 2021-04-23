@@ -187,7 +187,9 @@ measure' (from, to)= let
   accessors = [second, minute, hour, day, year]
   units= [1..length increments] >$ flip take increments >$ product
   in
-  zipWith seconds accessors units & sum
+  if month to - month from /= 0
+      then error "Implausible data! Events overlapped for more than a month. Nobody sleeps that long."
+      else zipWith seconds accessors units & sum
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
