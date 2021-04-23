@@ -15,9 +15,9 @@ import Test.Hspec.Core.QuickCheck( modifyMaxSuccess )
 import Text.ParserCombinators.ReadP( eof, ReadP, readP_to_S )
 import Test.QuickCheck (arbitrary, getPositive, Positive, Gen, choose, property)
 
-import Bjartur.Types
+import Bjartur.Time
 
-import Main ( (>$), coefficient, jaccard, measure, overlaps, union, measures )
+import Main ( (>$), coefficient, jaccard, overlaps, union, measures )
 
 examples:: (Show a, Show b, Eq b)=> (a -> b)-> [(a,b)]-> Expectation
 examples f= (f >$ shouldBe) & uncurry & mapM_

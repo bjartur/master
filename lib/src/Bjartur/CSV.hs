@@ -1,6 +1,6 @@
 module Bjartur.CSV where
 
-import Bjartur.Types
+import Bjartur.Time
 
 import Control.Applicative( liftA2, some, many )
 import Data.Char ( isDigit, ord )

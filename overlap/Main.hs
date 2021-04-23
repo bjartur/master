@@ -14,7 +14,7 @@ import Data.Interval (Extended(Finite))
 import System.FilePath ( takeFileName )
 import Plot (formatPercentage, renderOverlaps)
 
-import Bjartur.Types
+import Bjartur.Time
 import Bjartur.Records ( autoscoredIntervals, intervals, readIntervals, tst )
 
 type Number = Ratio Int
@@ -167,11 +167,6 @@ union = IntervalSet.union
 overlaps:: Intervals -> Intervals -> Int
 overlaps a b = measures $ IntervalSet.intersection a b
 
-measure :: Interval -> Int
-measure i = let (Finite lower) = Interval.lowerBound i
-                (Finite upper) = Interval.upperBound i
-            in measure' (lower, upper)
-
 measures :: Intervals -> Int
 measures is = map measure (IntervalSet.toList is) & sum
 
@@ -179,17 +174,6 @@ meanIntervalLength :: Intervals -> Number
 meanIntervalLength = IntervalSet.toList
   >$ map measure
   >$ (\list-> sum list `dividedBy` length list)
-
-measure' :: (DateTime, DateTime)-> Int
-measure' (from, to)= let
-  seconds accessor unit= unit * (accessor to - accessor from)
-  increments= [1, 60, 60, 24, 365]
-  accessors = [second, minute, hour, day, year]
-  units= [1..length increments] >$ flip take increments >$ product
-  in
-  if month to - month from /= 0
-      then error "Implausible data! Events overlapped for more than a month. Nobody sleeps that long."
-      else zipWith seconds accessors units & sum
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements

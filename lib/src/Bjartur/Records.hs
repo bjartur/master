@@ -12,7 +12,7 @@ import System.Directory ( listDirectory )
 import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
 import qualified Data.IntervalSet  as IntervalSet
 
-import Bjartur.Types
+import Bjartur.Time
 import Bjartur.CSV ( parse )
 
 -- a bit like a Cartesian product, but concatenating instead of pairing
@@ -147,3 +147,6 @@ tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
 
 readIntervals :: FilePath -> IO Intervals
 readIntervals path = readFile path <&> parse
+
+-- Represent number of lines in a file
+type PathLines = (FilePath, Int)
