@@ -13,7 +13,7 @@ import Prelude hiding( readFile )
 import Test.Hspec
 import Test.Hspec.Core.QuickCheck( modifyMaxSuccess )
 import Text.ParserCombinators.ReadP( eof, ReadP, readP_to_S )
-import Test.QuickCheck (arbitrary, getPositive, Positive, Gen, choose, property)
+import Test.QuickCheck( (==>), arbitrary, getPositive, Positive, Gen, choose, property )
 
 import Bjartur.Time
 
@@ -76,13 +76,13 @@ main= hspec.modifyMaxSuccess(10*) $ do
       it "considers a list equivalent to itself"
        . property $ do
         disjoints<- arbitrarySet
-        return (jaccard disjoints disjoints `shouldBe` 1)
+        return(0 < measures disjoints ==> jaccard disjoints disjoints `shouldBe` 1)
       it "considers no non-empty set 100% correlated with the empty set"
        . property $ do
         disjoints<- arbitrarySet
-        return $ do
+        return $ 0 < measures disjoints ==> (do
           jaccard disjoints empty `shouldBe` 0
-          jaccard empty disjoints `shouldBe` 0
+          jaccard empty disjoints `shouldBe` 0)
     describe "overlaps" $ do
       it "identical interval sets overlap totally" $ do
         let setA = fromList [period (DateTime 2020 07 09 15 56 00) (DateTime 2020 07 09 15 56 10)]
@@ -116,9 +116,13 @@ nubSort = sort >$ fastnub
 arbitrarySet:: Gen Intervals
 arbitrarySet= do
       size<- arbitrary:: Gen Int
-      datetimes<- replicateM (2 * abs size + 2) arbitrary >$ nubSort ::Gen[DateTime]
+      mo <- arbitrary ::Gen Int
+      yr <- arbitrary ::Gen Int
+      datetimes<- replicateM (2 * abs size + 2) arbitrary
+        >$ map (\datetime-> datetime{month = mo, year = yr })
+        >$ nubSort ::Gen[DateTime]
       let pair[]= []
-          pair[_]= undefined
+          pair[_]= []
           pair(a:b:xs)= period a b : pair xs
       let disjoints= pair datetimes
       return $! fromList disjoints

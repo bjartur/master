@@ -44,6 +44,8 @@ score directory= do
 autoscores :: IO [(String, [FilePath])]
 autoscores = do
   let expandedPaths =
+        "../csv-to-score/output/unabrupt/10sec/"
+        :
         ["../csv-to-score/output/"]
         +/+ ["unabrupt", "reversal", "baseline"]
         +/+ map pure ['2'..'5']

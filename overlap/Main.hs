@@ -8,7 +8,6 @@ import Data.Function( (&), on )
 import Data.List( inits, intercalate, tails )
 import Data.Ratio( (%), Ratio )
 import System.Environment( getArgs )
-import qualified Data.Interval     as Interval
 import qualified Data.IntervalSet  as IntervalSet
 import Data.Interval (Extended(Finite))
 import System.FilePath ( takeFileName )
@@ -75,7 +74,7 @@ indent indent= intercalate "\t" >$ (replicate indent '\t' ++)
 tabulate:: Bool-> (String, [(Ratio Int, String, Number, String, Ratio Int)])-> String
 tabulate frameProportions (title, coefficients)=
   "\n" ++ map toUpper title ++ "\n" ++ let
-    rowLengths = [14-1, 14-2 .. 1]
+    rowLengths = [15-1, 15-2 .. 1]
     keepsAndSkips = if length coefficients /= sum rowLengths
       then error("Miscalculation: expected " ++ show (sum rowLengths) ++ " coefficients, but found " ++ show (length coefficients) ++ "!")
       else zip rowLengths (inits rowLengths) & map (fmap sum) ::[(Int, Int)]
