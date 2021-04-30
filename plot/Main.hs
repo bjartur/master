@@ -25,7 +25,6 @@ import Plots.Types.HeatMap( heatMap' )
 import Statistics.Correlation.Kendall( kendall )
 import System.FilePath( takeBaseName )
 
-import Bjartur.CSV ( PathLines )
 import Bjartur.Records
 
 kendallTable:: [(String, [PathLines])]-> String

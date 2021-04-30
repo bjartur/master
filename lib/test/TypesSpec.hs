@@ -2,7 +2,7 @@ module TypesSpec ( spec ) where
 
 import Data.Function ( (&) )
 import Data.Functor( (<&>) )
-import Data.List( sort )
+import Data.List( sort, sortOn )
 import Test.Hspec
 import Test.QuickCheck ( Gen, SortedList(getSorted), arbitrary, elements, forAll, getSize, listOf, listOf1, property, vectorOf )
 
@@ -21,30 +21,48 @@ spec = do
                                 then False
                                 else head accessors datetime < 0
         property $ \a b-> (a < b) == (a `lessThan` b)
-    describe "samtelja" $ do
+    describe "count" $ do
       it "preserves length" $ do
-        forAll (listOf arbitraryDateTimes) $ \periodLists->
-          length (samtelja periodLists) >= (map length periodLists & sum)
+        forAll (listOf1 arbitraryDateTimes) $ \periodLists->
+          length (count periodLists (flattenAll periodLists)) >= (map length periodLists & sum)
       it "counts each period at least once" $ do
         forAll (listOf arbitraryDateTimes) $ \periodLists->
-          sum (samtelja periodLists) >= (map length periodLists & sum)
-    describe "telja" $ do
-      it "preserves the length of the flattened list of datetimes" $ do
+          sum (count periodLists (flattenAll periodLists)) >= (map length periodLists & sum)
+    describe "labelFromOutside" $ do
+      it "almost preserves the length of the flattened list of datetimes" $ do
         forAll (listOf1 arbitraryDateTimes) $ \periodLists->
           forAll (elements periodLists) $ \periodList-> do
             let flattened = flattenAll periodLists
-            length(telja flattened periodList) `shouldBe` length flattened
+            length(labelFromOutside flattened periodList) `shouldBe` length flattened - 1
+      it "left-pads with False until the first period" $ do
+        labelFromOutside [8,9,20,21::Int] [(20,21)] `shouldBe` [False,False,True]
     describe "mergeAll" $ do
       it "returns an ascending list if each input is ascending" $ do
         forAll (arbitrary ::Gen [SortedList DateTime]) $ \wrapped-> do
           let lists = map getSorted wrapped
           mergeAll lists `shouldBe` (concat lists & sort)
+    describe "flattenAll" $ do
+      it "can flatten a list of intervals which, in total, leave no gaps" $ do
+        let listar = [[(3,5),(8,9)], [(4,7)], [(1,4)], [(4,9)]]
+        flattenAll listar `shouldBe` [1::Int,3,4,5,7,8,9]
+      it "works even if one interval is later then the others" $ do
+        let listar = [[(3,5),(8,9)], [(4,7), (20,21)], [(1,4)], [(4,9)]]
+        flattenAll listar `shouldBe` [1::Int,3,4,5,7,8,9,20,21]
+    describe "count" $ do
+      it "produces the count 0 if there's a gap" $ do
+        let listar = [[(3,5),(8,9)], [(4,7), (20,21)], [(1,4)], [(4,9)]]
+        count listar [1::Int,3,4,5,7,8,9,20,21] `shouldBe` [1,2,3,2,1,2,0,1]
+    describe "discreteHistogram" $ do
+      it "includes 0 as a label if there's a gap" $ do
+        let listOfIntervals = toDateTimes [[(3,5),(8,9)], [(4,7)]]
+        let expected = [(0, 1),(1, 4),(2, 1)]
+        (discreteHistogram listOfIntervals & sortOn fst) `shouldBe` expected
 
+seconds :: Int-> DateTime
+seconds n = DateTime 0 0 0 0 0 n
 
-nubSort:: [DateTime]-> [DateTime]
-nubSort = sort <&> fastnub
-    where fastnub(one:other:rest)= if one==other then fastnub(one:rest) else one:fastnub(other:rest)
-          fastnub(short)= short
+toDateTimes :: [[(Int,Int)]]-> [[(DateTime,DateTime)]]
+toDateTimes = map (map (\(n,m)-> (n & seconds, m & seconds)))
 
 arbitraryDateTimes:: Gen [(DateTime,DateTime)]
 arbitraryDateTimes= do

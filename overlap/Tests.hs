@@ -107,12 +107,6 @@ main= hspec.modifyMaxSuccess(10*) $ do
             setUnion = union setA setB
         measures setUnion `shouldBe` 19
 
-
-nubSort:: [DateTime]-> [DateTime]
-nubSort = sort >$ fastnub
-    where fastnub(one:other:rest)= if one==other then fastnub(one:rest) else one:fastnub(other:rest)
-          fastnub(short)= short
-
 arbitrarySet:: Gen Intervals
 arbitrarySet= do
       size<- arbitrary:: Gen Int
