@@ -3,24 +3,23 @@ module Bjartur.CSV where
 import Bjartur.Time
 
 import Control.Applicative( liftA2, some, many )
-import Data.Char ( isDigit, ord )
+import Data.Char( isDigit, ord )
+import Data.Functor( (<&>) )
+import qualified Data.IntervalSet as IntervalSet
 import Text.ParserCombinators.ReadP( ReadP, char, eof, get, readP_to_S, satisfy, (<++) )
-import qualified Data.Interval     as Interval
-import qualified Data.IntervalSet  as IntervalSet
-import Data.Interval (Extended(Finite), Boundary(Closed))
 
 (>$):: Functor functor=> functor before-> (before-> after)-> functor after
 (>$)= flip fmap
 infixl 1 >$
 
-parse:: String-> Intervals
+parse:: String-> Events
 parse= readP_to_S file
     >$ last >$ fst
 
-file:: ReadP Intervals
-file = many row <* eof >$ IntervalSet.fromList
+file:: ReadP Events
+file = many row <* eof <&> IntervalSet.fromList
 
-row:: ReadP Interval
+row:: ReadP Event
 row= do
   start <- dateTime
   expect ','

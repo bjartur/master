@@ -6,6 +6,7 @@ dependencies:
   - base < 4.14 && >= 2.10
   - bjartur-lib
   - filepath < 1.5 && >= 1.4
+  - containers
   - data-interval >= 2.0
   - lens >= 4.6 && < 5.0
   - linear >= 1.20.9 && < 1.22
@@ -18,13 +19,14 @@ dependencies:
 executables:
   overlap:
     main: Main.hs
-    other-modules: Plot
+    other-modules: Plot Histogram
 
 tests:
   spec:
     main: Tests.hs
-    other-modules: Main Plot
+    other-modules: Main Plot Histogram
     dependencies:
+    - lens
     - hspec
     - QuickCheck
     - hspec-core

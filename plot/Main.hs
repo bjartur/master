@@ -124,15 +124,11 @@ severity:: Num score=> [(String, score)]-> score
 severity= map snd <&> sum
 
 arrange:: [(String, [Double])]-> [(String, [Double])]
-arrange heats= do
-  let -- transposed :: [[(String, (FilePath, score))]] -- score is a scoped type variable
-      transposed =
-          heats & descending sensitivity
-        & map (\(label, list)-> map ((,) label) list)
-        & transpose;
-  descending severity transposed
-        & transpose
-        & map (\list-> (list&head&fst, map snd list));
+arrange=  descending sensitivity
+      <&> transposeLabeled
+      <&> descending severity
+      <&> transpose
+      <&> map (\patterns-> (patterns&head&fst, map snd patterns))
 
 main:: IO ()
 main= do
@@ -142,7 +138,7 @@ main= do
   over (mapped._2) ((60 *) . (tst "total" /) . sum) heats & mapM_ (\(label, meanInterval)-> label ++ "\t" ++ show meanInterval & putStrLn)
   putStrLn""
   putStrLn"TALLY OF PES CRESCENDOS"
-  (heats <&> (\(label, list)-> map ((,) label) list) & transpose) <&> severity & print
+  transposeLabeled heats <&> severity & print
   putStrLn""
   let mean xs = sum xs / (length xs & fromIntegral)
   putStrLn . ("Mean Kendall's rank correlation:\t"++)

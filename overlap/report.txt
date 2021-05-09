@@ -1,3 +1,5 @@
+Comparing patterns
+Drawing agreementTotals.svg
 Manual and automatic scoring: intersection: 0 seconds	overlap coefficient: 0 % 1
 Programmatic scoring: intersection: 37 seconds	overlap coefficient: 37 % 115
 without classifier Simple10sec (whose mean interval length is 114242 % 7527):	intersection: 0 seconds	overlap coefficient: 0 % 1

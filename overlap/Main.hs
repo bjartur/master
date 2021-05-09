@@ -5,16 +5,16 @@ import Control.Applicative ( liftA2 )
 import Control.Monad ( forM, forM_ )
 import Data.Char( toUpper )
 import Data.Function( (&), on )
+import Data.Functor( (<&>) )
 import Data.List( inits, intercalate, tails )
 import Data.Ratio( (%), Ratio )
 import System.Environment( getArgs )
 import qualified Data.IntervalSet  as IntervalSet
-import Data.Interval (Extended(Finite))
 import System.FilePath ( takeFileName )
-import Plot (formatPercentage, renderOverlaps)
+import Plot (formatPercentage, renderBarPlot, renderOverlaps)
 
 import Bjartur.Time
-import Bjartur.Records ( autoscoredIntervals, intervals, readIntervals, tst )
+import Bjartur.Records( autoscoredIntervals, getEventsByRecordingByPattern, intervals, readIntervals, transposeLabeled, tst )
 
 type Number = Ratio Int
 
@@ -25,19 +25,17 @@ infixl 1 >$
 combinations:: [a] -> [(a,a)]
 combinations list= [(x,y) | (x:ys) <- tails list, y <- ys]
 
-when:: Monoid m=> Bool-> m-> m
-when True m= m
-when False _= mempty
-
 main:: IO ()
 main= do
   paths <- getArgs
   let leave1out = length paths == 1
-  scores <- if length paths < 2 then intervals else
+  scores <- if length paths < 2 then do putStrLn "Comparing patterns"; intervals else do
+      putStrLn "Comparing individual recordings."
       forM paths $ \path -> (do
         let name = takeFileName path
         intervals <- readIntervals path
         pure (name, intervals))
+  agreementTotals
 
 -- Calculate the coefficient of all classifier sets
   putStr "Manual and automatic scoring: "
@@ -68,6 +66,17 @@ main= do
   report False ("Jaccard", jaccards)
   report True ("Overlap coefficient", coefficient)
 
+agreementTotals:: IO ()
+agreementTotals= do
+  putStrLn "Drawing agreementTotals.svg"
+  eventsByRecordingByPattern <- getEventsByRecordingByPattern ::IO[(String,[Events])]
+  agreements eventsByRecordingByPattern & renderBarPlot"agreementTotals.svg"
+
+agreements:: [(String, [Events])]-> [[[(DateTime, DateTime)]]]
+agreements eventsByRecordingByPattern= do
+  let labeledEventsByRecording = transposeLabeled eventsByRecordingByPattern ::[[(String, Events)]]
+  labeledEventsByRecording <&> map (snd<&>imperiods)
+
 indent:: Int-> [String]-> String
 indent indent= intercalate "\t" >$ (replicate indent '\t' ++)
 
@@ -94,7 +103,7 @@ tabulate frameProportions (title, coefficients)=
 totalSleepTime:: Int
 totalSleepTime= round(60 * 60 * tst "total")
 
-statistics:: (String, Intervals)-> (String, Intervals)-> (String, (Ratio Int, String, (Number,Number,Number), String, Ratio Int) )
+statistics:: (String, Events)-> (String, Events)-> (String, (Ratio Int, String, (Number,Number,Number), String, Ratio Int) )
 statistics (leftName, left) (rightName, right) =
   let former = onlyLeft left right
       intersectionOverUnion = jaccard left right
@@ -110,7 +119,7 @@ statistics (leftName, left) (rightName, right) =
       (measures left % totalSleepTime, leftName, (former,intersectionOverUnion,latter), rightName, measures right % totalSleepTime)
   )
 
-absoluteStatistics:: (String, Intervals)-> (String, Intervals)-> String
+absoluteStatistics:: (String, Events)-> (String, Events)-> String
 absoluteStatistics (leftName, left) (rightName, right)=
   let both = measures(IntervalSet.intersection left right)
       neither = totalSleepTime - measures(IntervalSet.union left right)
@@ -131,7 +140,7 @@ coefficient :: Number-> Number-> Number-> Number
 coefficient left intersection right= intersection / (intersection + min left right)
 
 -- Overlap coefficient for multiple sets
-summary :: [(label, Intervals)]-> String
+summary :: [(label, Events)]-> String
 summary intervals =
   let sets = map snd intervals
       intersectionInSeconds = measures $ IntervalSet.intersections sets
@@ -142,7 +151,7 @@ summary intervals =
 
 
 -- on measures (/) (union one other) (intersection one other)
-jaccard :: Intervals -> Intervals -> Number
+jaccard :: Events -> Events -> Number
 jaccard one other = do
   let total = measures (union one other)
   if total == 0
@@ -150,7 +159,7 @@ jaccard one other = do
   else overlaps one other `dividedBy` total
 
 -- Ratio of measures on the left-hand side
-onlyLeft :: Intervals -> Intervals -> Number
+onlyLeft :: Events -> Events -> Number
 onlyLeft one other = (one `IntervalSet.difference` other & measures) `dividedBy` (measures $ union one other)
 
 dividedBy :: Int -> Int -> Number
@@ -158,21 +167,25 @@ dividedBy = (/) `on` (%1)
 -- @union ones others@ calculates a union of the given ascending lists of intervals, ordered by their start time.
 -- If each input list contains only disjoint intervals, the same will hold for the result.
 -- If the input is represented by exclusive intervals, so will the result be, and vice versa.
-union :: Intervals -> Intervals -> Intervals
+union :: Events -> Events -> Events
 union = IntervalSet.union
 
 -- @overlaps ones others@ measures the intersection of the two given countable unions of intervals,
 -- assuming each argument is an ascending list of disjoint intervals.
-overlaps:: Intervals -> Intervals -> Int
+overlaps:: Events -> Events -> Int
 overlaps a b = measures $ IntervalSet.intersection a b
 
-measures :: Intervals -> Int
+measures :: Events -> Int
 measures is = map measure (IntervalSet.toList is) & sum
 
-meanIntervalLength :: Intervals -> Number
+meanIntervalLength :: Events -> Number
 meanIntervalLength = IntervalSet.toList
   >$ map measure
   >$ (\list-> sum list `dividedBy` length list)
 
 fewerThan :: [a]-> Int-> Bool
 elements `fewerThan` n = null $ drop (n-1) elements
+
+when:: Monoid m=> Bool-> m-> m
+when True m= m
+when False _= mempty

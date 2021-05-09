@@ -1,15 +1,16 @@
+{-# LANGUAGE RankNTypes #-}
 module Bjartur.Records where
 
 import Control.Applicative( liftA2 )
 import Control.DeepSeq ( ($!!) )
-import Control.Lens.Setter( (.~), (.=), mapped, over, set )
+import Control.Lens.Setter( (.~), mapped, over )
 import Control.Lens.Tuple( _1, _2 )
 import Control.Monad ( forM )
 import Data.Functor( (<&>) )
 import Data.Function( (&), on )
-import Data.List( sort )
+import Data.List( sort, transpose )
 import System.Directory ( listDirectory )
-import System.FilePath( (</>), splitDirectories, takeFileName, takeBaseName )
+import System.FilePath( (</>), splitDirectories, takeFileName )
 import qualified Data.IntervalSet  as IntervalSet
 
 import Bjartur.Time
@@ -22,6 +23,10 @@ import Bjartur.CSV ( parse )
 (+/+):: [FilePath]-> [FilePath]-> [FilePath]
 (+/+)= liftA2 (</>)
 infixr 6 +/+ -- one tighter than ++
+
+transposeLabeled:: [(String, [a])]-> [[(String, a)]]
+transposeLabeled= (map $ \(label, row)-> map ((,) label) row)
+              <&> transpose
 
 -- (was countAllLines)
 -- Given a score directory, return a label and list of all
@@ -59,13 +64,26 @@ marta= score "../Nox2score/output/Marta" <&> (_1 .~ "technician")
 manual :: IO [(String, [FilePath])]
 manual = sequence [kao, marta]
 
+same :: (Eq a, Show a)=> [a]-> Bool
+same (eq:eqs) = dropWhile (eq ==) eqs & map (show <&> ( ++ "/=" ++ show eq) <&> error) & and; same [] = True
+
+correctly :: [(String, [FilePath])]-> Bool
+correctly sorted= do
+  let filenames = sorted <&> snd <&> map takeFileName <&> (map $ take $ length "VSN-14-080-0NN.")
+  let equinumberous = same $ map length filenames
+  let concordant = transpose filenames & all same
+  equinumberous && concordant
+
 -- Paths to all CSV files grouped by PES classifier
 -- Joins `autoscores'`, `kao` and `marta`
 scores :: IO [(String, [FilePath])]
-scores = liftA2 (++) autoscores manual
+scores = do
+  unsorted <- liftA2 (++) autoscores manual
+  let sorted = over (mapped._2) sort unsorted
+  if correctly sorted then return sorted else error "Record mismatch!"
 
 numbers :: IO [(String, [PathLines])]
-numbers = scores >>= 
+numbers = scores >>=
     mapM (mapM (mapM countLines))
 --  ^- map outer list
 --        ^- map snd of tuple
@@ -82,16 +100,20 @@ martaLines = marta >>= mapM (mapM countLines)
 kaoLines :: IO (String, [PathLines])
 kaoLines = kao >>= mapM (mapM countLines)
 
-listIntervals :: IO [(String, [FilePath])] -> IO [(String, Intervals)]
+listIntervals :: IO [(String, [FilePath])] -> IO [(String, Events)]
 listIntervals = (>>= mapM ( mapM $ \paths ->
   mapM readIntervals paths <&> IntervalSet.unions ))
 
+-- For every pattern, a list of IntervalSets. One IntervalSet per recording.
+getEventsByRecordingByPattern :: IO [(String, [Events])]
+getEventsByRecordingByPattern = scores >>= (mapM . mapM . mapM) readIntervals
+
 -- One big IntervalSet out of all CSV files for each classifier
-intervals :: IO [(String, Intervals)]
+intervals :: IO [(String, Events)]
 intervals = listIntervals scores
 
 -- -||- but only autoscores
-autoscoredIntervals :: IO [(String, Intervals)]
+autoscoredIntervals :: IO [(String, Events)]
 autoscoredIntervals = listIntervals autoscores
 
 countLines :: FilePath -> IO PathLines
@@ -147,7 +169,7 @@ tst "VSN-14-080-029" = 6 + 27/60
 tst "total" = 166.7
 tst f = error $ "Weight for recording name " ++ f ++ " is not defined"
 
-readIntervals :: FilePath -> IO Intervals
+readIntervals :: FilePath -> IO Events
 readIntervals path = readFile path <&> parse
 
 -- Represent number of lines in a file
