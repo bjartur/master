@@ -18,9 +18,10 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules:
-    - Bjartur.Time
-    - Bjartur.Records
+    - Bjartur
     - Bjartur.CSV
+    - Bjartur.Records
+    - Bjartur.Time
 
 tests:
   bjartur-lib-tests:

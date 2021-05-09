@@ -74,9 +74,11 @@ renderOverlaps filename formerMethod observations latterMethod = renderSVG filen
 drawBarPlot :: [[[(DateTime, DateTime)]]]-> Diagram SVG
 drawBarPlot agreements = do
       let arrangeBarsByValue xs = sortOn snd xs
-      (agreements <&> discreteHistogram & combineHistograms & arrangeBarsByValue)
-  <&> fmap fromIntegral & namedBarPlot'
-   &  (&~) r2Axis & renderAxis -- (&~) returns the final state after drawing the namedBarPlot'
+      let bars = agreements <&> discreteHistogram & combineHistograms & arrangeBarsByValue
+      do
+        hideGridLines
+        bars <&> fmap (fromIntegral<&>(/(60*60))) & namedBarPlot'
+      &  (&~) r2Axis & renderAxis -- (&~) returns the final state after drawing the namedBarPlot'
 
 renderBarPlot :: FilePath-> [[[(DateTime, DateTime)]]]-> IO ()
 renderBarPlot filename = drawBarPlot <&> svg filename

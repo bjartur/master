@@ -55,7 +55,7 @@ main = do
                       , "If no method is specified, baseline is used by default."
                       , "Reversal drops the requirement that every nadir be under baseline."
                       , "Unabrupt additionally drops the requirement that a crescendo be followed by an nadir above baseline."
-                      , "The only legal value for N is 0 which represents varying the the minimum number of increases in negative pressure from 2 to 5."]
+                      , "N is the minimum number of increases in negative pressure. By default, N is 0 which represents varying the the minimum number  from 2 to 5."]
   else forM_ (parseOptions shortOptions) $ \n-> score (parseFlags longOptions) (tail paths) n (head paths </> show n)
 
 score:: [[Double]-> (Index,Count)-> Double-> Bool]-> [FilePath]-> Int-> FilePath-> IO ()

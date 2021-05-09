@@ -13,6 +13,7 @@ import qualified Data.IntervalSet  as IntervalSet
 import System.FilePath ( takeFileName )
 import Plot (formatPercentage, renderBarPlot, renderOverlaps)
 
+import Bjartur( numberOfPatterns )
 import Bjartur.Time
 import Bjartur.Records( autoscoredIntervals, getEventsByRecordingByPattern, intervals, readIntervals, transposeLabeled, tst )
 
@@ -83,7 +84,7 @@ indent indent= intercalate "\t" >$ (replicate indent '\t' ++)
 tabulate:: Bool-> (String, [(Ratio Int, String, Number, String, Ratio Int)])-> String
 tabulate frameProportions (title, coefficients)=
   "\n" ++ map toUpper title ++ "\n" ++ let
-    rowLengths = [15-1, 15-2 .. 1]
+    rowLengths = [numberOfPatterns-1, numberOfPatterns-2 .. 1]
     keepsAndSkips = if length coefficients /= sum rowLengths
       then error("Miscalculation: expected " ++ show (sum rowLengths) ++ " coefficients, but found " ++ show (length coefficients) ++ "!")
       else zip rowLengths (inits rowLengths) & map (fmap sum) ::[(Int, Int)]

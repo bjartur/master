@@ -26,8 +26,8 @@ tests:
     main: Tests.hs
     other-modules: Main Plot Histogram
     dependencies:
-    - lens
-    - hspec
-    - QuickCheck
-    - hspec-core
+      - lens
+      - hspec
+      - QuickCheck
+      - hspec-core
     ghc-options: -main-is Tests
