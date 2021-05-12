@@ -144,17 +144,17 @@ main= hspec $ do
     it "includes 0 as a label if there's a gap" $ do
       let listOfIntervals = toDateTimes [[(3,5),(8,9)], [(4,7)]]
       let expected = [("0", 1),("1", 4),("2", 1)]
-      (discreteHistogram listOfIntervals & sortOn fst) `shouldBe` expected
+      (discreteHistogram listOfIntervals & sortOn fst & filter (snd<&>(/=)0)) `shouldBe` expected
     prop "is compatible with its original implementation" $ do
       periodList <- listOf1 arbitraryDateTimes
       yr <- arbitrary
       mo <- choose(1,12)
       over (mapped.mapped.both) (fixMonth yr mo) periodList
-        & liftA2 (on shouldBe sort) discreteHistogram discreteHistogram'
+        & liftA2 (on shouldBe sort) (discreteHistogram <&> filter (snd<&>(/=)0)) discreteHistogram'
         & return
   describe "treesum" $ do
     prop "is compatible with its original implementation" $
-      liftA2 (on (===) sort) treesum (sort <&> group <&> over (mapped._2) sum )
+      liftA2 (on (===) sort) (treesum <&> filter (snd<&>(/=)0)) (sort <&> group <&> over (mapped._2) sum <&> filter (snd<&>(/=)0))
 
 
 -- input: list of pairs

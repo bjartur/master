@@ -4,8 +4,9 @@ import Control.Monad( ap )
 import Data.Function( (&) )
 import Data.Functor( (<&>) )
 import Data.List( foldl1' )
-import qualified Data.Map as BinTree( fromListWith, toList )
+import qualified Data.Map as BinTree( fromListWith, insertWith, toList )
 
+import Bjartur( numberOfPatterns )
 import Bjartur.Time( DateTime, measure' )
 
 flatten :: (Ord a, Show a)=> [(a, a)]-> [a]
@@ -64,8 +65,14 @@ flatCount xs = do
   let flat = flattenAll xs
   zip (count xs flat) (unflatten flat)
 
+apply :: [a-> a]-> a-> a
+apply [] v = v
+apply (f:fs) v = apply fs (f v)
+
 treesum :: [(String, Int)]-> [(String, Int)]
-treesum = BinTree.fromListWith (+) <&> BinTree.toList
+treesum = BinTree.fromListWith (+)
+  <&> (apply $ map (flip (BinTree.insertWith (flip const)) 0 . show) [0..numberOfPatterns])
+  <&> BinTree.toList
 
 discreteHistogram :: [[(DateTime, DateTime)]]-> [(String, Int)]
 discreteHistogram eventsByPattern = do

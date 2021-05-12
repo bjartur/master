@@ -14,9 +14,9 @@ import Linear.Vector( zero )
 import Plots.Types.Bar (onBars, namedBarPlot', multiBars, stackedBars )
 import Plots.Axis( r2Axis )
 import Plots.Axis.Grid( hideGridLines )
-import Plots.Axis.Labels( axisLabelText, tickLabelPositions )
-import Plots.Axis.Ticks( hideTicks )
-import Plots.Types ( key )
+import Plots.Axis.Labels( atMajorTicks, axisLabelText, tickLabelFunction, tickLabelPositions )
+import Plots.Axis.Ticks( hideTicks, minorTicks )
+import Plots.Types ( key, visible )
 import Plots.Axis( xAxis, yAxis )
 import Plots.Axis.Render( renderAxis )
 
@@ -77,6 +77,8 @@ drawBarPlot agreements = do
       let bars = agreements <&> discreteHistogram & combineHistograms & arrangeBarsByValue
       do
         hideGridLines
+        xAxis . minorTicks . visible .= False
+        xAxis . tickLabelFunction .= atMajorTicks (show . (round :: Double-> Int))
         bars <&> fmap (fromIntegral<&>(/(60*60))) & namedBarPlot'
       &  (&~) r2Axis & renderAxis -- (&~) returns the final state after drawing the namedBarPlot'
 
