@@ -1,0 +1,370 @@
+Comparing patterns
+Drawing agreementTotals.svg
+Manual and automatic scoring: intersection: 0 seconds	overlap coefficient: 0 % 1
+Programmatic scoring: intersection: 37 seconds	overlap coefficient: 37 % 115
+without classifier Simple10sec (whose mean interval length is 114242 % 7527):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Simple2 (whose mean interval length is 209767 % 19383):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Simple3 (whose mean interval length is 111017 % 7521):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Simple4 (whose mean interval length is 50827 % 2679):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Simple5 (whose mean interval length is 21948 % 955):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Medium2 (whose mean interval length is 154 % 15):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Medium3 (whose mean interval length is 11701 % 804):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Medium4 (whose mean interval length is 17976 % 949):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Medium5 (whose mean interval length is 9611 % 418):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Complex2 (whose mean interval length is 9111 % 920):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Complex3 (whose mean interval length is 100 % 7):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Complex4 (whose mean interval length is 18 % 1):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier Complex5 (whose mean interval length is 23 % 1):	intersection: 0 seconds	overlap coefficient: 0 % 1
+without classifier technologist (whose mean interval length is 69193 % 1493):	intersection: 13 seconds	overlap coefficient: 13 % 115
+without classifier technician (whose mean interval length is 18053 % 681):	intersection: 24 seconds	overlap coefficient: 24 % 115
+
+left (Simple10sec):  0 % 1	jaccard: 114242 % 209767	right (Simple2): 95525 % 209767	overlap coefficient: 1 % 1
+left (Simple10sec):  14788 % 125805	jaccard: 99454 % 125805	right (Simple3): 11563 % 125805	overlap coefficient: 99454 % 111017
+left (Simple10sec):  63839 % 114666	jaccard: 16801 % 38222	right (Simple4): 212 % 57333	overlap coefficient: 951 % 959
+left (Simple10sec):  46157 % 57131	jaccard: 10964 % 57131	right (Simple5): 10 % 57131	overlap coefficient: 5482 % 5487
+left (Simple10sec):  83071 % 147443	jaccard: 31171 % 147443	right (Medium2): 33201 % 147443	overlap coefficient: 4453 % 9196
+left (Simple10sec):  82652 % 117755	jaccard: 6318 % 23551	right (Medium3): 3513 % 117755	overlap coefficient: 10530 % 11701
+left (Simple10sec):  48217 % 57205	jaccard: 8904 % 57205	right (Medium4): 84 % 57205	overlap coefficient: 106 % 107
+left (Simple10sec):  104631 % 114242	jaccard: 9611 % 114242	right (Medium5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple10sec):  109096 % 118207	jaccard: 5146 % 118207	right (Complex2): 3965 % 118207	overlap coefficient: 5146 % 9111
+left (Simple10sec):  2243 % 2289	jaccard: 1046 % 57225	right (Complex3): 104 % 57225	overlap coefficient: 523 % 575
+left (Simple10sec):  113767 % 114271	jaccard: 475 % 114271	right (Complex4): 29 % 114271	overlap coefficient: 475 % 504
+left (Simple10sec):  114127 % 114242	jaccard: 115 % 114242	right (Complex5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple10sec):  89779 % 158972	jaccard: 24463 % 158972	right (technologist): 22365 % 79486	overlap coefficient: 24463 % 69193
+left (Simple10sec):  86873 % 159085	jaccard: 27369 % 159085	right (technician): 44843 % 159085	overlap coefficient: 27369 % 72212
+left (Simple2):  98750 % 209767	jaccard: 111017 % 209767	right (Simple3): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  158940 % 209767	jaccard: 50827 % 209767	right (Simple4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  187819 % 209767	jaccard: 21948 % 209767	right (Simple5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  145395 % 209767	jaccard: 64372 % 209767	right (Medium2): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  174664 % 209767	jaccard: 35103 % 209767	right (Medium3): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  191791 % 209767	jaccard: 17976 % 209767	right (Medium4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  200156 % 209767	jaccard: 9611 % 209767	right (Medium5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  200656 % 209767	jaccard: 9111 % 209767	right (Complex2): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  207467 % 209767	jaccard: 2300 % 209767	right (Complex3): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  209263 % 209767	jaccard: 504 % 209767	right (Complex4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  209652 % 209767	jaccard: 115 % 209767	right (Complex5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple2):  176198 % 245391	jaccard: 33569 % 245391	right (technologist): 35624 % 245391	overlap coefficient: 33569 % 69193
+left (Simple2):  85419 % 121525	jaccard: 38929 % 243050	right (technician): 33283 % 243050	overlap coefficient: 38929 % 72212
+left (Simple3):  60190 % 111017	jaccard: 50827 % 111017	right (Simple4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  89069 % 111017	jaccard: 21948 % 111017	right (Simple5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  81603 % 145975	jaccard: 29414 % 145975	right (Medium2): 34958 % 145975	overlap coefficient: 191 % 418
+left (Simple3):  75914 % 111017	jaccard: 35103 % 111017	right (Medium3): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  93041 % 111017	jaccard: 17976 % 111017	right (Medium4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  101406 % 111017	jaccard: 9611 % 111017	right (Medium5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  106169 % 115280	jaccard: 303 % 7205	right (Complex2): 4263 % 115280	overlap coefficient: 1616 % 3037
+left (Simple3):  108717 % 111017	jaccard: 2300 % 111017	right (Complex3): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  110513 % 111017	jaccard: 504 % 111017	right (Complex4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  110902 % 111017	jaccard: 115 % 111017	right (Complex5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple3):  86624 % 155817	jaccard: 8131 % 51939	right (technologist): 44800 % 155817	overlap coefficient: 24393 % 69193
+left (Simple3):  20751 % 38804	jaccard: 257 % 1424	right (technician): 44199 % 155216	overlap coefficient: 28013 % 72212
+left (Simple4):  28879 % 50827	jaccard: 21948 % 50827	right (Simple5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple4):  93 % 247	jaccard: 11953 % 103246	right (Medium2): 52419 % 103246	overlap coefficient: 11953 % 50827
+left (Simple4):  36029 % 71132	jaccard: 7399 % 35566	right (Medium3): 20305 % 71132	overlap coefficient: 14798 % 35103
+left (Simple4):  4693 % 7261	jaccard: 2568 % 7261	right (Medium4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple4):  5888 % 7261	jaccard: 1373 % 7261	right (Medium5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple4):  48835 % 57946	jaccard: 996 % 28973	right (Complex2): 1017 % 8278	overlap coefficient: 664 % 3037
+left (Simple4):  24871 % 26021	jaccard: 1085 % 52042	right (Complex3): 1215 % 52042	overlap coefficient: 217 % 460
+left (Simple4):  7189 % 7261	jaccard: 72 % 7261	right (Complex4): 0 % 1	overlap coefficient: 1 % 1
+left (Simple4):  50712 % 50827	jaccard: 115 % 50827	right (Complex5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple4):  36324 % 105517	jaccard: 14503 % 105517	right (technologist): 54690 % 105517	overlap coefficient: 14503 % 50827
+left (Simple4):  34203 % 106415	jaccard: 16624 % 106415	right (technician): 55588 % 106415	overlap coefficient: 16624 % 50827
+left (Simple5):  4337 % 20430	jaccard: 115 % 2043	right (Medium2): 4981 % 6810	overlap coefficient: 1150 % 5487
+left (Simple5):  5481 % 17182	jaccard: 1835 % 17182	right (Medium3): 4933 % 8591	overlap coefficient: 1835 % 7316
+left (Simple5):  4897 % 10889	jaccard: 2419 % 10889	right (Medium4): 3573 % 10889	overlap coefficient: 2419 % 5992
+left (Simple5):  12337 % 21948	jaccard: 9611 % 21948	right (Medium5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple5):  21179 % 30290	jaccard: 769 % 30290	right (Complex2): 4171 % 15145	overlap coefficient: 769 % 9111
+left (Simple5):  10739 % 11889	jaccard: 235 % 11889	right (Complex3): 305 % 3963	overlap coefficient: 47 % 230
+left (Simple5):  21701 % 22205	jaccard: 247 % 22205	right (Complex4): 257 % 22205	overlap coefficient: 247 % 504
+left (Simple5):  21833 % 21948	jaccard: 115 % 21948	right (Complex5): 0 % 1	overlap coefficient: 1 % 1
+left (Simple5):  13895 % 83088	jaccard: 8053 % 83088	right (technologist): 5095 % 6924	overlap coefficient: 8053 % 21948
+left (Simple5):  3320 % 21373	jaccard: 197 % 1943	right (technician): 15886 % 21373	overlap coefficient: 2167 % 5487
+left (Medium2):  12875 % 24576	jaccard: 25747 % 73728	right (Medium3): 2339 % 18432	overlap coefficient: 25747 % 35103
+left (Medium2):  6793 % 9040	jaccard: 2507 % 18080	right (Medium4): 1987 % 18080	overlap coefficient: 2507 % 4494
+left (Medium2):  60342 % 69953	jaccard: 310 % 5381	right (Medium5): 5581 % 69953	overlap coefficient: 4030 % 9611
+left (Medium2):  18951 % 21988	jaccard: 7519 % 65964	right (Complex2): 398 % 16491	overlap coefficient: 7519 % 9111
+left (Medium2):  15667 % 16242	jaccard: 71 % 2707	right (Complex3): 149 % 16242	overlap coefficient: 426 % 575
+left (Medium2):  63985 % 64489	jaccard: 387 % 64489	right (Complex4): 117 % 64489	overlap coefficient: 43 % 56
+left (Medium2):  64282 % 64397	jaccard: 90 % 64397	right (Complex5): 25 % 64397	overlap coefficient: 18 % 23
+left (Medium2):  57904 % 127097	jaccard: 6468 % 127097	right (technologist): 62725 % 127097	overlap coefficient: 21 % 209
+left (Medium2):  55201 % 127413	jaccard: 1019 % 14157	right (technician): 521 % 1053	overlap coefficient: 9171 % 64372
+left (Medium3):  10873 % 19861	jaccard: 13357 % 39722	right (Medium4): 4619 % 39722	overlap coefficient: 13357 % 17976
+left (Medium3):  29969 % 39580	jaccard: 2567 % 19790	right (Medium5): 4477 % 39580	overlap coefficient: 5134 % 9611
+left (Medium3):  10494 % 13531	jaccard: 1207 % 13531	right (Complex2): 1830 % 13531	overlap coefficient: 1207 % 3037
+left (Medium3):  33379 % 35679	jaccard: 1724 % 35679	right (Complex3): 192 % 11893	overlap coefficient: 431 % 575
+left (Medium3):  34757 % 35261	jaccard: 346 % 35261	right (Complex4): 158 % 35261	overlap coefficient: 173 % 252
+left (Medium3):  35043 % 35158	jaccard: 30 % 17579	right (Complex5): 55 % 35158	overlap coefficient: 12 % 23
+left (Medium3):  30120 % 99313	jaccard: 4983 % 99313	right (technologist): 64210 % 99313	overlap coefficient: 1661 % 11701
+left (Medium3):  6912 % 24965	jaccard: 1491 % 19972	right (technician): 64757 % 99860	overlap coefficient: 2485 % 11701
+left (Medium4):  10972 % 20583	jaccard: 7004 % 20583	right (Medium5): 869 % 6861	overlap coefficient: 7004 % 9611
+left (Medium4):  16666 % 25777	jaccard: 1310 % 25777	right (Complex2): 7801 % 25777	overlap coefficient: 1310 % 9111
+left (Medium4):  4334 % 4909	jaccard: 160 % 4909	right (Complex3): 415 % 4909	overlap coefficient: 32 % 115
+left (Medium4):  5897 % 6065	jaccard: 19 % 1213	right (Complex4): 73 % 6065	overlap coefficient: 95 % 168
+left (Medium4):  17916 % 18031	jaccard: 60 % 18031	right (Complex5): 55 % 18031	overlap coefficient: 12 % 23
+left (Medium4):  14322 % 83515	jaccard: 3654 % 83515	right (technologist): 65539 % 83515	overlap coefficient: 87 % 428
+left (Medium4):  12601 % 84813	jaccard: 5375 % 84813	right (technician): 22279 % 28271	overlap coefficient: 5375 % 17976
+left (Medium5):  9079 % 18190	jaccard: 266 % 9095	right (Complex2): 8579 % 18190	overlap coefficient: 532 % 9111
+left (Medium5):  4647 % 5797	jaccard: 317 % 11594	right (Complex3): 1983 % 11594	overlap coefficient: 317 % 2300
+left (Medium5):  2365 % 2491	jaccard: 151 % 9964	right (Complex4): 353 % 9964	overlap coefficient: 151 % 504
+left (Medium5):  9551 % 9666	jaccard: 10 % 1611	right (Complex5): 55 % 9666	overlap coefficient: 12 % 23
+left (Medium5):  6930 % 76123	jaccard: 2681 % 76123	right (technologist): 66512 % 76123	overlap coefficient: 383 % 1373
+left (Medium5):  3091 % 39197	jaccard: 3429 % 78394	right (technician): 68783 % 78394	overlap coefficient: 3429 % 9611
+left (Complex2):  1511 % 1971	jaccard: 1556 % 9855	right (Complex3): 248 % 3285	overlap coefficient: 389 % 575
+left (Complex2):  1096 % 1159	jaccard: 343 % 9272	right (Complex4): 161 % 9272	overlap coefficient: 49 % 72
+left (Complex2):  9001 % 9116	jaccard: 55 % 4558	right (Complex5): 5 % 9116	overlap coefficient: 22 % 23
+left (Complex2):  7234 % 76427	jaccard: 1877 % 76427	right (technologist): 67316 % 76427	overlap coefficient: 1877 % 9111
+left (Complex2):  7285 % 79497	jaccard: 166 % 7227	right (technician): 23462 % 26499	overlap coefficient: 1826 % 9111
+left (Complex3):  643 % 811	jaccard: 371 % 2433	right (Complex4): 133 % 2433	overlap coefficient: 53 % 72
+left (Complex3):  2213 % 2328	jaccard: 29 % 776	right (Complex5): 7 % 582	overlap coefficient: 87 % 115
+left (Complex3):  1382 % 70575	jaccard: 306 % 23525	right (technologist): 2731 % 2823	overlap coefficient: 459 % 1150
+left (Complex3):  213 % 10529	jaccard: 809 % 73703	right (technician): 71403 % 73703	overlap coefficient: 809 % 2300
+left (Complex4):  394 % 509	jaccard: 110 % 509	right (Complex5): 5 % 509	overlap coefficient: 22 % 23
+left (Complex4):  244 % 69437	jaccard: 260 % 69437	right (technologist): 68933 % 69437	overlap coefficient: 65 % 126
+left (Complex4):  153 % 36259	jaccard: 99 % 36259	right (technician): 36007 % 36259	overlap coefficient: 11 % 28
+left (Complex5):  37 % 69230	jaccard: 39 % 34615	right (technologist): 601 % 602	overlap coefficient: 78 % 115
+left (Complex5):  47 % 72259	jaccard: 68 % 72259	right (technician): 72144 % 72259	overlap coefficient: 68 % 115
+left (technologist):  45463 % 117675	jaccard: 1582 % 7845	right (technician): 48482 % 117675	overlap coefficient: 23730 % 69193
+Simple10sec	( 0 ( 114242 ) 95525 )	Simple2	[390353]
+Simple10sec	( 14788 ( 99454 ) 11563 )	Simple3	[474315]
+Simple10sec	( 63839 ( 50403 ) 424 )	Simple4	[485454]
+Simple10sec	( 92314 ( 21928 ) 20 )	Simple5	[485858]
+Simple10sec	( 83071 ( 31171 ) 33201 )	Medium2	[452677]
+Simple10sec	( 82652 ( 31590 ) 3513 )	Medium3	[482365]
+Simple10sec	( 96434 ( 17808 ) 168 )	Medium4	[485710]
+Simple10sec	( 104631 ( 9611 ) 0 )	Medium5	[485878]
+Simple10sec	( 109096 ( 5146 ) 3965 )	Complex2	[481913]
+Simple10sec	( 112150 ( 2092 ) 208 )	Complex3	[485670]
+Simple10sec	( 113767 ( 475 ) 29 )	Complex4	[485849]
+Simple10sec	( 114127 ( 115 ) 0 )	Complex5	[485878]
+Simple10sec	( 89779 ( 24463 ) 44730 )	technologist	[441148]
+Simple10sec	( 86873 ( 27369 ) 44843 )	technician	[441035]
+Simple2	( 98750 ( 111017 ) 0 )	Simple3	[390353]
+Simple2	( 158940 ( 50827 ) 0 )	Simple4	[390353]
+Simple2	( 187819 ( 21948 ) 0 )	Simple5	[390353]
+Simple2	( 145395 ( 64372 ) 0 )	Medium2	[390353]
+Simple2	( 174664 ( 35103 ) 0 )	Medium3	[390353]
+Simple2	( 191791 ( 17976 ) 0 )	Medium4	[390353]
+Simple2	( 200156 ( 9611 ) 0 )	Medium5	[390353]
+Simple2	( 200656 ( 9111 ) 0 )	Complex2	[390353]
+Simple2	( 207467 ( 2300 ) 0 )	Complex3	[390353]
+Simple2	( 209263 ( 504 ) 0 )	Complex4	[390353]
+Simple2	( 209652 ( 115 ) 0 )	Complex5	[390353]
+Simple2	( 176198 ( 33569 ) 35624 )	technologist	[354729]
+Simple2	( 170838 ( 38929 ) 33283 )	technician	[357070]
+Simple3	( 60190 ( 50827 ) 0 )	Simple4	[489103]
+Simple3	( 89069 ( 21948 ) 0 )	Simple5	[489103]
+Simple3	( 81603 ( 29414 ) 34958 )	Medium2	[454145]
+Simple3	( 75914 ( 35103 ) 0 )	Medium3	[489103]
+Simple3	( 93041 ( 17976 ) 0 )	Medium4	[489103]
+Simple3	( 101406 ( 9611 ) 0 )	Medium5	[489103]
+Simple3	( 106169 ( 4848 ) 4263 )	Complex2	[484840]
+Simple3	( 108717 ( 2300 ) 0 )	Complex3	[489103]
+Simple3	( 110513 ( 504 ) 0 )	Complex4	[489103]
+Simple3	( 110902 ( 115 ) 0 )	Complex5	[489103]
+Simple3	( 86624 ( 24393 ) 44800 )	technologist	[444303]
+Simple3	( 83004 ( 28013 ) 44199 )	technician	[444904]
+Simple4	( 28879 ( 21948 ) 0 )	Simple5	[549293]
+Simple4	( 38874 ( 11953 ) 52419 )	Medium2	[496874]
+Simple4	( 36029 ( 14798 ) 20305 )	Medium3	[528988]
+Simple4	( 32851 ( 17976 ) 0 )	Medium4	[549293]
+Simple4	( 41216 ( 9611 ) 0 )	Medium5	[549293]
+Simple4	( 48835 ( 1992 ) 7119 )	Complex2	[542174]
+Simple4	( 49742 ( 1085 ) 1215 )	Complex3	[548078]
+Simple4	( 50323 ( 504 ) 0 )	Complex4	[549293]
+Simple4	( 50712 ( 115 ) 0 )	Complex5	[549293]
+Simple4	( 36324 ( 14503 ) 54690 )	technologist	[494603]
+Simple4	( 34203 ( 16624 ) 55588 )	technician	[493705]
+Simple5	( 17348 ( 4600 ) 59772 )	Medium2	[518400]
+Simple5	( 16443 ( 5505 ) 29598 )	Medium3	[548574]
+Simple5	( 14691 ( 7257 ) 10719 )	Medium4	[567453]
+Simple5	( 12337 ( 9611 ) 0 )	Medium5	[578172]
+Simple5	( 21179 ( 769 ) 8342 )	Complex2	[569830]
+Simple5	( 21478 ( 470 ) 1830 )	Complex3	[576342]
+Simple5	( 21701 ( 247 ) 257 )	Complex4	[577915]
+Simple5	( 21833 ( 115 ) 0 )	Complex5	[578172]
+Simple5	( 13895 ( 8053 ) 61140 )	technologist	[517032]
+Simple5	( 13280 ( 8668 ) 63544 )	technician	[514628]
+Medium2	( 38625 ( 25747 ) 9356 )	Medium3	[526392]
+Medium2	( 54344 ( 10028 ) 7948 )	Medium4	[527800]
+Medium2	( 60342 ( 4030 ) 5581 )	Medium5	[530167]
+Medium2	( 56853 ( 7519 ) 1592 )	Complex2	[534156]
+Medium2	( 62668 ( 1704 ) 596 )	Complex3	[535152]
+Medium2	( 63985 ( 387 ) 117 )	Complex4	[535631]
+Medium2	( 64282 ( 90 ) 25 )	Complex5	[535723]
+Medium2	( 57904 ( 6468 ) 62725 )	technologist	[473023]
+Medium2	( 55201 ( 9171 ) 63041 )	technician	[472707]
+Medium3	( 21746 ( 13357 ) 4619 )	Medium4	[560398]
+Medium3	( 29969 ( 5134 ) 4477 )	Medium5	[560540]
+Medium3	( 31482 ( 3621 ) 5490 )	Complex2	[559527]
+Medium3	( 33379 ( 1724 ) 576 )	Complex3	[564441]
+Medium3	( 34757 ( 346 ) 158 )	Complex4	[564859]
+Medium3	( 35043 ( 60 ) 55 )	Complex5	[564962]
+Medium3	( 30120 ( 4983 ) 64210 )	technologist	[500807]
+Medium3	( 27648 ( 7455 ) 64757 )	technician	[500260]
+Medium4	( 10972 ( 7004 ) 2607 )	Medium5	[579537]
+Medium4	( 16666 ( 1310 ) 7801 )	Complex2	[574343]
+Medium4	( 17336 ( 640 ) 1660 )	Complex3	[580484]
+Medium4	( 17691 ( 285 ) 219 )	Complex4	[581925]
+Medium4	( 17916 ( 60 ) 55 )	Complex5	[582089]
+Medium4	( 14322 ( 3654 ) 65539 )	technologist	[516605]
+Medium4	( 12601 ( 5375 ) 66837 )	technician	[515307]
+Medium5	( 9079 ( 532 ) 8579 )	Complex2	[581930]
+Medium5	( 9294 ( 317 ) 1983 )	Complex3	[588526]
+Medium5	( 9460 ( 151 ) 353 )	Complex4	[590156]
+Medium5	( 9551 ( 60 ) 55 )	Complex5	[590454]
+Medium5	( 6930 ( 2681 ) 66512 )	technologist	[523997]
+Medium5	( 6182 ( 3429 ) 68783 )	technician	[521726]
+Complex2	( 7555 ( 1556 ) 744 )	Complex3	[590265]
+Complex2	( 8768 ( 343 ) 161 )	Complex4	[590848]
+Complex2	( 9001 ( 110 ) 5 )	Complex5	[591004]
+Complex2	( 7234 ( 1877 ) 67316 )	technologist	[523693]
+Complex2	( 7285 ( 1826 ) 70386 )	technician	[520623]
+Complex3	( 1929 ( 371 ) 133 )	Complex4	[597687]
+Complex3	( 2213 ( 87 ) 28 )	Complex5	[597792]
+Complex3	( 1382 ( 918 ) 68275 )	technologist	[529545]
+Complex3	( 1491 ( 809 ) 71403 )	technician	[526417]
+Complex4	( 394 ( 110 ) 5 )	Complex5	[599611]
+Complex4	( 244 ( 260 ) 68933 )	technologist	[530683]
+Complex4	( 306 ( 198 ) 72014 )	technician	[527602]
+Complex5	( 37 ( 78 ) 69115 )	technologist	[530890]
+Complex5	( 47 ( 68 ) 72144 )	technician	[527861]
+technologist	( 45463 ( 23730 ) 48482 )	technician	[482445]
+Writing output/Simple10sec-Simple2.svg
+Writing output/Simple10sec-Simple3.svg
+Writing output/Simple10sec-Simple4.svg
+Writing output/Simple10sec-Simple5.svg
+Writing output/Simple10sec-Medium2.svg
+Writing output/Simple10sec-Medium3.svg
+Writing output/Simple10sec-Medium4.svg
+Writing output/Simple10sec-Medium5.svg
+Writing output/Simple10sec-Complex2.svg
+Writing output/Simple10sec-Complex3.svg
+Writing output/Simple10sec-Complex4.svg
+Writing output/Simple10sec-Complex5.svg
+Writing output/Simple10sec-technologist.svg
+Writing output/Simple10sec-technician.svg
+Writing output/Simple2-Simple3.svg
+Writing output/Simple2-Simple4.svg
+Writing output/Simple2-Simple5.svg
+Writing output/Simple2-Medium2.svg
+Writing output/Simple2-Medium3.svg
+Writing output/Simple2-Medium4.svg
+Writing output/Simple2-Medium5.svg
+Writing output/Simple2-Complex2.svg
+Writing output/Simple2-Complex3.svg
+Writing output/Simple2-Complex4.svg
+Writing output/Simple2-Complex5.svg
+Writing output/Simple2-technologist.svg
+Writing output/Simple2-technician.svg
+Writing output/Simple3-Simple4.svg
+Writing output/Simple3-Simple5.svg
+Writing output/Simple3-Medium2.svg
+Writing output/Simple3-Medium3.svg
+Writing output/Simple3-Medium4.svg
+Writing output/Simple3-Medium5.svg
+Writing output/Simple3-Complex2.svg
+Writing output/Simple3-Complex3.svg
+Writing output/Simple3-Complex4.svg
+Writing output/Simple3-Complex5.svg
+Writing output/Simple3-technologist.svg
+Writing output/Simple3-technician.svg
+Writing output/Simple4-Simple5.svg
+Writing output/Simple4-Medium2.svg
+Writing output/Simple4-Medium3.svg
+Writing output/Simple4-Medium4.svg
+Writing output/Simple4-Medium5.svg
+Writing output/Simple4-Complex2.svg
+Writing output/Simple4-Complex3.svg
+Writing output/Simple4-Complex4.svg
+Writing output/Simple4-Complex5.svg
+Writing output/Simple4-technologist.svg
+Writing output/Simple4-technician.svg
+Writing output/Simple5-Medium2.svg
+Writing output/Simple5-Medium3.svg
+Writing output/Simple5-Medium4.svg
+Writing output/Simple5-Medium5.svg
+Writing output/Simple5-Complex2.svg
+Writing output/Simple5-Complex3.svg
+Writing output/Simple5-Complex4.svg
+Writing output/Simple5-Complex5.svg
+Writing output/Simple5-technologist.svg
+Writing output/Simple5-technician.svg
+Writing output/Medium2-Medium3.svg
+Writing output/Medium2-Medium4.svg
+Writing output/Medium2-Medium5.svg
+Writing output/Medium2-Complex2.svg
+Writing output/Medium2-Complex3.svg
+Writing output/Medium2-Complex4.svg
+Writing output/Medium2-Complex5.svg
+Writing output/Medium2-technologist.svg
+Writing output/Medium2-technician.svg
+Writing output/Medium3-Medium4.svg
+Writing output/Medium3-Medium5.svg
+Writing output/Medium3-Complex2.svg
+Writing output/Medium3-Complex3.svg
+Writing output/Medium3-Complex4.svg
+Writing output/Medium3-Complex5.svg
+Writing output/Medium3-technologist.svg
+Writing output/Medium3-technician.svg
+Writing output/Medium4-Medium5.svg
+Writing output/Medium4-Complex2.svg
+Writing output/Medium4-Complex3.svg
+Writing output/Medium4-Complex4.svg
+Writing output/Medium4-Complex5.svg
+Writing output/Medium4-technologist.svg
+Writing output/Medium4-technician.svg
+Writing output/Medium5-Complex2.svg
+Writing output/Medium5-Complex3.svg
+Writing output/Medium5-Complex4.svg
+Writing output/Medium5-Complex5.svg
+Writing output/Medium5-technologist.svg
+Writing output/Medium5-technician.svg
+Writing output/Complex2-Complex3.svg
+Writing output/Complex2-Complex4.svg
+Writing output/Complex2-Complex5.svg
+Writing output/Complex2-technologist.svg
+Writing output/Complex2-technician.svg
+Writing output/Complex3-Complex4.svg
+Writing output/Complex3-Complex5.svg
+Writing output/Complex3-technologist.svg
+Writing output/Complex3-technician.svg
+Writing output/Complex4-Complex5.svg
+Writing output/Complex4-technologist.svg
+Writing output/Complex4-technician.svg
+Writing output/Complex5-technologist.svg
+Writing output/Complex5-technician.svg
+Writing output/technologist-technician.svg
+
+JACCARD
+	technician	technologist	Complex5	Complex4	Complex3	Complex2	Medium5	Medium4	Medium3	Medium2	Simple5	Simple4	Simple3	Simple2
+Simple10sec	17%	15%	0%	0%	2%	4%	8%	16%	27%	21%	19%	44%	79%	54%
+Simple2	16%	14%	0%	0%	1%	4%	5%	9%	17%	31%	10%	24%	53%
+Simple3	18%	16%	0%	0%	2%	4%	9%	16%	32%	20%	20%	46%
+Simple4	16%	14%	0%	1%	2%	3%	19%	35%	21%	12%	43%
+Simple5	10%	10%	1%	1%	2%	3%	44%	22%	11%	6%
+Medium2	7%	5%	0%	1%	3%	11%	6%	14%	35%
+Medium3	7%	5%	0%	1%	5%	9%	13%	34%
+Medium4	6%	4%	0%	2%	3%	5%	34%
+Medium5	4%	4%	1%	2%	3%	3%
+Complex2	2%	2%	1%	4%	16%
+Complex3	1%	1%	4%	15%
+Complex4	0%	0%	22%
+Complex5	0%	0%
+technologist	20%
+
+OVERLAP COEFFICIENT
+		12%	12%	0%	0%	0%	2%	2%	3%	6%	11%	4%	8%	18%	35%
+		technician	technologist	Complex5	Complex4	Complex3	Complex2	Medium5	Medium4	Medium3	Medium2	Simple5	Simple4	Simple3	Simple2
+19%	Simple10sec	38%	35%	100%	94%	91%	56%	100%	99%	90%	48%	100%	99%	90%	100%
+35%	Simple2	54%	49%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%
+18%	Simple3	39%	35%	100%	100%	100%	53%	100%	100%	100%	46%	100%	100%
+8%	Simple4	33%	29%	100%	100%	47%	22%	100%	100%	42%	24%	100%
+4%	Simple5	39%	37%	100%	49%	20%	8%	100%	40%	25%	21%
+11%	Medium2	14%	10%	78%	77%	74%	83%	42%	56%	73%
+6%	Medium3	21%	14%	52%	69%	75%	40%	53%	74%
+3%	Medium4	30%	20%	52%	57%	28%	14%	73%
+2%	Medium5	36%	28%	52%	30%	14%	6%
+2%	Complex2	20%	21%	96%	68%	68%
+0%	Complex3	35%	40%	76%	74%
+0%	Complex4	39%	52%	96%
+0%	Complex5	59%	68%
+12%	technologist	34%

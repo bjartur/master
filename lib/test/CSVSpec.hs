@@ -1,17 +1,16 @@
 module CSVSpec ( spec ) where
 
 import Control.Exception( ErrorCall, catch, evaluate )
-import Control.Monad( replicateM )
 import Data.Function( (&) )
-import Data.IntervalSet( empty, fromList, isSubsetOf )
-import Data.List( intercalate, sort )
+import Data.IntervalSet( fromList, isSubsetOf )
+import Data.List( intercalate )
 import Prelude hiding( readFile )
 import Test.Hspec
 import Test.Hspec.Core.QuickCheck( modifyMaxSuccess )
 import Text.ParserCombinators.ReadP( eof, ReadP, readP_to_S )
-import Test.QuickCheck (Arbitrary, arbitrary, Gen, choose, property)
+import Test.QuickCheck (Gen, choose, property)
 
-import Bjartur.Types
+import Bjartur.Time
 import Bjartur.CSV ( couple, dateTime, digit, file, row, (>$) )
 
 examples:: (Show a, Show b, Eq b)=> (a -> b)-> [(a,b)]-> Expectation
@@ -137,18 +136,3 @@ spec = modifyMaxSuccess(10*) $ do
           "2015-01-21 23:02:44.000000,2015-01-21 23:02:55.000000",
           "2015-01-21 23:03:01.000000,2015-01-21 23:03:34.000000",
         ""])
-
-nubSort:: [DateTime]-> [DateTime]
-nubSort = sort >$ fastnub
-    where fastnub(one:other:rest)= if one==other then fastnub(one:rest) else one:fastnub(other:rest)
-          fastnub(short)= short
-
-arbitrarySet:: Gen Intervals
-arbitrarySet= do
-      size<- arbitrary:: Gen Int
-      datetimes<- replicateM (2 * abs size + 2) arbitrary >$ nubSort:: Gen [DateTime]
-      let pair[]= []
-          pair[_]= undefined
-          pair(a:b:xs)= period a b : pair xs
-      let disjoints= pair datetimes
-      return $! fromList disjoints

@@ -1,12 +1,19 @@
-This software was composed for scoring esophageal pressure swings, namely Pes crescendos, in 26 polysomnograms comprising a specific, pre-existing, dataset as part of a scientific study. If you want to use it for another dataset, some adaptions will be needed. **This documentation, data, grapics and source code is provided "as is" and is not merchantable without further modifications. In no event shall the authors be liable for any damages, direct or indirect, arising in connection with the use of this information or this software. The authors disclaim all warranties with regards to this information or this software, including implied warranties.** Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted.
+This software was composed for scoring esophageal pressure swings, namely Pes crescendos, in 26 polysomnograms comprising a specific, pre-existing, dataset as part of a scientific study. If you want to use it for another dataset, some adaptions will be needed. **This documentation, data, grapics and source code is provided "as is" and is not merchantable without further modifications. In no event shall the authors be liable for any damages, direct or indirect, arising in connection with the use of this information or this software. The authors disclaim all warranties with regards to this information or this software, including implied warranties.** See the LICENSE for a copyright license for the enclosed documentation, graphics, and source code.
+
+Respiratory effort patterns
+===
 
 If you have sleep-wake scored polysomnograms with esophageal manometry in the proprietary Noxturnal format, and a proprietary library from Nox Medical, you can use this software with modifications to score swings in esophageal pressure known as Pes crescendos in your polysomnograms. Alternatively, you supply your dataset in the format of CSV containing little but the peak-negative pressure of each breath. See NoxPes2Csv/nadir/BbB/\*.txt for examples of such CSVs. Replace them with CSVs based on your data. In special, NoxPes2Csv is hardcoded to exclude a polysomnogram named VSN-14-080-002. Additionally, the definition of the function score in the file lib/src/Records.hs needs to be revised to match the dataset. Currently, score uses the function forbid to exclude polysomnograms named VSN-14-080-013 and VSN-14-080-014.
+
+See csv-to-score/Readme.md for instructions on compiling and executing the software for scoring respiratory effort patterns.
 
 Full data flow
 ---
 If your polysomnograms are in the proprietary Noxturnal format, you can adapt the NoxPes2Csv/Makefile and the script NoxPes2Csv/BbB_nadir.py and its dependencies for your dataset. The Makefile mentions the VSN-14-080 dataset explicitly, and the Python script is hardcoded to exclude polysomnogram number 2 (from the VSN-14-080 set of polysomnograms). Change both to match your dataset.
 
 ### Polysomnogram with scored esophageal manometry
+The data processing pipelines are split into steps. At each step a program reads input files and creates output files. The flow of data through one pipeline is illustrated in the following line. Descriptions of the state of the data between steps alternate with the names of the programs transforming the data in each step (with program names surrounded by double arrows and vertical bars).
+
 Polysomnograms ⇉|NoxPes2Csv|⇉ CSVs breaths ⇉|csv-to-score|⇉ CSVs of Pes crescendos ⇉|score-to-nox|⇉ Polysomnograms
 <dl>
   <dt>CSV of breaths</dt><dd> has two columns: the datetime and the peak-negative pressure of each breath. The datetime can be any phase of the breath, e.g. the highest pressure or the lowest pressure, as long as it is consistently the same phase both within and across CSVs.
