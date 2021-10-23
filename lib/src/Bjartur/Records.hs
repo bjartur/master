@@ -52,7 +52,7 @@ autoscores = do
         "../csv-to-score/output/unabrupt/10sec/"
         :
         ["../csv-to-score/output/"]
-        +/+ ["unabrupt", "reversal", "baseline"]
+        +/+ ["baseline", "baserev", "complex"]
         +/+ map pure ['2'..'5']
   forM expandedPaths score
 
@@ -130,9 +130,12 @@ pairWith:: (a-> b)-> [a]-> [(b,a)]
 pairWith f= (map f >>= zip)
 
 rename:: String-> String
-rename "unabrupt"= "Simple"
-rename "reversal"= "Medium"
-rename "baseline"= "Complex"
+rename "unabrupt"= "cres"
+rename "reversal"= "cresrev"
+rename "abrupt"= "cresabrupt"
+rename "baseline"= "cresbase"
+rename "baserev"= "cresbaserev"
+rename "complex"= "cresbaseabrupt"
 rename other= other
 
 -- Data on the length of polysomnograms

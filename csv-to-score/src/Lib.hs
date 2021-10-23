@@ -1,9 +1,10 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (baseline, belowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, abrupts, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
+module Lib (belowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, reversal, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
 
+import Control.Applicative (liftA2)
 import Control.Arrow ((>>>))
-import Data.Function ((&))
+import Data.Function ((&), on)
 import Data.List.Safe ((!!))
 import Prelude hiding ((!!))
 
@@ -101,9 +102,6 @@ judge additional_critera n pressures all_candidates = let
  in
     continue all_candidates 0
 
-baseline :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
-baseline = judge [belowBaseline, abrupt]
-
 belowBaseline :: [Double]-> (Index,Count)-> Double-> Bool
 belowBaseline pressures (index,count) reference = all (reference >) (pressures & drop (index+1) & take count)
 
@@ -112,8 +110,11 @@ abrupt pressures decrescendo reference = do
        let pressure = pressures !! indexAfter decrescendo
        maybe False (reference <) pressure
 
-abrupts :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
-abrupts = judge [abrupt]
+reversal :: [Double]-> (Index,Count)-> Double-> Bool
+reversal pressures decrescendo reference = do
+       let after = indexAfter decrescendo
+       let pressure = on (liftA2 max) (pressures !!) after (after+1)
+       maybe False (reference <) pressure
 
 baselines :: [Double]-> [(Index,Count)]-> [Double]
 baselines pressures candidates = let
@@ -128,6 +129,9 @@ baselines pressures candidates = let
 indexBefore :: (Index,Count)-> Index
 indexBefore =      fst
 
+indexOfStartOf :: (Index,Count)-> Index
+indexOfStartOf (index,_)=      index + 1
+
 indexOfEndOf :: (Index,Count)-> Index
 indexOfEndOf =     uncurry (+)
 
@@ -135,8 +139,7 @@ indexOfEndOf =     uncurry (+)
 -- This index is always beyond the end span,
 -- and sometimes beyond the end of the underlying list.
 indexAfter :: (Index,Count)-> Index
-indexAfter =       indexOfEndOf
-                >$ (+ 1)
+indexAfter (index,count)=       index + count + 1
 
 (>$) :: Functor l=> l a-> (a-> b)-> l b
 (>$) = flip fmap
