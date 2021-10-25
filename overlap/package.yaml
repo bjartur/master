@@ -1,11 +1,16 @@
 ---
 name: overlap
-version: 0.0.0.0
+version: 0.1.0.0
+github: "bjartur/Master/overlap"
+author: "Bjartur Thorlacius"
+maintainer: "bjt9@hi.is"
+copyright: "Copyright (c) 2018–2021 Bjartur Thorlacius"
 
 dependencies:
   - base < 4.14 && >= 2.10
   - bjartur-lib
   - filepath < 1.5 && >= 1.4
+  - colour
   - containers
   - data-interval >= 2.0
   - lens >= 4.6 && < 5.0

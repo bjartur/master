@@ -1,7 +1,7 @@
 ---
 name: bjartur-lib
 version: 0.1.0.0
-github: "bjartur/Master/tree/master/lib"
+github: "bjartur/Master/lib"
 author: "Bjartur Thorlacius"
 maintainer: "bjt9@hi.is"
 copyright: "Copyright (c) 2018–2020 Bjartur Thorlacius"

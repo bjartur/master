@@ -1,10 +1,10 @@
 ---
 name: plot
 version: 0.1.0.0
-github: "bjartur/Master/tree/master/plot"
+github: "bjartur/Master/plot"
 author: "Bjartur Thorlacius"
 maintainer: "bjt9@hi.is"
-copyright: "Copyright (c) 2018–2020 Bjartur Thorlacius"
+copyright: "Copyright (c) 2018–2021 Bjartur Thorlacius"
 
 dependencies:
   - plots >= 0.1.1.2

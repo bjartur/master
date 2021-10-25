@@ -1,5 +1,10 @@
-name: nox2score
-version: 0.0.0.0
+---
+name:                nox2score
+version:             0.1.0.0
+github:              "bjartur/Master/nox2score"
+author:              "Bjartur Thorlacius"
+maintainer:          "bjt9@hi.is"
+copyright:           "Copyright (c) 2018–2021 Bjartur Thorlacius"
 
 dependencies:
   - base < 4.14 && >= 2.10

@@ -1,10 +1,10 @@
 ---
 name:                csv-to-score
 version:             0.1.0.0
-github:              "bjartur/Master/tree/master/csv-to-score"
+github:              "bjartur/Master/csv-to-score"
 author:              "Bjartur Thorlacius"
 maintainer:          "bjt9@hi.is"
-copyright:           "Copyright (c) 2018–2020 Bjartur Thorlacius"
+copyright:           "Copyright (c) 2018–2021 Bjartur Thorlacius"
 
 extra-source-files:
   - README.md
