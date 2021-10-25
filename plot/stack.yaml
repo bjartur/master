@@ -1,11 +1,11 @@
 ---
-resolver: lts-14.27
+resolver: lts-16.12
 extra-deps:
   - ../lib
   - plots-0.1.1.2
-  - hashable-1.2.7.0
   - data-interval-2.0.1
   - extended-reals-0.2.4.0
+  - linear-1.20.9@sha256:4f37c497484706afc995ac76e41c95579d11a8fb9d6fb890db6824a7d5b86b2d,4237
 
 flags:
   diagrams:
