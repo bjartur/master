@@ -7,7 +7,7 @@ from nox_reader.nox_recording_class import Recording
 from sys import stderr
 from os import path
 
-def mark_events(recording: Recording, score: str, base_scoring='PSGPes', signal='PES 3', log=False):
+def mark_events(recording: Recording, score: str, signal='PES 3', log=False):
     with open(score, 'r', encoding='ascii') as lines:
 
         for line in lines:
@@ -20,9 +20,9 @@ def mark_events(recording: Recording, score: str, base_scoring='PSGPes', signal=
                 stderr.write("Beginning: {}\n".format(beginning))
                 stderr.write("End:       {}\n".format(end))
                 stderr.write("Duration:              {}\n".format(duration))
-            recording.add_marker_to_active_scoring(event_type="autopes", start_time=start_time,
+            recording.add_marker_to_active_scoring(event_type="cres4", start_time=start_time,
                                              signal_header=pes, duration=duration.total_seconds(), artifact=False)
-        recording.save_scoring("Bjartur")
+        recording.save_scoring("SiggaKaoCres4")
 
 
 with open('../best_signal.py', 'rb') as file:
@@ -44,7 +44,6 @@ if __name__ == '__main__':
                     else:
                         stderr.write("No\n")
                 recording = Recording(filepath, False)
-                measurement_name = path.basename(path.dirname(filepath));
-                best_scoring_group(recording, measurement_name=measurement_name, log=True);
+                best_scoring_group(recording, measurement_name=name, log=True)
                 score = '..\\csv-to-score\\output\\' + crescendo + '\\' + n + '\\' + name + '.txt'
-                mark_events(recording, score, best_signal(name))
+                mark_events(recording=recording, score=score, signal=best_signal(name))
