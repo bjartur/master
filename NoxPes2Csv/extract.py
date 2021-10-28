@@ -1,4 +1,3 @@
-from glob import glob
 from os import path, makedirs
 from sys import stderr
 from nox_reader import get_recording_with_derived
