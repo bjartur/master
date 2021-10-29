@@ -1,15 +1,12 @@
-import Control.Arrow
 import Control.Applicative
-import Control.Monad(ap, join)
+import Control.Monad(ap)
 import Data.Function
-import Data.Functor.Const
-import Data.List (sort, nub, foldl1')
-import Debug.Trace
+import Data.List (sort, nub)
 import Input
 import Lib
 import Prelude
-import Test.Hspec
-import Test.QuickCheck (Arbitrary(..), Arbitrary1(..), choose, forAll, Gen(..), listOf, maxSuccess, NonEmptyList(..), Property, property, resize, sized, stdArgs, Testable, quickCheckWith, (==>))
+import Test.Hspec hiding (after, before)
+import Test.QuickCheck (Arbitrary(..), choose, forAll, Gen, listOf, maxSuccess, NonEmptyList(..), Property, property, resize, sized, stdArgs, quickCheckWith, (==>))
 
 
 ofAscendingListShouldBeAllTrue =
@@ -134,6 +131,9 @@ randomNadirs = sized $ \recordLength-> let
         in
             go 1 (return [])
          >$ reverse
+
+abrupts :: Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
+abrupts = judge [abrupt]
 
 examples :: (Show a, Show b, Eq b) => (a -> b) -> [(a,b)] -> Expectation
 examples function = mapM_(\(input,output) -> function input `shouldBe` output)
@@ -267,9 +267,9 @@ main = hspec $ do
                 ap ofEqualLength (ap baselines) declinesLongerThanThree
         describe "abrupt" $ do
                 it "dismisses a triangle." $ do
-                        abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] (0, 9) 5.5 `shouldBe` False
+                        abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] (0, 9) [5.5] `shouldBe` False
                 it "can notice an abrupt return to baseline" $ do
-                        abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] (4, 9) 8.5 `shouldBe` True
+                        abrupt [8, 9, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 9, 10, 9, 8] (4, 9) [8.5] `shouldBe` True
         describe "abrupts"$ do
                 it "only accepts, shortens or rejects candidate nadirs without introducing new ones" $ do
                         forAll $ do
@@ -303,15 +303,15 @@ main = hspec $ do
         describe "liftA2 (<*>) abrupts declinesLongerThan 3" $ do
                 let search = liftA2 (<*>) abrupts declinesLongerThan 3
                 it "rejects a decline terminating the analysis period" $ do
-                  let sawtooth = [4,3..1]
-                  search sawtooth `shouldBe` []
-                  let sawtooth = [5,4..1]
-                  search sawtooth `shouldBe` []
+                  let sawtooth4 = [4,3..1]
+                  search sawtooth4 `shouldBe` []
+                  let sawtooth5 = [5,4..1]
+                  search sawtooth5 `shouldBe` []
                 it "accepts a decrescendo followed by a jump to above the starting pressure" $ do
-                  let sawtooth = [4,3..1] ++ [5]
-                  search sawtooth `shouldBe` [(0, 3)]
-                  let sawtooth = [5,4..1] ++ [6]
-                  search sawtooth `shouldBe` [(0, 4)]
+                  let sawtooth45 = [4,3..1] ++ [5]
+                  search sawtooth45 `shouldBe` [(0, 3)]
+                  let sawtooth56 = [5,4..1] ++ [6]
+                  search sawtooth56 `shouldBe` [(0, 4)]
                 it "finds baselines and short decrescendos in a saw blade" $ do
                   let sawtooth = [5,4..1]
                   let saw = replicate 8 sawtooth & concat
@@ -323,4 +323,7 @@ main = hspec $ do
         describe "decrescendosFulfilling" $ do
           it "ignores decrescendos not terminated by abrupt reversal" $ do
             (>$) vsn007 (decrescendosFulfilling [belowBaseline, abrupt] 5) `shouldReturn` [(22,5)]
+--       describe "variance" $ do
+--         it "works on a few examples" $ examples variance
+--           [([1..9], 20/3)]
 

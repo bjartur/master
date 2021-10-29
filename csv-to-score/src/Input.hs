@@ -1,4 +1,4 @@
-module Input( CSV, Count, Index, abrupt, belowBaseline, decrescendosFulfilling, judge, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, readFormerColumn, readLatterColumnAsDoubles, (>$), (>>$) ) where
+module Input( CSV, Count, Criteria, Index, abrupt, belowBaseline, decrescendosFulfilling, dipWayBelowBaseline, judge, timestampsOfDeclineBeginning, timestampsOfDeclineEnd, readFormerColumn, readLatterColumnAsDoubles, reversal, (>$), (>>$) ) where
 import Control.Applicative
 import Lib
 
@@ -8,21 +8,21 @@ decrescendos :: Int-> CSV-> [(Index,Count)]
 decrescendos n =           readLatterColumnAsDoubles
                 >$ declinesLongerThan n
 
-decrescendosFulfilling :: [[Double]-> (Index,Count)-> Double-> Bool]-> Int-> CSV-> [(Index,Count)]
+decrescendosFulfilling :: Criteria-> Int-> CSV-> [(Index,Count)]
 decrescendosFulfilling method n = liftA2 (judge method n)
   readLatterColumnAsDoubles
   (decrescendos n)
 
-timestampsOfDeclineBeginning :: [[Double]-> (Index,Count)-> Double-> Bool]-> Int-> CSV-> [String]
+timestampsOfDeclineBeginning :: Criteria-> Int-> CSV-> [String]
 timestampsOfDeclineBeginning =
                    timestamp indexBefore
 
 
-timestampsOfDeclineEnd :: [[Double]-> (Index,Count)-> Double-> Bool]-> Int-> CSV-> [String]
+timestampsOfDeclineEnd :: Criteria-> Int-> CSV-> [String]
 timestampsOfDeclineEnd =
                    timestamp indexOfEndOf
 
-timestamp :: ((Index,Count)-> Index)-> [[Double]-> (Index,Count)-> Double-> Bool]-> Int-> String-> [String]
+timestamp :: ((Index,Count)-> Index)-> Criteria-> Int-> String-> [String]
 timestamp accessor method n csv =
                    decrescendosFulfilling method n csv
                 >$ accessor

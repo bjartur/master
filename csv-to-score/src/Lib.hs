@@ -1,16 +1,19 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (belowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, average, range, abrupt, reversal, baselines, indexBefore, indexOfEndOf, indexAfter, Count, Index, (>$), (>>$)) where
+module Lib (belowBaseline, dipWayBelowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, mean, range, abrupt, reversal, baselines, indexBefore, indexOfEndOf, indexAfter, {-variance,-} Count, Criteria, Index, (>$), (>>$)) where
 
 import Control.Applicative (liftA2)
 import Control.Arrow ((>>>))
 import Data.Function ((&), on)
 import Data.List.Safe ((!!))
+import Data.Maybe (fromJust)
 import Prelude hiding ((!!))
 
 type Index = Int -- nonnegative
 type Count = Int -- positive
 --type Debt  = Int -- impositive
+
+type Criteria = [[Double]-> (Index,Count)-> [Double]-> Bool]
 
 -- inclusive
 range :: Index-> Index-> [a]-> [a]
@@ -20,8 +23,8 @@ range beginning end = drop beginning
                    count :: Count
                    count = end - beginning + 1
 
-average :: [Double]-> Double
-average list = sum list / (fromIntegral.length) list
+mean :: [Double]-> Double
+mean list = sum list / (fromIntegral.length) list
 
 -- The output list is one element shorter than the input list.
 -- For each overlapping pair of adjacent numbers in the input list,
@@ -83,16 +86,21 @@ risesLongerThanThree list = [ (index,count) | (index, count) <- rises list, coun
 declinesLongerThanThree :: [Double]-> [(Index,Count)]
 declinesLongerThanThree list = [ (index,count) | (index, count) <- declines list, count >= 3]
 
-judge :: [[Double]-> (Index,Count)-> Double-> Bool]-> Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
+nonZero  :: [Double]-> (Index,Count)-> [Double]-> Bool
+nonZero pressures decrescendo _ =
+    map (pressures !!) [indexOfStartOf decrescendo..indexOfEndOf decrescendo]
+ & map fromJust & not.elem 0
+
+judge :: Criteria-> Int-> [Double]-> [(Index,Count)]-> [(Index,Count)]
 judge additional_critera n pressures all_candidates = let
     nonEmpty (_, count) _ = 0 < count
-    criteria = nonEmpty : (additional_critera <*> [pressures])
+    criteria = nonEmpty : (nonZero : additional_critera <*> [pressures])
 
     continue :: [(Index,Count)]-> Index-> [(Index,Count)]
     continue [] _ = []
     continue (candidate:candidates) startOfBaseline = do
-      let reference = range startOfBaseline (indexBefore candidate) pressures & average
-      if and (criteria <*> [candidate] <*> [reference])
+      let baseline = range startOfBaseline (indexBefore candidate) pressures
+      if and (criteria <*> [candidate] <*> [baseline])
       then candidate : continue candidates (indexAfter candidate)
       else do
         let (index, count) = candidate
@@ -102,19 +110,28 @@ judge additional_critera n pressures all_candidates = let
  in
     continue all_candidates 0
 
-belowBaseline :: [Double]-> (Index,Count)-> Double-> Bool
-belowBaseline pressures (index,count) reference = all (reference >) (pressures & drop (index+1) & take count)
+--variance :: [Double] -> Double
+--variance numbers = numbers >$ (+ (- mean numbers)) >$ (\difference-> difference*difference) & mean
 
-abrupt :: [Double]-> (Index,Count)-> Double-> Bool
-abrupt pressures decrescendo reference = do
+dipWayBelowBaseline :: [Double]-> (Index,Count)-> [Double]-> Bool
+dipWayBelowBaseline pressures candidate baseline= do
+       let peak = fromJust (pressures !! indexOfEndOf candidate)
+       peak < mean baseline
+       -- && variance baseline <= 81 * (mean baseline - peak) ^ (2::Int)
+
+belowBaseline :: [Double]-> (Index,Count)-> [Double]-> Bool
+belowBaseline pressures (index,count) baseline = all (mean baseline >) (pressures & drop (index+1) & take count)
+
+abrupt :: [Double]-> (Index,Count)-> [Double]-> Bool
+abrupt pressures decrescendo baseline = do
        let pressure = pressures !! indexAfter decrescendo
-       maybe False (reference <) pressure
+       maybe False (mean baseline <) pressure
 
-reversal :: [Double]-> (Index,Count)-> Double-> Bool
-reversal pressures decrescendo reference = do
+reversal :: [Double]-> (Index,Count)-> [Double]-> Bool
+reversal pressures decrescendo _ = do
        let after = indexAfter decrescendo
        let pressure = on (liftA2 max) (pressures !!) after (after+1)
-       maybe False (reference <) pressure
+       maybe False ((pressures !! (after - 3) & fromJust) <) pressure
 
 baselines :: [Double]-> [(Index,Count)]-> [Double]
 baselines pressures candidates = let
@@ -124,7 +141,7 @@ baselines pressures candidates = let
     in
             selectors
          >$ ($ pressures)
-         >$ average
+         >$ mean
 
 indexBefore :: (Index,Count)-> Index
 indexBefore =      fst

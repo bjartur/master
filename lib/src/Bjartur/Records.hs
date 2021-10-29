@@ -52,7 +52,7 @@ autoscores = do
         "../csv-to-score/output/unabrupt/10sec/"
         :
         ["../csv-to-score/output/"]
-        +/+ ["baseline", "baserev", "complex"]
+        +/+ ["unabrupt", "abrupt", "complex"]
         +/+ map pure ['2'..'5']
   forM expandedPaths score
 
