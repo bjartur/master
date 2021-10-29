@@ -1,31 +1,31 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 18852763627530c0d5a56e67c839389e8b03008a31b3b5d7fee70a5605688564
+-- hash: c2e2a34105750886572f9a6f48f8e467ccc97ef18d33a2b0cabb7d0367391981
 
 name:           plot
 version:        0.1.0.0
-homepage:       https://github.com/bjartur/Master/tree/master/plot#readme
-bug-reports:    https://github.com/bjartur/Master/tree/master/plot/issues
+homepage:       https://github.com/bjartur/Master#readme
+bug-reports:    https://github.com/bjartur/Master/issues
 author:         Bjartur Thorlacius
 maintainer:     bjt9@hi.is
-copyright:      Copyright (c) 2018–2020 Bjartur Thorlacius
+copyright:      Copyright (c) 2018–2021 Bjartur Thorlacius
 build-type:     Simple
 
 source-repository head
   type: git
-  location: https://github.com/bjartur/Master/tree/master/plot
+  location: https://github.com/bjartur/Master
+  subdir: plot
 
 executable plot
   main-is: Main.hs
   other-modules:
-      Wilcoxon
       Paths_plot
   hs-source-dirs:
-      ./.
+      ./
   build-depends:
       base >=4.12.0.0 && <4.14
     , bjartur-lib

@@ -2,6 +2,7 @@ import Control.Applicative( liftA2 )
 import Control.Lens.Operators( (&~) )
 import Control.Lens.Setter( (.=), mapped, over, set )
 import Control.Lens.Tuple( _2 )
+import Control.Monad( forM_ )
 import Data.Char( toUpper )
 import Data.Colour( Colour )
 import Data.Colour.Names( black, brown, pink, red, white, yellow )
@@ -25,6 +26,7 @@ import Plots.Types.HeatMap( heatMap' )
 import Statistics.Correlation.Kendall( kendall )
 import System.FilePath( takeBaseName )
 
+import Bjartur( numberOfPatterns )
 import Bjartur.Records
 
 kendallTable:: [(String, [PathLines])]-> String
@@ -51,7 +53,7 @@ formatPercentage number = ((number*100 & round :: Int) & show) ++ "%"
 tabulate:: String-> [(String, Double, String)]-> String
 tabulate title kendalls=
   map toUpper title ++ "\n" ++ let
-    rowLengths = [14-1, 14-2 .. 1]
+    rowLengths = [numberOfPatterns-1, numberOfPatterns-2 .. 1]
     keepsAndSkips = if length kendalls /= sum rowLengths
       then error("Miscalculation: expected " ++ show (sum rowLengths) ++ " coefficients, but found " ++ show (length kendalls) ++ "!")
       else zip rowLengths (inits rowLengths <&> sum) ::[(Int, Int)]
@@ -100,7 +102,7 @@ plot colours distributions=
     heatMap' (distributions <&> snd)
 
 raw:: [(String, [Double])]-> Diagram SVG
-raw= plot [(0,white), (1/3, pink), (2/3, red), (1,brown)]
+raw= plot [(0,white), (1,black)]
 
 logscale:: [(String, [Double])]-> Diagram SVG
 logscale= over (mapped._2.mapped) (logBase 10) <&> plot [(0,white), (1/3, pink), (2/3, red), (1,brown)]
@@ -132,15 +134,16 @@ arrange=  descending sensitivity
 
 main:: IO ()
 main= do
+  let mean xs = sum xs / (length xs & fromIntegral)
   heats <- numbers <&> tally <&> arrange :: IO [(String, [Double])]
-  putStrLn"SENSITIVITY"
-  putStrLn"The number of minutes between esophageal crescendos, by criteria"
-  over (mapped._2) ((60 *) . (tst "total" /) . sum) heats & mapM_ (\(label, meanInterval)-> label ++ "\t" ++ show meanInterval & putStrLn)
+  putStrLn"RATE"
+  putStrLn"The hourly rate of esophageal crescendos, by criteria"
+  let rate = over (mapped._2) (sum <&> (/tst "total")) heats
+  forM_ rate (\(label, meanInterval)-> label ++ "\t" ++ show meanInterval & putStrLn)
   putStrLn""
   putStrLn"TALLY OF PES CRESCENDOS"
   transposeLabeled heats <&> severity & print
   putStrLn""
-  let mean xs = sum xs / (length xs & fromIntegral)
   putStrLn . ("Mean Kendall's rank correlation:\t"++)
     =<< (numbers <&> pairs <&> map (\(_,x,_)->x) <&> mean <&> formatPercentage)
   mapM_(kendallTable <$> numbers >>=) [putStr, writeFile"../kendall.rank.coefficients.txt"]

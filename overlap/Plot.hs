@@ -2,6 +2,7 @@ module Plot (formatPercentage, renderOverlaps, renderBarPlot) where
 
 import Control.Applicative( liftA2 )
 import Control.Lens.Operators( (&~), (.=) )
+import Data.Colour.Names( black, white )
 import Data.Function( (&), on )
 import Data.Functor( (<&>) )
 import Data.Functor.Identity( Identity(Identity) )
@@ -19,6 +20,7 @@ import Plots.Axis.Ticks( hideTicks, minorTicks )
 import Plots.Types ( key, visible )
 import Plots.Axis( xAxis, yAxis )
 import Plots.Axis.Render( renderAxis )
+import Plots.Style( ColourMap, axisColourMap, axisStyle, blackAndWhite, colourMap, infColour, negInfColour )
 
 import Bjartur.Time( DateTime )
 import Histogram( combineHistograms, discreteHistogram )
@@ -79,6 +81,7 @@ drawBarPlot agreements = do
         hideGridLines
         xAxis . minorTicks . visible .= False
         xAxis . tickLabelFunction .= atMajorTicks (show . (round :: Double-> Int))
+        axisStyle .= blackAndWhite
         bars <&> fmap (fromIntegral<&>(/(60*60))) & namedBarPlot'
       &  (&~) r2Axis & renderAxis -- (&~) returns the final state after drawing the namedBarPlot'
 
