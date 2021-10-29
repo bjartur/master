@@ -10,7 +10,7 @@ from extract import extract
 def middle_of(period: cm.Period) -> datetime:
     return get_python_date(period.From) + (get_python_date(period.To) - get_python_date(period.From))/2;
 
-def nadir(pes_header: cm.ISignal, n: int, accumulator: Optional[float], recent_expiration: float, period: cm.Period) -> Tuple[datetime, float]:
+def nadir(pes_header: cm.ISignal, n: int, accumulator: Optional[float], recent_expiration: float, period: cm.Period) -> Tuple[Tuple[datetime, float], float, float]:
     data = [effort for effort in get_data_for_period(pes_header, period) if effort != 0e1];
     greatest_effort = max(data);
     expiration = min(data);
@@ -27,8 +27,23 @@ def nadir(pes_header: cm.ISignal, n: int, accumulator: Optional[float], recent_e
 def zero(period: cm.Period) -> Tuple[datetime, float]:
     return middle_of(period), 0e1
 
-def split_recording_into_breaths(recording: Recording, signal: cm.ISignal) -> List[Tuple[datetime, float]]:
-    #movements = recording.get_special_events("Activity");
+def drop(until, markers: List[cm.Marker]):
+    while len(markers) > 0 and markers[0].Period.get_To() < until:
+        markers.pop(0);
+
+def exclude_next_breath(input_breaths: List[cm.Periods], output_pressures: List[Tuple[datetime, float]]):
+    output_pressures.append(zero(input_breaths.pop(0)));
+
+def is_next_breath_before(input_breaths: List[cm.Periods], until):
+    return len(input_breaths) > 0 and input_breaths[0].get_From() < until;
+
+def excluder(input_breaths: List[cm.Periods], output_pressures: List[Tuple[datetime, float]]):
+    def exclude(until):
+        while is_next_breath_before(input_breaths=input_breaths, until=until):
+            exclude_next_breath(input_breaths=input_breaths, output_pressures=output_pressures);
+    return exclude;
+
+def split_recording_into_breaths(recording: Recording, signal: cm.ISignal) -> ndarray:
     # PES 3 (or RIP Sum) results in way to short 'breaths'.
     # RIP Sum couldn't be expected to indicate breathing efforts during paradoxical movements, anyway.
     # Thorax is much better, but joins some breaths when the Thorax is almost still.
