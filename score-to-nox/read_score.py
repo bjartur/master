@@ -8,7 +8,7 @@ from sys import stderr
 from os import path
 
 def mark_events(recording: Recording, score: str, signal='PES 3', log=False):
-    with open(score, 'r', encoding='ascii') as lines:
+    with open(file=score, mode='r', encoding='ascii') as lines:
 
         for line in lines:
             row = line.strip().split(',')
