@@ -56,21 +56,38 @@ def split_recording_into_breaths(recording: Recording, signal: cm.ISignal) -> nd
     recent_expiration = float('-inf');
 
     epochs = recording.get_sleep_events();
+    movements = recording.get_special_events("Activity");
+    exclude = excluder(input_breaths=breaths, output_pressures=breaths_during_sleep);
     while len(breaths) > 0:
-        while epochs[0].Period.get_To() < breaths[0].get_From():
-            epochs.pop(0);
-
-        while len(breaths) > 0 and breaths[0].get_From() < epochs[0].Period.get_From():
-            # no sleep-wake stage scored
-            breaths_during_sleep.append(zero(breaths.pop(0)));
+        # I := breaths is a chronological list of a breath or consecutive breaths in the analysis period, ...
+        #  ... breaths_during_sleep is empty or a chronological list of the breaths preceding those in breaths, ...
+        #  ... all breaths in breaths_during_sleep are either from epochs labeled as sleep and ...
+        #  ... have pressure data available, or ...
+        #  ... have their pressure reported as positive zero (no less and no more).
+        drop(until=breaths[0].get_From(), markers=epochs);
+        # I and epochs[0] starts at the same time or later than breaths[0] (either labeled sleep or labeled as wake).
+        exclude(until=epochs[0].Period.get_From()); # crashes if the last breaths have not be sleep-wake staged
+        # I and breaths[0] is in epochs[0], which is either labeled as sleep or labeled as wake.
 
         if epochs[0].get_Key().Type.__str__() == 'sleep-wake':
-            while len(breaths) > 0 and breaths[0].get_From() < epochs[0].Period.get_To():
-                breaths_during_sleep.append(zero(breaths.pop(0)));
+            exclude(until=epochs[0].Period.get_To());
+            # epochs[0] is labeled as wake and I.
         else:
-            while len(breaths) > 0 and breaths[0].get_From() < epochs[0].Period.get_To():
-                breath, swing, recent_expiration = nadir(pes_header=pes_header, n=len(breaths_during_sleep), accumulator=swing, recent_expiration=recent_expiration, period=breaths.pop(0));
-                breaths_during_sleep.append(breath);
+            # I and S := breaths[0] is in epochs[0] and epochs[0] is labeled as sleep.
+            while is_next_breath_before(breaths, epochs[0].Period.get_To()):
+                # I and S
+                drop(until=breaths[0].get_From(), markers=movements);
+                # I, S, and movements is empty or movements[0] starts at the same or later than the next breath.
+                if 0 == len(movements) or breaths[0].get_To() < movements[0].Period.get_From():
+                    # I, S, and movements is empty or breaths[0] ends before movements[0] begins.
+                    breath, swing, recent_expiration = nadir(pes_header=pes_header, n=len(breaths_during_sleep), accumulator=swing, recent_expiration=recent_expiration, period=breaths.pop(0));
+                    breaths_during_sleep.append(breath);
+                else:
+                    # I, S, and movements[0] starts during the next breath.
+                    exclude(until=movements[0].Period.get_To());
+                    # I and movements[0] ends at the same time as breaths[0] or later.
+                    if len(breaths) > 0 and movements[0].Period.get_To() == breaths[0].get_To():
+                        exclude_next_breath(breaths, breaths_during_sleep);
         epochs.pop(0);
 
     return array(breaths_during_sleep);
