@@ -1,6 +1,6 @@
 {-# LANGUAGE Safe #-}
 
-module Lib (belowBaseline, dipWayBelowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, mean, range, abrupt, reversal, baselines, indexBefore, indexOfEndOf, indexAfter, {-variance,-} Count, Criteria, Index, (>$), (>>$)) where
+module Lib (belowBaseline, dipWayBelowBaseline, increasing, decreasing, judge, spans, rises, declines, risesLongerThan, declinesLongerThan, risesLongerThanThree, declinesLongerThanThree, mean, range, abrupt, reversal, indexBefore, indexOfEndOf, indexAfter, {-variance,-} Count, Criteria, Index, (>$), (>>$)) where
 
 import Control.Applicative (liftA2)
 import Control.Arrow ((>>>))
@@ -99,7 +99,7 @@ judge additional_critera n pressures all_candidates = let
     continue :: [(Index,Count)]-> Index-> [(Index,Count)]
     continue [] _ = []
     continue (candidate:candidates) startOfBaseline = do
-      let baseline = range startOfBaseline (indexBefore candidate) pressures
+      let baseline = range startOfBaseline (indexBefore candidate) pressures & filter (/= 0)
       if and (criteria <*> [candidate] <*> [baseline])
       then candidate : continue candidates (indexAfter candidate)
       else do
@@ -132,16 +132,6 @@ reversal pressures decrescendo _ = do
        let after = indexAfter decrescendo
        let pressure = on (liftA2 max) (pressures !!) after (after+1)
        maybe False ((pressures !! (after - 3) & fromJust) <) pressure
-
-baselines :: [Double]-> [(Index,Count)]-> [Double]
-baselines pressures candidates = let
-            beforeIndices = candidates >$ indexBefore
-            afterIndices = candidates >$ indexAfter
-            selectors = zipWith range (0:afterIndices) beforeIndices :: [ [Double]-> [Double] ]
-    in
-            selectors
-         >$ ($ pressures)
-         >$ mean
 
 indexBefore :: (Index,Count)-> Index
 indexBefore =      fst

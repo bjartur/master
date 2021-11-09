@@ -1,232 +1,232 @@
 Comparing patterns
 Drawing agreementTotals.svg
-Manual and automatic scoring: intersection: 0 seconds	overlap coefficient: 0 % 1
-Programmatic scoring: intersection: 35 seconds	overlap coefficient: 35 % 82
-without classifier cres10sec (whose mean interval length is 35724 % 2365):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cres2 (whose mean interval length is 11767 % 1096):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cres3 (whose mean interval length is 52316 % 3569):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cres4 (whose mean interval length is 47221 % 2505):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cres5 (whose mean interval length is 20114 % 879):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresabrupt2 (whose mean interval length is 69994 % 6767):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresabrupt3 (whose mean interval length is 19841 % 1359):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresabrupt4 (whose mean interval length is 21126 % 1121):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresabrupt5 (whose mean interval length is 3557 % 155):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresbaseabrupt2 (whose mean interval length is 7649 % 776):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresbaseabrupt3 (whose mean interval length is 1889 % 138):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresbaseabrupt4 (whose mean interval length is 18 % 1):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier cresbaseabrupt5 (whose mean interval length is 41 % 2):	intersection: 0 seconds	overlap coefficient: 0 % 1
-without classifier technologist (whose mean interval length is 69193 % 1493):	intersection: 13 seconds	overlap coefficient: 13 % 82
-without classifier technician (whose mean interval length is 18053 % 681):	intersection: 0 seconds	overlap coefficient: 0 % 1
+Manual and automatic scoring: intersection: 204 seconds	overlap coefficient: 102 % 329
+Programmatic scoring: intersection: 315 seconds	overlap coefficient: 45 % 94
+without classifier cres10sec (whose mean interval length is 95832 % 6379):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cres2 (whose mean interval length is 91343 % 8586):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cres3 (whose mean interval length is 94450 % 6497):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cres4 (whose mean interval length is 42179 % 2253):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cres5 (whose mean interval length is 8976 % 395):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cresabrupt2 (whose mean interval length is 54921 % 5464):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cresabrupt3 (whose mean interval length is 26017 % 1837):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cresabrupt4 (whose mean interval length is 10901 % 588):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cresabrupt5 (whose mean interval length is 157 % 7):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cresbaseabrupt2 (whose mean interval length is 11086 % 1161):	intersection: 207 seconds	overlap coefficient: 207 % 658
+without classifier cresbaseabrupt3 (whose mean interval length is 5576 % 409):	intersection: 204 seconds	overlap coefficient: 102 % 329
+without classifier cresbaseabrupt4 (whose mean interval length is 163 % 9):	intersection: 225 seconds	overlap coefficient: 225 % 658
+without classifier cresbaseabrupt5 (whose mean interval length is 329 % 15):	intersection: 333 seconds	overlap coefficient: 37 % 163
+without classifier technologist (whose mean interval length is 69193 % 1493):	intersection: 245 seconds	overlap coefficient: 35 % 94
+without classifier technician (whose mean interval length is 18053 % 681):	intersection: 204 seconds	overlap coefficient: 102 % 329
 
-left (cres10sec):  0 % 1	jaccard: 107172 % 200039	right (cres2): 92867 % 200039	overlap coefficient: 1 % 1
-left (cres10sec):  13859 % 118491	jaccard: 93313 % 118491	right (cres3): 3773 % 39497	overlap coefficient: 8483 % 9512
-left (cres10sec):  60378 % 107599	jaccard: 46794 % 107599	right (cres4): 427 % 107599	overlap coefficient: 46794 % 47221
-left (cres10sec):  43539 % 53596	jaccard: 10047 % 53596	right (cres5): 5 % 26798	overlap coefficient: 10047 % 10057
-left (cres10sec):  36286 % 71283	jaccard: 17300 % 71283	right (cresabrupt2): 5899 % 23761	overlap coefficient: 17300 % 34997
-left (cres10sec):  35774 % 55615	jaccard: 17812 % 55615	right (cresabrupt3): 2029 % 55615	overlap coefficient: 17812 % 19841
-left (cres10sec):  86263 % 107389	jaccard: 20909 % 107389	right (cresabrupt4): 217 % 107389	overlap coefficient: 2987 % 3018
-left (cres10sec):  96511 % 107182	jaccard: 10661 % 107182	right (cresabrupt5): 5 % 53591	overlap coefficient: 10661 % 10671
-left (cres10sec):  102732 % 110381	jaccard: 4440 % 110381	right (cresbaseabrupt2): 3209 % 110381	overlap coefficient: 4440 % 7649
-left (cres10sec):  105500 % 107389	jaccard: 1672 % 107389	right (cresbaseabrupt3): 217 % 107389	overlap coefficient: 1672 % 1889
-left (cres10sec):  106751 % 107201	jaccard: 421 % 107201	right (cresbaseabrupt4): 29 % 107201	overlap coefficient: 421 % 450
-left (cres10sec):  53545 % 53586	jaccard: 41 % 53586	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres10sec):  83611 % 152804	jaccard: 23561 % 152804	right (technologist): 11408 % 38201	overlap coefficient: 23561 % 69193
-left (cres10sec):  20290 % 38343	jaccard: 6503 % 38343	right (technician): 3850 % 12781	overlap coefficient: 929 % 2579
-left (cres2):  2327 % 4879	jaccard: 2552 % 4879	right (cres3): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  152818 % 200039	jaccard: 47221 % 200039	right (cres4): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  179925 % 200039	jaccard: 20114 % 200039	right (cres5): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  130045 % 200039	jaccard: 69994 % 200039	right (cresabrupt2): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  160357 % 200039	jaccard: 39682 % 200039	right (cresabrupt3): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  25559 % 28577	jaccard: 3018 % 28577	right (cresabrupt4): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  189368 % 200039	jaccard: 10671 % 200039	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  192390 % 200039	jaccard: 7649 % 200039	right (cresbaseabrupt2): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  198150 % 200039	jaccard: 1889 % 200039	right (cresbaseabrupt3): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  199589 % 200039	jaccard: 450 % 200039	right (cresbaseabrupt4): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  4877 % 4879	jaccard: 2 % 4879	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres2):  167398 % 236591	jaccard: 32641 % 236591	right (technologist): 36552 % 236591	overlap coefficient: 32641 % 69193
-left (cres2):  40636 % 58689	jaccard: 37495 % 234756	right (technician): 34717 % 234756	overlap coefficient: 37495 % 72212
-left (cres3):  57411 % 104632	jaccard: 47221 % 104632	right (cres4): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  42259 % 52316	jaccard: 10057 % 52316	right (cres5): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  71949 % 141943	jaccard: 32683 % 141943	right (cresabrupt2): 37311 % 141943	overlap coefficient: 32683 % 69994
-left (cres3):  32475 % 52316	jaccard: 19841 % 52316	right (cresabrupt3): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  41753 % 52316	jaccard: 10563 % 52316	right (cresabrupt4): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  93961 % 104632	jaccard: 10671 % 104632	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  100537 % 108186	jaccard: 105 % 2774	right (cresbaseabrupt2): 1777 % 54093	overlap coefficient: 4095 % 7649
-left (cres3):  102743 % 104632	jaccard: 1889 % 104632	right (cresbaseabrupt3): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  52091 % 52316	jaccard: 225 % 52316	right (cresbaseabrupt4): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  1275 % 1276	jaccard: 1 % 1276	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres3):  81103 % 150296	jaccard: 23529 % 150296	right (technologist): 5708 % 18787	overlap coefficient: 23529 % 69193
-left (cres3):  77967 % 150179	jaccard: 26665 % 150179	right (technician): 45547 % 150179	overlap coefficient: 26665 % 72212
-left (cres4):  27107 % 47221	jaccard: 20114 % 47221	right (cres5): 0 % 1	overlap coefficient: 1 % 1
-left (cres4):  33705 % 103699	jaccard: 13516 % 103699	right (cresabrupt2): 56478 % 103699	overlap coefficient: 13516 % 47221
-left (cres4):  30357 % 70039	jaccard: 16864 % 70039	right (cresabrupt3): 22818 % 70039	overlap coefficient: 8432 % 19841
-left (cres4):  26095 % 47221	jaccard: 21126 % 47221	right (cresabrupt4): 0 % 1	overlap coefficient: 1 % 1
-left (cres4):  36550 % 47221	jaccard: 10671 % 47221	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres4):  45668 % 53317	jaccard: 1553 % 53317	right (cresbaseabrupt2): 6096 % 53317	overlap coefficient: 1553 % 7649
-left (cres4):  46441 % 48330	jaccard: 26 % 1611	right (cresbaseabrupt3): 1109 % 48330	overlap coefficient: 780 % 1889
-left (cres4):  46771 % 47221	jaccard: 450 % 47221	right (cresbaseabrupt4): 0 % 1	overlap coefficient: 1 % 1
-left (cres4):  47139 % 47221	jaccard: 82 % 47221	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres4):  33515 % 102708	jaccard: 6853 % 51354	right (technologist): 55487 % 102708	overlap coefficient: 13706 % 47221
-left (cres4):  31687 % 103899	jaccard: 5178 % 34633	right (technician): 56678 % 103899	overlap coefficient: 15534 % 47221
-left (cres5):  14617 % 84611	jaccard: 5497 % 84611	right (cresabrupt2): 64497 % 84611	overlap coefficient: 5497 % 20114
-left (cres5):  6755 % 26596	jaccard: 1651 % 13298	right (cresabrupt3): 16539 % 26596	overlap coefficient: 3302 % 10057
-left (cres5):  3889 % 10931	jaccard: 8447 % 32793	right (cresabrupt4): 12679 % 32793	overlap coefficient: 8447 % 20114
-left (cres5):  9443 % 20114	jaccard: 10671 % 20114	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres5):  19492 % 27141	jaccard: 622 % 27141	right (cresbaseabrupt2): 7027 % 27141	overlap coefficient: 622 % 7649
-left (cres5):  19829 % 21718	jaccard: 285 % 21718	right (cresbaseabrupt3): 802 % 10859	overlap coefficient: 285 % 1889
-left (cres5):  3979 % 4069	jaccard: 219 % 20345	right (cresbaseabrupt4): 231 % 20345	overlap coefficient: 73 % 150
-left (cres5):  10016 % 10057	jaccard: 41 % 10057	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cres5):  12600 % 81793	jaccard: 7514 % 81793	right (technologist): 61679 % 81793	overlap coefficient: 3757 % 10057
-left (cres5):  12077 % 84289	jaccard: 8037 % 84289	right (technician): 64175 % 84289	overlap coefficient: 8037 % 20114
-left (cresabrupt2):  20312 % 40153	jaccard: 14685 % 40153	right (cresabrupt3): 5156 % 40153	overlap coefficient: 14685 % 19841
-left (cresabrupt2):  9678 % 13199	jaccard: 89 % 591	right (cresabrupt4): 4600 % 39597	overlap coefficient: 5963 % 10563
-left (cresabrupt2):  21693 % 25250	jaccard: 983 % 15150	right (cresabrupt5): 2878 % 37875	overlap coefficient: 4915 % 10671
-left (cresabrupt2):  63711 % 71360	jaccard: 6283 % 71360	right (cresbaseabrupt2): 683 % 35680	overlap coefficient: 6283 % 7649
-left (cresabrupt2):  68603 % 70492	jaccard: 1391 % 70492	right (cresbaseabrupt3): 249 % 35246	overlap coefficient: 1391 % 1889
-left (cresabrupt2):  69601 % 70051	jaccard: 393 % 70051	right (cresbaseabrupt4): 57 % 70051	overlap coefficient: 131 % 150
-left (cresabrupt2):  34956 % 34997	jaccard: 41 % 34997	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cresabrupt2):  62404 % 131597	jaccard: 7590 % 131597	right (technologist): 61603 % 131597	overlap coefficient: 7590 % 69193
-left (cresabrupt2):  14725 % 32778	jaccard: 1849 % 21852	right (technician): 30559 % 65556	overlap coefficient: 5547 % 34997
-left (cresabrupt3):  24095 % 45221	jaccard: 1417 % 4111	right (cresabrupt4): 5539 % 45221	overlap coefficient: 15587 % 21126
-left (cresabrupt3):  11198 % 14755	jaccard: 6088 % 44265	right (cresabrupt5): 4583 % 44265	overlap coefficient: 6088 % 10671
-left (cresabrupt3):  36512 % 44161	jaccard: 3170 % 44161	right (cresbaseabrupt2): 4479 % 44161	overlap coefficient: 3170 % 7649
-left (cresabrupt3):  38226 % 40115	jaccard: 1456 % 40115	right (cresbaseabrupt3): 433 % 40115	overlap coefficient: 1456 % 1889
-left (cresabrupt3):  4369 % 4419	jaccard: 361 % 39771	right (cresbaseabrupt4): 89 % 39771	overlap coefficient: 361 % 450
-left (cresabrupt3):  19800 % 19841	jaccard: 41 % 19841	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cresabrupt3):  33306 % 102499	jaccard: 6376 % 102499	right (technologist): 62817 % 102499	overlap coefficient: 3188 % 19841
-left (cresabrupt3):  30407 % 102619	jaccard: 9275 % 102619	right (technician): 62937 % 102619	overlap coefficient: 9275 % 39682
-left (cresabrupt4):  12985 % 23656	jaccard: 8141 % 23656	right (cresabrupt5): 1265 % 11828	overlap coefficient: 8141 % 10671
-left (cresabrupt4):  20037 % 27686	jaccard: 1089 % 27686	right (cresbaseabrupt2): 3280 % 13843	overlap coefficient: 1089 % 7649
-left (cresabrupt4):  20657 % 22546	jaccard: 469 % 22546	right (cresbaseabrupt3): 710 % 11273	overlap coefficient: 469 % 1889
-left (cresabrupt4):  10396 % 10621	jaccard: 167 % 10621	right (cresbaseabrupt4): 58 % 10621	overlap coefficient: 167 % 225
-left (cresabrupt4):  10522 % 10563	jaccard: 41 % 10563	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cresabrupt4):  16332 % 85525	jaccard: 4794 % 85525	right (technologist): 64399 % 85525	overlap coefficient: 799 % 3521
-left (cresabrupt4):  3599 % 21652	jaccard: 3365 % 43304	right (technician): 32741 % 43304	overlap coefficient: 3365 % 10563
-left (cresabrupt5):  10195 % 17844	jaccard: 119 % 4461	right (cresbaseabrupt2): 2391 % 5948	overlap coefficient: 476 % 7649
-left (cresabrupt5):  10461 % 12350	jaccard: 21 % 1235	right (cresbaseabrupt3): 1679 % 12350	overlap coefficient: 210 % 1889
-left (cresabrupt5):  5249 % 5474	jaccard: 173 % 10948	right (cresbaseabrupt4): 277 % 10948	overlap coefficient: 173 % 450
-left (cresabrupt5):  10589 % 10671	jaccard: 82 % 10671	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cresabrupt5):  7335 % 76528	jaccard: 417 % 9566	right (technologist): 65857 % 76528	overlap coefficient: 1112 % 3557
-left (cresabrupt5):  236 % 2815	jaccard: 4063 % 78820	right (technician): 68149 % 78820	overlap coefficient: 4063 % 10671
-left (cresbaseabrupt2):  6347 % 8236	jaccard: 651 % 4118	right (cresbaseabrupt3): 587 % 8236	overlap coefficient: 1302 % 1889
-left (cresbaseabrupt2):  7339 % 7789	jaccard: 310 % 7789	right (cresbaseabrupt4): 140 % 7789	overlap coefficient: 31 % 45
-left (cresbaseabrupt2):  3795 % 3836	jaccard: 59 % 7672	right (cresbaseabrupt5): 23 % 7672	overlap coefficient: 59 % 82
-left (cresbaseabrupt2):  5939 % 75132	jaccard: 95 % 4174	right (technologist): 67483 % 75132	overlap coefficient: 1710 % 7649
-left (cresbaseabrupt2):  865 % 11181	jaccard: 1594 % 78267	right (technician): 70618 % 78267	overlap coefficient: 1594 % 7649
-left (cresbaseabrupt3):  274 % 349	jaccard: 245 % 2094	right (cresbaseabrupt4): 205 % 2094	overlap coefficient: 49 % 90
-left (cresbaseabrupt3):  927 % 968	jaccard: 35 % 1936	right (cresbaseabrupt5): 47 % 1936	overlap coefficient: 35 % 82
-left (cresbaseabrupt3):  1243 % 70436	jaccard: 323 % 35218	right (technologist): 68547 % 70436	overlap coefficient: 646 % 1889
-left (cresbaseabrupt3):  1293 % 73505	jaccard: 596 % 73505	right (technician): 71616 % 73505	overlap coefficient: 596 % 1889
-left (cresbaseabrupt4):  184 % 225	jaccard: 41 % 225	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
-left (cresbaseabrupt4):  273 % 69466	jaccard: 177 % 69466	right (technologist): 34508 % 34733	overlap coefficient: 59 % 150
-left (cresbaseabrupt4):  75 % 18128	jaccard: 75 % 36256	right (technician): 36031 % 36256	overlap coefficient: 1 % 3
-left (cresbaseabrupt5):  58 % 69251	jaccard: 24 % 69251	right (technologist): 69169 % 69251	overlap coefficient: 12 % 41
-left (cresbaseabrupt5):  69 % 72281	jaccard: 13 % 72281	right (technician): 72199 % 72281	overlap coefficient: 13 % 82
+left (cres10sec):  0 % 1	jaccard: 47916 % 91343	right (cres2): 43427 % 91343	overlap coefficient: 1 % 1
+left (cres10sec):  5932 % 53157	jaccard: 41984 % 53157	right (cres3): 1747 % 17719	overlap coefficient: 41984 % 47225
+left (cres10sec):  54021 % 96200	jaccard: 41811 % 96200	right (cres4): 46 % 12025	overlap coefficient: 41811 % 42179
+left (cres10sec):  19475 % 23963	jaccard: 4483 % 23963	right (cres5): 5 % 23963	overlap coefficient: 4483 % 4488
+left (cres10sec):  23564 % 41871	jaccard: 8380 % 41871	right (cresabrupt2): 3309 % 13957	overlap coefficient: 8380 % 18307
+left (cres10sec):  72980 % 98997	jaccard: 22852 % 98997	right (cresabrupt3): 1055 % 32999	overlap coefficient: 22852 % 26017
+left (cres10sec):  85050 % 95951	jaccard: 10782 % 95951	right (cresabrupt4): 119 % 95951	overlap coefficient: 10782 % 10901
+left (cres10sec):  90965 % 95832	jaccard: 4867 % 95832	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres10sec):  84907 % 107079	jaccard: 10925 % 107079	right (cresbaseabrupt2): 3749 % 35693	overlap coefficient: 475 % 964
+left (cres10sec):  90907 % 96483	jaccard: 4925 % 96483	right (cresbaseabrupt3): 217 % 32161	overlap coefficient: 4925 % 5576
+left (cres10sec):  31468 % 31957	jaccard: 476 % 31957	right (cresbaseabrupt4): 13 % 31957	overlap coefficient: 476 % 489
+left (cres10sec):  47587 % 47916	jaccard: 329 % 47916	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres10sec):  75881 % 145074	jaccard: 19951 % 145074	right (technologist): 8207 % 24179	overlap coefficient: 19951 % 69193
+left (cres10sec):  5265 % 10423	jaccard: 11061 % 72961	right (technician): 25045 % 72961	overlap coefficient: 11061 % 36106
+left (cres2):  44118 % 91343	jaccard: 47225 % 91343	right (cres3): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  140507 % 182686	jaccard: 42179 % 182686	right (cres4): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  82367 % 91343	jaccard: 8976 % 91343	right (cres5): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  127765 % 182686	jaccard: 54921 % 182686	right (cresabrupt2): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  156669 % 182686	jaccard: 26017 % 182686	right (cresabrupt3): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  171785 % 182686	jaccard: 10901 % 182686	right (cresabrupt4): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  177819 % 182686	jaccard: 4867 % 182686	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  80257 % 91343	jaccard: 11086 % 91343	right (cresbaseabrupt2): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  88555 % 91343	jaccard: 2788 % 91343	right (cresbaseabrupt3): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  181219 % 182686	jaccard: 1467 % 182686	right (cresbaseabrupt4): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  13002 % 13049	jaccard: 47 % 13049	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres2):  155050 % 224243	jaccard: 27636 % 224243	right (technologist): 41557 % 224243	overlap coefficient: 27636 % 69193
+left (cres2):  150369 % 222581	jaccard: 1901 % 13093	right (technician): 39895 % 222581	overlap coefficient: 32317 % 72212
+left (cres3):  52271 % 94450	jaccard: 42179 % 94450	right (cres4): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  38249 % 47225	jaccard: 8976 % 47225	right (cres5): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  70156 % 125077	jaccard: 24294 % 125077	right (cresabrupt2): 30627 % 125077	overlap coefficient: 8098 % 18307
+left (cres3):  68433 % 94450	jaccard: 26017 % 94450	right (cresabrupt3): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  83549 % 94450	jaccard: 10901 % 94450	right (cresabrupt4): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  89583 % 94450	jaccard: 4867 % 94450	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  83643 % 105815	jaccard: 10807 % 105815	right (cresbaseabrupt2): 2273 % 21163	overlap coefficient: 10807 % 22172
+left (cres3):  44437 % 47225	jaccard: 2788 % 47225	right (cresbaseabrupt3): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  92983 % 94450	jaccard: 1467 % 94450	right (cresbaseabrupt4): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  46896 % 47225	jaccard: 329 % 47225	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres3):  74515 % 143708	jaccard: 19935 % 143708	right (technologist): 24629 % 71854	overlap coefficient: 19935 % 69193
+left (cres3):  17900 % 35953	jaccard: 11425 % 71906	right (technician): 24681 % 71906	overlap coefficient: 11425 % 36106
+left (cres4):  24227 % 42179	jaccard: 17952 % 42179	right (cres5): 0 % 1	overlap coefficient: 1 % 1
+left (cres4):  32825 % 87746	jaccard: 4677 % 43873	right (cresabrupt2): 45567 % 87746	overlap coefficient: 9354 % 42179
+left (cres4):  31791 % 57808	jaccard: 2597 % 14452	right (cresabrupt3): 15629 % 57808	overlap coefficient: 10388 % 26017
+left (cres4):  31278 % 42179	jaccard: 10901 % 42179	right (cresabrupt4): 0 % 1	overlap coefficient: 1 % 1
+left (cres4):  37312 % 42179	jaccard: 4867 % 42179	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres4):  18799 % 29885	jaccard: 4581 % 59770	right (cresbaseabrupt2): 17591 % 59770	overlap coefficient: 4581 % 22172
+left (cres4):  19759 % 22547	jaccard: 2661 % 45094	right (cresbaseabrupt3): 2915 % 45094	overlap coefficient: 2661 % 5576
+left (cres4):  40712 % 42179	jaccard: 1467 % 42179	right (cresbaseabrupt4): 0 % 1	overlap coefficient: 1 % 1
+left (cres4):  41521 % 42179	jaccard: 658 % 42179	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres4):  30529 % 99722	jaccard: 5825 % 49861	right (technologist): 57543 % 99722	overlap coefficient: 11650 % 42179
+left (cres4):  14523 % 50629	jaccard: 13133 % 101258	right (technician): 59079 % 101258	overlap coefficient: 13133 % 42179
+left (cres5):  14348 % 69269	jaccard: 3604 % 69269	right (cresabrupt2): 51317 % 69269	overlap coefficient: 53 % 264
+left (cres5):  14305 % 40322	jaccard: 3647 % 40322	right (cresabrupt3): 11185 % 20161	overlap coefficient: 3647 % 17952
+left (cres5):  13852 % 24753	jaccard: 4100 % 24753	right (cresabrupt4): 2267 % 8251	overlap coefficient: 4100 % 10901
+left (cres5):  13085 % 17952	jaccard: 4867 % 17952	right (cresabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres5):  3997 % 9540	jaccard: 491 % 9540	right (cresbaseabrupt2): 421 % 795	overlap coefficient: 491 % 4488
+left (cres5):  16791 % 22367	jaccard: 1161 % 22367	right (cresbaseabrupt3): 4415 % 22367	overlap coefficient: 1161 % 5576
+left (cres5):  5701 % 6190	jaccard: 283 % 6190	right (cresbaseabrupt4): 103 % 3095	overlap coefficient: 283 % 489
+left (cres5):  8647 % 8976	jaccard: 329 % 8976	right (cresbaseabrupt5): 0 % 1	overlap coefficient: 1 % 1
+left (cres5):  11516 % 80709	jaccard: 6436 % 80709	right (technologist): 20919 % 26903	overlap coefficient: 1609 % 4488
+left (cres5):  785 % 5943	jaccard: 3481 % 41601	right (technician): 10875 % 13867	overlap coefficient: 3481 % 8976
+left (cresabrupt2):  35082 % 61099	jaccard: 19839 % 61099	right (cresabrupt3): 6178 % 61099	overlap coefficient: 19839 % 26017
+left (cresabrupt2):  48083 % 58984	jaccard: 3419 % 29492	right (cresabrupt4): 4063 % 58984	overlap coefficient: 6838 % 10901
+left (cresabrupt2):  52476 % 57343	jaccard: 2445 % 57343	right (cresabrupt5): 2422 % 57343	overlap coefficient: 2445 % 4867
+left (cresabrupt2):  18139 % 29225	jaccard: 18643 % 58450	right (cresbaseabrupt2): 3529 % 58450	overlap coefficient: 18643 % 22172
+left (cresabrupt2):  50713 % 56289	jaccard: 4208 % 56289	right (cresbaseabrupt3): 456 % 18763	overlap coefficient: 526 % 697
+left (cresabrupt2):  17896 % 18385	jaccard: 411 % 18385	right (cresbaseabrupt4): 78 % 18385	overlap coefficient: 137 % 163
+left (cresabrupt2):  54361 % 55019	jaccard: 560 % 55019	right (cresbaseabrupt5): 98 % 55019	overlap coefficient: 40 % 47
+left (cresabrupt2):  49976 % 119169	jaccard: 4945 % 119169	right (technologist): 21416 % 39723	overlap coefficient: 4945 % 54921
+left (cresabrupt2):  47687 % 119899	jaccard: 7234 % 119899	right (technician): 64978 % 119899	overlap coefficient: 7234 % 54921
+left (cresabrupt3):  17471 % 28372	jaccard: 4273 % 14186	right (cresabrupt4): 2355 % 28372	overlap coefficient: 8546 % 10901
+left (cresabrupt3):  23170 % 28037	jaccard: 2847 % 28037	right (cresabrupt5): 2020 % 28037	overlap coefficient: 2847 % 4867
+left (cresabrupt3):  17883 % 40055	jaccard: 8134 % 40055	right (cresbaseabrupt2): 14038 % 40055	overlap coefficient: 4067 % 11086
+left (cresabrupt3):  2684 % 3381	jaccard: 1515 % 9016	right (cresbaseabrupt3): 1031 % 27048	overlap coefficient: 4545 % 5576
+left (cresabrupt3):  24835 % 26302	jaccard: 591 % 13151	right (cresbaseabrupt4): 285 % 26302	overlap coefficient: 394 % 489
+left (cresabrupt3):  25567 % 26225	jaccard: 18 % 1049	right (cresbaseabrupt5): 208 % 26225	overlap coefficient: 225 % 329
+left (cresabrupt3):  22758 % 91951	jaccard: 3259 % 91951	right (technologist): 65934 % 91951	overlap coefficient: 3259 % 26017
+left (cresabrupt3):  20873 % 93085	jaccard: 5144 % 93085	right (technician): 67068 % 93085	overlap coefficient: 5144 % 26017
+left (cresabrupt4):  7234 % 12101	jaccard: 3667 % 12101	right (cresabrupt5): 1200 % 12101	overlap coefficient: 3667 % 4867
+left (cresabrupt4):  3915 % 15001	jaccard: 3071 % 30002	right (cresbaseabrupt2): 19101 % 30002	overlap coefficient: 3071 % 10901
+left (cresabrupt4):  109 % 177	jaccard: 1963 % 14514	right (cresbaseabrupt3): 3613 % 14514	overlap coefficient: 1963 % 5576
+left (cresabrupt4):  9746 % 11213	jaccard: 1155 % 11213	right (cresbaseabrupt4): 312 % 11213	overlap coefficient: 385 % 489
+left (cresabrupt4):  1493 % 1587	jaccard: 150 % 3703	right (cresbaseabrupt5): 208 % 11109	overlap coefficient: 225 % 329
+left (cresabrupt4):  9051 % 78244	jaccard: 925 % 39122	right (technologist): 67343 % 78244	overlap coefficient: 1850 % 10901
+left (cresabrupt4):  7975 % 80187	jaccard: 2926 % 80187	right (technician): 69286 % 80187	overlap coefficient: 266 % 991
+left (cresabrupt5):  1803 % 12889	jaccard: 1261 % 25778	right (cresbaseabrupt2): 20911 % 25778	overlap coefficient: 1261 % 4867
+left (cresabrupt5):  500 % 1197	jaccard: 289 % 3192	right (cresbaseabrupt3): 4709 % 9576	overlap coefficient: 867 % 4867
+left (cresabrupt5):  1391 % 1880	jaccard: 347 % 2820	right (cresbaseabrupt4): 773 % 5640	overlap coefficient: 694 % 1467
+left (cresabrupt5):  2175 % 2504	jaccard: 517 % 5008	right (cresbaseabrupt5): 141 % 5008	overlap coefficient: 11 % 14
+left (cresabrupt5):  3741 % 72934	jaccard: 563 % 36467	right (technologist): 68067 % 72934	overlap coefficient: 1126 % 4867
+left (cresabrupt5):  3121 % 75333	jaccard: 582 % 25111	right (technician): 70466 % 75333	overlap coefficient: 1746 % 4867
+left (cresbaseabrupt2):  17985 % 23561	jaccard: 4187 % 23561	right (cresbaseabrupt3): 1389 % 23561	overlap coefficient: 4187 % 5576
+left (cresbaseabrupt2):  2340 % 2503	jaccard: 1112 % 22527	right (cresbaseabrupt4): 355 % 22527	overlap coefficient: 1112 % 1467
+left (cresbaseabrupt2):  1550 % 1597	jaccard: 236 % 11179	right (cresbaseabrupt5): 93 % 11179	overlap coefficient: 236 % 329
+left (cresbaseabrupt2):  18551 % 87744	jaccard: 1207 % 29248	right (technologist): 16393 % 21936	overlap coefficient: 3621 % 22172
+left (cresbaseabrupt2):  4532 % 22585	jaccard: 1011 % 22585	right (technician): 17042 % 22585	overlap coefficient: 1011 % 5543
+left (cresbaseabrupt3):  4439 % 5906	jaccard: 1137 % 5906	right (cresbaseabrupt4): 165 % 2953	overlap coefficient: 379 % 489
+left (cresbaseabrupt3):  5119 % 5777	jaccard: 457 % 5777	right (cresbaseabrupt5): 201 % 5777	overlap coefficient: 457 % 658
+left (cresbaseabrupt3):  3773 % 72966	jaccard: 601 % 24322	right (technologist): 33695 % 36483	overlap coefficient: 1803 % 5576
+left (cresbaseabrupt3):  869 % 18922	jaccard: 525 % 18922	right (technician): 8764 % 9461	overlap coefficient: 525 % 1394
+left (cresbaseabrupt4):  965 % 1623	jaccard: 502 % 1623	right (cresbaseabrupt5): 52 % 541	overlap coefficient: 251 % 329
+left (cresbaseabrupt4):  603 % 69796	jaccard: 216 % 17449	right (technologist): 68329 % 69796	overlap coefficient: 96 % 163
+left (cresbaseabrupt4):  137 % 18190	jaccard: 919 % 72760	right (technician): 71293 % 72760	overlap coefficient: 919 % 1467
+left (cresbaseabrupt5):  303 % 69496	jaccard: 355 % 69496	right (technologist): 4917 % 4964	overlap coefficient: 355 % 658
+left (cresbaseabrupt5):  59 % 18112	jaccard: 211 % 36224	right (technician): 35895 % 36224	overlap coefficient: 211 % 329
 left (technologist):  45463 % 117675	jaccard: 1582 % 7845	right (technician): 48482 % 117675	overlap coefficient: 23730 % 69193
-cres10sec	( 0 ( 107172 ) 92867 )	cres2	[400081]
-cres10sec	( 13859 ( 93313 ) 11319 )	cres3	[481629]
-cres10sec	( 60378 ( 46794 ) 427 )	cres4	[492521]
-cres10sec	( 87078 ( 20094 ) 20 )	cres5	[492928]
-cres10sec	( 72572 ( 34600 ) 35394 )	cresabrupt2	[457554]
-cres10sec	( 71548 ( 35624 ) 4058 )	cresabrupt3	[488890]
-cres10sec	( 86263 ( 20909 ) 217 )	cresabrupt4	[492731]
-cres10sec	( 96511 ( 10661 ) 10 )	cresabrupt5	[492938]
-cres10sec	( 102732 ( 4440 ) 3209 )	cresbaseabrupt2	[489739]
-cres10sec	( 105500 ( 1672 ) 217 )	cresbaseabrupt3	[492731]
-cres10sec	( 106751 ( 421 ) 29 )	cresbaseabrupt4	[492919]
-cres10sec	( 107090 ( 82 ) 0 )	cresbaseabrupt5	[492948]
-cres10sec	( 83611 ( 23561 ) 45632 )	technologist	[447316]
-cres10sec	( 81160 ( 26012 ) 46200 )	technician	[446748]
-cres2	( 95407 ( 104632 ) 0 )	cres3	[400081]
-cres2	( 152818 ( 47221 ) 0 )	cres4	[400081]
-cres2	( 179925 ( 20114 ) 0 )	cres5	[400081]
-cres2	( 130045 ( 69994 ) 0 )	cresabrupt2	[400081]
-cres2	( 160357 ( 39682 ) 0 )	cresabrupt3	[400081]
-cres2	( 178913 ( 21126 ) 0 )	cresabrupt4	[400081]
-cres2	( 189368 ( 10671 ) 0 )	cresabrupt5	[400081]
-cres2	( 192390 ( 7649 ) 0 )	cresbaseabrupt2	[400081]
-cres2	( 198150 ( 1889 ) 0 )	cresbaseabrupt3	[400081]
-cres2	( 199589 ( 450 ) 0 )	cresbaseabrupt4	[400081]
-cres2	( 199957 ( 82 ) 0 )	cresbaseabrupt5	[400081]
-cres2	( 167398 ( 32641 ) 36552 )	technologist	[363529]
-cres2	( 162544 ( 37495 ) 34717 )	technician	[365364]
-cres3	( 57411 ( 47221 ) 0 )	cres4	[495488]
-cres3	( 84518 ( 20114 ) 0 )	cres5	[495488]
-cres3	( 71949 ( 32683 ) 37311 )	cresabrupt2	[458177]
-cres3	( 64950 ( 39682 ) 0 )	cresabrupt3	[495488]
-cres3	( 83506 ( 21126 ) 0 )	cresabrupt4	[495488]
-cres3	( 93961 ( 10671 ) 0 )	cresabrupt5	[495488]
-cres3	( 100537 ( 4095 ) 3554 )	cresbaseabrupt2	[491934]
-cres3	( 102743 ( 1889 ) 0 )	cresbaseabrupt3	[495488]
-cres3	( 104182 ( 450 ) 0 )	cresbaseabrupt4	[495488]
-cres3	( 104550 ( 82 ) 0 )	cresbaseabrupt5	[495488]
-cres3	( 81103 ( 23529 ) 45664 )	technologist	[449824]
-cres3	( 77967 ( 26665 ) 45547 )	technician	[449941]
-cres4	( 27107 ( 20114 ) 0 )	cres5	[552899]
-cres4	( 33705 ( 13516 ) 56478 )	cresabrupt2	[496421]
-cres4	( 30357 ( 16864 ) 22818 )	cresabrupt3	[530081]
-cres4	( 26095 ( 21126 ) 0 )	cresabrupt4	[552899]
-cres4	( 36550 ( 10671 ) 0 )	cresabrupt5	[552899]
-cres4	( 45668 ( 1553 ) 6096 )	cresbaseabrupt2	[546803]
-cres4	( 46441 ( 780 ) 1109 )	cresbaseabrupt3	[551790]
-cres4	( 46771 ( 450 ) 0 )	cresbaseabrupt4	[552899]
-cres4	( 47139 ( 82 ) 0 )	cresbaseabrupt5	[552899]
-cres4	( 33515 ( 13706 ) 55487 )	technologist	[497412]
-cres4	( 31687 ( 15534 ) 56678 )	technician	[496221]
-cres5	( 14617 ( 5497 ) 64497 )	cresabrupt2	[515509]
-cres5	( 13510 ( 6604 ) 33078 )	cresabrupt3	[546928]
-cres5	( 11667 ( 8447 ) 12679 )	cresabrupt4	[567327]
-cres5	( 9443 ( 10671 ) 0 )	cresabrupt5	[580006]
-cres5	( 19492 ( 622 ) 7027 )	cresbaseabrupt2	[572979]
-cres5	( 19829 ( 285 ) 1604 )	cresbaseabrupt3	[578402]
-cres5	( 19895 ( 219 ) 231 )	cresbaseabrupt4	[579775]
-cres5	( 20032 ( 82 ) 0 )	cresbaseabrupt5	[580006]
-cres5	( 12600 ( 7514 ) 61679 )	technologist	[518327]
-cres5	( 12077 ( 8037 ) 64175 )	technician	[515831]
-cresabrupt2	( 40624 ( 29370 ) 10312 )	cresabrupt3	[519814]
-cresabrupt2	( 58068 ( 11926 ) 9200 )	cresabrupt4	[520926]
-cresabrupt2	( 65079 ( 4915 ) 5756 )	cresabrupt5	[524370]
-cresabrupt2	( 63711 ( 6283 ) 1366 )	cresbaseabrupt2	[528760]
-cresabrupt2	( 68603 ( 1391 ) 498 )	cresbaseabrupt3	[529628]
-cresabrupt2	( 69601 ( 393 ) 57 )	cresbaseabrupt4	[530069]
-cresabrupt2	( 69912 ( 82 ) 0 )	cresbaseabrupt5	[530126]
-cresabrupt2	( 62404 ( 7590 ) 61603 )	technologist	[468523]
-cresabrupt2	( 58900 ( 11094 ) 61118 )	technician	[469008]
-cresabrupt3	( 24095 ( 15587 ) 5539 )	cresabrupt4	[554899]
-cresabrupt3	( 33594 ( 6088 ) 4583 )	cresabrupt5	[555855]
-cresabrupt3	( 36512 ( 3170 ) 4479 )	cresbaseabrupt2	[555959]
-cresabrupt3	( 38226 ( 1456 ) 433 )	cresbaseabrupt3	[560005]
-cresabrupt3	( 39321 ( 361 ) 89 )	cresbaseabrupt4	[560349]
-cresabrupt3	( 39600 ( 82 ) 0 )	cresbaseabrupt5	[560438]
-cresabrupt3	( 33306 ( 6376 ) 62817 )	technologist	[497621]
-cresabrupt3	( 30407 ( 9275 ) 62937 )	technician	[497501]
-cresabrupt4	( 12985 ( 8141 ) 2530 )	cresabrupt5	[576464]
-cresabrupt4	( 20037 ( 1089 ) 6560 )	cresbaseabrupt2	[572434]
-cresabrupt4	( 20657 ( 469 ) 1420 )	cresbaseabrupt3	[577574]
-cresabrupt4	( 20792 ( 334 ) 116 )	cresbaseabrupt4	[578878]
-cresabrupt4	( 21044 ( 82 ) 0 )	cresbaseabrupt5	[578994]
-cresabrupt4	( 16332 ( 4794 ) 64399 )	technologist	[514595]
-cresabrupt4	( 14396 ( 6730 ) 65482 )	technician	[513512]
-cresabrupt5	( 10195 ( 476 ) 7173 )	cresbaseabrupt2	[582276]
-cresabrupt5	( 10461 ( 210 ) 1679 )	cresbaseabrupt3	[587770]
-cresabrupt5	( 10498 ( 173 ) 277 )	cresbaseabrupt4	[589172]
-cresabrupt5	( 10589 ( 82 ) 0 )	cresbaseabrupt5	[589449]
-cresabrupt5	( 7335 ( 3336 ) 65857 )	technologist	[523592]
-cresabrupt5	( 6608 ( 4063 ) 68149 )	technician	[521300]
-cresbaseabrupt2	( 6347 ( 1302 ) 587 )	cresbaseabrupt3	[591884]
-cresbaseabrupt2	( 7339 ( 310 ) 140 )	cresbaseabrupt4	[592331]
-cresbaseabrupt2	( 7590 ( 59 ) 23 )	cresbaseabrupt5	[592448]
-cresbaseabrupt2	( 5939 ( 1710 ) 67483 )	technologist	[524988]
-cresbaseabrupt2	( 6055 ( 1594 ) 70618 )	technician	[521853]
-cresbaseabrupt3	( 1644 ( 245 ) 205 )	cresbaseabrupt4	[598026]
-cresbaseabrupt3	( 1854 ( 35 ) 47 )	cresbaseabrupt5	[598184]
-cresbaseabrupt3	( 1243 ( 646 ) 68547 )	technologist	[529684]
-cresbaseabrupt3	( 1293 ( 596 ) 71616 )	technician	[526615]
-cresbaseabrupt4	( 368 ( 82 ) 0 )	cresbaseabrupt5	[599670]
-cresbaseabrupt4	( 273 ( 177 ) 69016 )	technologist	[530654]
-cresbaseabrupt4	( 300 ( 150 ) 72062 )	technician	[527608]
-cresbaseabrupt5	( 58 ( 24 ) 69169 )	technologist	[530869]
-cresbaseabrupt5	( 69 ( 13 ) 72199 )	technician	[527839]
+cres10sec	( 0 ( 95832 ) 86854 )	cres2	[417434]
+cres10sec	( 11864 ( 83968 ) 10482 )	cres3	[493806]
+cres10sec	( 54021 ( 41811 ) 368 )	cres4	[503920]
+cres10sec	( 77900 ( 17932 ) 20 )	cres5	[504268]
+cres10sec	( 70692 ( 25140 ) 29781 )	cresabrupt2	[474507]
+cres10sec	( 72980 ( 22852 ) 3165 )	cresabrupt3	[501123]
+cres10sec	( 85050 ( 10782 ) 119 )	cresabrupt4	[504169]
+cres10sec	( 90965 ( 4867 ) 0 )	cresabrupt5	[504288]
+cres10sec	( 84907 ( 10925 ) 11247 )	cresbaseabrupt2	[493041]
+cres10sec	( 90907 ( 4925 ) 651 )	cresbaseabrupt3	[503637]
+cres10sec	( 94404 ( 1428 ) 39 )	cresbaseabrupt4	[504249]
+cres10sec	( 95174 ( 658 ) 0 )	cresbaseabrupt5	[504288]
+cres10sec	( 75881 ( 19951 ) 49242 )	technologist	[455046]
+cres10sec	( 73710 ( 22122 ) 50090 )	technician	[454198]
+cres2	( 88236 ( 94450 ) 0 )	cres3	[417434]
+cres2	( 140507 ( 42179 ) 0 )	cres4	[417434]
+cres2	( 164734 ( 17952 ) 0 )	cres5	[417434]
+cres2	( 127765 ( 54921 ) 0 )	cresabrupt2	[417434]
+cres2	( 156669 ( 26017 ) 0 )	cresabrupt3	[417434]
+cres2	( 171785 ( 10901 ) 0 )	cresabrupt4	[417434]
+cres2	( 177819 ( 4867 ) 0 )	cresabrupt5	[417434]
+cres2	( 160514 ( 22172 ) 0 )	cresbaseabrupt2	[417434]
+cres2	( 177110 ( 5576 ) 0 )	cresbaseabrupt3	[417434]
+cres2	( 181219 ( 1467 ) 0 )	cresbaseabrupt4	[417434]
+cres2	( 182028 ( 658 ) 0 )	cresbaseabrupt5	[417434]
+cres2	( 155050 ( 27636 ) 41557 )	technologist	[375877]
+cres2	( 150369 ( 32317 ) 39895 )	technician	[377539]
+cres3	( 52271 ( 42179 ) 0 )	cres4	[505670]
+cres3	( 76498 ( 17952 ) 0 )	cres5	[505670]
+cres3	( 70156 ( 24294 ) 30627 )	cresabrupt2	[475043]
+cres3	( 68433 ( 26017 ) 0 )	cresabrupt3	[505670]
+cres3	( 83549 ( 10901 ) 0 )	cresabrupt4	[505670]
+cres3	( 89583 ( 4867 ) 0 )	cresabrupt5	[505670]
+cres3	( 83643 ( 10807 ) 11365 )	cresbaseabrupt2	[494305]
+cres3	( 88874 ( 5576 ) 0 )	cresbaseabrupt3	[505670]
+cres3	( 92983 ( 1467 ) 0 )	cresbaseabrupt4	[505670]
+cres3	( 93792 ( 658 ) 0 )	cresbaseabrupt5	[505670]
+cres3	( 74515 ( 19935 ) 49258 )	technologist	[456412]
+cres3	( 71600 ( 22850 ) 49362 )	technician	[456308]
+cres4	( 24227 ( 17952 ) 0 )	cres5	[557941]
+cres4	( 32825 ( 9354 ) 45567 )	cresabrupt2	[512374]
+cres4	( 31791 ( 10388 ) 15629 )	cresabrupt3	[542312]
+cres4	( 31278 ( 10901 ) 0 )	cresabrupt4	[557941]
+cres4	( 37312 ( 4867 ) 0 )	cresabrupt5	[557941]
+cres4	( 37598 ( 4581 ) 17591 )	cresbaseabrupt2	[540350]
+cres4	( 39518 ( 2661 ) 2915 )	cresbaseabrupt3	[555026]
+cres4	( 40712 ( 1467 ) 0 )	cresbaseabrupt4	[557941]
+cres4	( 41521 ( 658 ) 0 )	cresbaseabrupt5	[557941]
+cres4	( 30529 ( 11650 ) 57543 )	technologist	[500398]
+cres4	( 29046 ( 13133 ) 59079 )	technician	[498862]
+cres5	( 14348 ( 3604 ) 51317 )	cresabrupt2	[530851]
+cres5	( 14305 ( 3647 ) 22370 )	cresabrupt3	[559798]
+cres5	( 13852 ( 4100 ) 6801 )	cresabrupt4	[575367]
+cres5	( 13085 ( 4867 ) 0 )	cresabrupt5	[582168]
+cres5	( 15988 ( 1964 ) 20208 )	cresbaseabrupt2	[561960]
+cres5	( 16791 ( 1161 ) 4415 )	cresbaseabrupt3	[577753]
+cres5	( 17103 ( 849 ) 618 )	cresbaseabrupt4	[581550]
+cres5	( 17294 ( 658 ) 0 )	cresbaseabrupt5	[582168]
+cres5	( 11516 ( 6436 ) 62757 )	technologist	[519411]
+cres5	( 10990 ( 6962 ) 65250 )	technician	[516918]
+cresabrupt2	( 35082 ( 19839 ) 6178 )	cresabrupt3	[539021]
+cresabrupt2	( 48083 ( 6838 ) 4063 )	cresabrupt4	[541136]
+cresabrupt2	( 52476 ( 2445 ) 2422 )	cresabrupt5	[542777]
+cresabrupt2	( 36278 ( 18643 ) 3529 )	cresbaseabrupt2	[541670]
+cresabrupt2	( 50713 ( 4208 ) 1368 )	cresbaseabrupt3	[543831]
+cresabrupt2	( 53688 ( 1233 ) 234 )	cresbaseabrupt4	[544965]
+cresabrupt2	( 54361 ( 560 ) 98 )	cresbaseabrupt5	[545101]
+cresabrupt2	( 49976 ( 4945 ) 64248 )	technologist	[480951]
+cresabrupt2	( 47687 ( 7234 ) 64978 )	technician	[480221]
+cresabrupt3	( 17471 ( 8546 ) 2355 )	cresabrupt4	[571748]
+cresabrupt3	( 23170 ( 2847 ) 2020 )	cresabrupt5	[572083]
+cresabrupt3	( 17883 ( 8134 ) 14038 )	cresbaseabrupt2	[560065]
+cresabrupt3	( 21472 ( 4545 ) 1031 )	cresbaseabrupt3	[573072]
+cresabrupt3	( 24835 ( 1182 ) 285 )	cresbaseabrupt4	[573818]
+cresabrupt3	( 25567 ( 450 ) 208 )	cresbaseabrupt5	[573895]
+cresabrupt3	( 22758 ( 3259 ) 65934 )	technologist	[508169]
+cresabrupt3	( 20873 ( 5144 ) 67068 )	technician	[507035]
+cresabrupt4	( 7234 ( 3667 ) 1200 )	cresabrupt5	[588019]
+cresabrupt4	( 7830 ( 3071 ) 19101 )	cresbaseabrupt2	[570118]
+cresabrupt4	( 8938 ( 1963 ) 3613 )	cresbaseabrupt3	[585606]
+cresabrupt4	( 9746 ( 1155 ) 312 )	cresbaseabrupt4	[588907]
+cresabrupt4	( 10451 ( 450 ) 208 )	cresbaseabrupt5	[589011]
+cresabrupt4	( 9051 ( 1850 ) 67343 )	technologist	[521876]
+cresabrupt4	( 7975 ( 2926 ) 69286 )	technician	[519933]
+cresabrupt5	( 3606 ( 1261 ) 20911 )	cresbaseabrupt2	[574342]
+cresabrupt5	( 4000 ( 867 ) 4709 )	cresbaseabrupt3	[590544]
+cresabrupt5	( 4173 ( 694 ) 773 )	cresbaseabrupt4	[594480]
+cresabrupt5	( 4350 ( 517 ) 141 )	cresbaseabrupt5	[595112]
+cresabrupt5	( 3741 ( 1126 ) 68067 )	technologist	[527186]
+cresabrupt5	( 3121 ( 1746 ) 70466 )	technician	[524787]
+cresbaseabrupt2	( 17985 ( 4187 ) 1389 )	cresbaseabrupt3	[576559]
+cresbaseabrupt2	( 21060 ( 1112 ) 355 )	cresbaseabrupt4	[577593]
+cresbaseabrupt2	( 21700 ( 472 ) 186 )	cresbaseabrupt5	[577762]
+cresbaseabrupt2	( 18551 ( 3621 ) 65572 )	technologist	[512376]
+cresbaseabrupt2	( 18128 ( 4044 ) 68168 )	technician	[509780]
+cresbaseabrupt3	( 4439 ( 1137 ) 330 )	cresbaseabrupt4	[594214]
+cresbaseabrupt3	( 5119 ( 457 ) 201 )	cresbaseabrupt5	[594343]
+cresbaseabrupt3	( 3773 ( 1803 ) 67390 )	technologist	[527154]
+cresbaseabrupt3	( 3476 ( 2100 ) 70112 )	technician	[524432]
+cresbaseabrupt4	( 965 ( 502 ) 156 )	cresbaseabrupt5	[598497]
+cresbaseabrupt4	( 603 ( 864 ) 68329 )	technologist	[530324]
+cresbaseabrupt4	( 548 ( 919 ) 71293 )	technician	[527360]
+cresbaseabrupt5	( 303 ( 355 ) 68838 )	technologist	[530624]
+cresbaseabrupt5	( 236 ( 422 ) 71790 )	technician	[527672]
 technologist	( 45463 ( 23730 ) 48482 )	technician	[482445]
 Writing output/cres10sec-cres2.svg
 Writing output/cres10sec-cres3.svg
@@ -336,35 +336,35 @@ Writing output/technologist-technician.svg
 
 JACCARD
 	technician	technologist	cresbaseabrupt5	cresbaseabrupt4	cresbaseabrupt3	cresbaseabrupt2	cresabrupt5	cresabrupt4	cresabrupt3	cresabrupt2	cres5	cres4	cres3	cres2
-cres10sec	17%	15%	0%	0%	2%	4%	10%	19%	32%	24%	19%	43%	79%	54%
-cres2	16%	14%	0%	0%	1%	4%	5%	11%	20%	35%	10%	24%	52%
-cres3	18%	16%	0%	0%	2%	4%	10%	20%	38%	23%	19%	45%
-cres4	15%	13%	0%	1%	2%	3%	23%	45%	24%	13%	43%
-cres5	10%	9%	0%	1%	1%	2%	53%	26%	12%	6%
-cresabrupt2	8%	6%	0%	1%	2%	9%	6%	15%	37%
-cresabrupt3	9%	6%	0%	1%	4%	7%	14%	34%
-cresabrupt4	8%	6%	0%	2%	2%	4%	34%
-cresabrupt5	5%	4%	1%	2%	2%	3%
-cresbaseabrupt2	2%	2%	1%	4%	16%
-cresbaseabrupt3	1%	1%	2%	12%
-cresbaseabrupt4	0%	0%	18%
-cresbaseabrupt5	0%	0%
+cres10sec	15%	14%	1%	1%	5%	10%	5%	11%	23%	20%	19%	43%	79%	52%
+cres2	15%	12%	0%	1%	3%	12%	3%	6%	14%	30%	10%	23%	52%
+cres3	16%	14%	1%	2%	6%	10%	5%	12%	28%	19%	19%	45%
+cres4	13%	12%	2%	3%	6%	8%	12%	26%	18%	11%	43%
+cres5	8%	8%	4%	5%	5%	5%	27%	17%	9%	5%
+cresabrupt2	6%	4%	1%	2%	7%	32%	4%	12%	32%
+cresabrupt3	6%	4%	2%	4%	17%	20%	10%	30%
+cresabrupt4	4%	2%	4%	10%	14%	10%	30%
+cresabrupt5	2%	2%	10%	12%	9%	5%
+cresbaseabrupt2	4%	4%	2%	5%	18%
+cresbaseabrupt3	3%	2%	8%	19%
+cresbaseabrupt4	1%	1%	31%
+cresbaseabrupt5	1%	1%
 technologist	20%
 
 OVERLAP COEFFICIENT
-		12%	12%	0%	0%	0%	1%	2%	4%	7%	12%	3%	8%	17%	33%
+		12%	12%	0%	0%	1%	4%	1%	2%	4%	9%	3%	7%	16%	30%
 		technician	technologist	cresbaseabrupt5	cresbaseabrupt4	cresbaseabrupt3	cresbaseabrupt2	cresabrupt5	cresabrupt4	cresabrupt3	cresabrupt2	cres5	cres4	cres3	cres2
-18%	cres10sec	36%	34%	100%	94%	89%	58%	100%	99%	90%	49%	100%	99%	89%	100%
-33%	cres2	52%	47%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%
-17%	cres3	37%	34%	100%	100%	100%	54%	100%	100%	100%	47%	100%	100%
-8%	cres4	33%	29%	100%	100%	41%	20%	100%	100%	42%	29%	100%
-3%	cres5	40%	37%	100%	49%	15%	8%	100%	42%	33%	27%
-12%	cresabrupt2	16%	11%	100%	87%	74%	82%	46%	56%	74%
-7%	cresabrupt3	23%	16%	100%	80%	77%	41%	57%	74%
-4%	cresabrupt4	32%	23%	100%	74%	25%	14%	76%
-2%	cresabrupt5	38%	31%	100%	38%	11%	6%
-1%	cresbaseabrupt2	21%	22%	72%	69%	69%
-0%	cresbaseabrupt3	32%	34%	43%	54%
-0%	cresbaseabrupt4	33%	39%	100%
-0%	cresbaseabrupt5	16%	29%
+16%	cres10sec	31%	29%	100%	97%	88%	49%	100%	99%	88%	46%	100%	99%	89%	100%
+30%	cres2	45%	40%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%	100%
+16%	cres3	32%	29%	100%	100%	100%	49%	100%	100%	100%	44%	100%	100%
+7%	cres4	31%	28%	100%	100%	48%	21%	100%	100%	40%	22%	100%
+3%	cres5	39%	36%	100%	58%	21%	11%	100%	38%	20%	20%
+9%	cresabrupt2	13%	9%	85%	84%	75%	84%	50%	63%	76%
+4%	cresabrupt3	20%	13%	68%	81%	82%	37%	58%	78%
+2%	cresabrupt4	27%	17%	68%	79%	35%	28%	75%
+1%	cresabrupt5	36%	23%	79%	47%	18%	26%
+4%	cresbaseabrupt2	18%	16%	72%	76%	75%
+1%	cresbaseabrupt3	38%	32%	69%	78%
+0%	cresbaseabrupt4	63%	59%	76%
+0%	cresbaseabrupt5	64%	54%
 12%	technologist	34%

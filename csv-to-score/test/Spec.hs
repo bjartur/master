@@ -246,25 +246,6 @@ main = hspec $ do
         describe "indexAfter" $ do
                 it "returns one more than the index of the last breath in a given event" $ do
                         indexAfter (0, 3) `shouldBe` 4
-        describe "baselines" $ do
-                let pressures  = [-7.567405304247912341e-02,-7.564403304247913341e-02,1.2,1.1,1.0,-3.1e-01]
-                let candidates = declinesLongerThanThree pressures
-                let references = baselines pressures candidates
-                it "calculates a mean before a decline." $ do
-                    shouldBe
-                       (
-                            references
-                         >$(\outcome->
-                                   (outcome
-                                  / 0.34956063797168058106
-                                  - 1
-                                  & abs)
-                                  < 0.001
-                           )
-                          & liftA2 (,) and length
-                       )
-                        (True, 1)
-                ap ofEqualLength (ap baselines) declinesLongerThanThree
         describe "abrupt" $ do
                 it "dismisses a triangle." $ do
                         abrupt [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] (0, 9) [5.5] `shouldBe` False
