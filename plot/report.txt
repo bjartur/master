@@ -1,38 +1,38 @@
 RATE
 The hourly rate of esophageal crescendos, by criteria
-cres2   115.48290341931614
-cresrev2        46.66466706658669
-cres3   45.11697660467907
-cres10sec       44.51709658068387
-cresrev3        22.495500899820037
-technician      16.340731853629276
-cres4   16.08278344331134
-cresbaserev2    11.523695260947811
-technologist    8.956208758248351
-cresrev4        8.650269946010798
-cres5   5.7288542291541695
-cresbaserev3    3.983203359328135
-cresrev5        3.2933413317336533
-cresbaserev4    1.1157768446310738
-cresbaserev5    0.2819436112777445
+cres2	103.01139772045592
+cres3	38.97420515896821
+cres10sec	38.26634673065387
+cresabrupt2	32.777444511097784
+technician	16.340731853629276
+cresbaseabrupt2	13.929214157168568
+cres4	13.51529694061188
+cresabrupt3	11.019796040791842
+technologist	8.956208758248351
+cres5	4.739052189562088
+cresabrupt4	3.527294541091782
+cresbaseabrupt3	2.453509298140372
+cresabrupt5	1.301739652069586
+cresbaseabrupt4	0.4859028194361128
+cresbaseabrupt5	0.1799640071985603
 
-TALLY OF PES CRESCENDOS
-[4196.0,2990.0,2704.0,2618.0,2590.0,2574.0,2488.0,2432.0,2358.0,2317.0,2313.0,2270.0,2234.0,2232.0,2179.0,2176.0,2098.0,2064.0,2052.0,2005.0,1943.0,1833.0,1832.0,1799.0,1271.0,816.0]
+Number of polysomnograms with 15 events/h or more
+[("cres2","100%"),("cres3","100%"),("cres10sec","100%"),("cresabrupt2","100%"),("technician","38%"),("cresbaseabrupt2","42%"),("cres4","23%"),("cresabrupt3","8%"),("technologist","15%"),("cres5","0%"),("cresabrupt4","0%"),("cresbaseabrupt3","0%"),("cresabrupt5","0%"),("cresbaseabrupt4","0%"),("cresbaseabrupt5","0%")]
 
-Mean Kendall's rank correlation:        28%
+Mean Kendall's rank correlation:	26%
 KENDALL RANK COEFFICIENTS
-        technician      technologist    cresbaserev5    cresbaserev4    cresbaserev3    cresbaserev2    cresrev5        cresrev4        cresrev3        cresrev2cres5   cres4   cres3   cres2
-cres10sec       23%     31%     12%     12%     12%     5%      23%     30%    11%      -6%     18%     23%     7%      -11%
-cres2   5%      5%      -12%    -6%     -7%     5%      30%     33%     64%    80%      28%     42%     67%
-cres3   34%     30%     -5%     2%      4%      5%      58%     63%     75%    64%      52%     71%
-cres4   45%     49%     2%      12%     14%     10%     72%     80%     55%    41%      66%
-cres5   31%     50%     11%     14%     14%     2%      85%     62%     36%    20%
-cresrev2        11%     4%      -9%     -3%     -4%     8%      26%     36%    71%
-cresrev3        36%     22%     0%      5%      10%     12%     45%     56%
-cresrev4        50%     40%     6%      12%     16%     5%      71%
-cresrev5        36%     50%     17%     15%     18%     4%
-cresbaserev2    20%     3%      57%     69%     77%
-cresbaserev3    21%     16%     67%     86%
-cresbaserev4    10%     13%     78%
-cresbaserev5    3%      3%
-technologist    39%
+	technician	technologist	cresbaseabrupt5	cresbaseabrupt4	cresbaseabrupt3	cresbaseabrupt2	cresabrupt5	cresabrupt4	cresabrupt3	cresabrupt2	cres5	cres4	cres3	cres2
+cres10sec	14%	20%	11%	14%	9%	-2%	8%	19%	11%	5%	13%	27%	12%	-6%
+cres2	-6%	-11%	-1%	-2%	26%	42%	14%	30%	54%	72%	30%	45%	70%
+cres3	18%	15%	9%	14%	35%	37%	18%	41%	59%	54%	52%	70%
+cres4	33%	35%	18%	25%	37%	19%	36%	54%	46%	33%	72%
+cres5	22%	42%	8%	14%	21%	0%	42%	47%	29%	18%
+cresabrupt2	-10%	-19%	-4%	-3%	29%	55%	12%	28%	56%
+cresabrupt3	20%	-1%	21%	22%	45%	45%	42%	63%
+cresabrupt4	26%	18%	18%	22%	33%	20%	61%
+cresabrupt5	15%	17%	31%	16%	25%	6%
+cresbaseabrupt2	3%	-7%	23%	32%	60%
+cresbaseabrupt3	29%	7%	47%	53%
+cresbaseabrupt4	32%	20%	67%
+cresbaseabrupt5	23%	6%
+technologist	39%

@@ -132,6 +132,10 @@ arrange=  descending sensitivity
       <&> transpose
       <&> map (\patterns-> (patterns&head&fst, map snd patterns))
 
+countOver15:: [Double]-> String
+countOver15= do
+  filter (>= 15.0) <&> length <&> fromIntegral <&> (/26) <&> formatPercentage
+
 main:: IO ()
 main= do
   let mean xs = sum xs / (length xs & fromIntegral)
@@ -141,8 +145,9 @@ main= do
   let rate = over (mapped._2) (sum <&> (/tst "total")) heats
   forM_ rate (\(label, meanInterval)-> label ++ "\t" ++ show meanInterval & putStrLn)
   putStrLn""
-  putStrLn"TALLY OF PES CRESCENDOS"
-  transposeLabeled heats <&> severity & print
+  putStrLn"Number of polysomnograms with 15 events/h or more"
+  (numbers <&> hourly <&> arrange <&> over (mapped._2) countOver15) >>= print
+
   putStrLn""
   putStrLn . ("Mean Kendall's rank correlation:\t"++)
     =<< (numbers <&> pairs <&> map (\(_,x,_)->x) <&> mean <&> formatPercentage)

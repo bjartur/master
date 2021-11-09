@@ -20,8 +20,8 @@ Polysomnograms ⇉|NoxPes2Csv|⇉ CSVs breaths ⇉|csv-to-score|⇉ CSVs of Pes 
   <dt>CSV of Pes crescendos</dt><dd> has two columns: the datetime of the beginning of a Pes crescendo and the datetime of its end. A datetime in a CSV of Pes crescendos is always a verbatim copy of a datetime in a CSV of breaths. The output of `score-to-nox` is twelve copies of each Noxturnal format polysomnogram, with Pes crescendos marked on the esophageal pressure signal in each polysomnogram according to one of the 12 respiratory effort patterns implemented by `csv-to-score`.</dd>
 </dl>
 
-### Numerical report
-A numerical report lists statistics on how frequently breathing matching a respiratory pattern also matched other respiratory patterns. `overlap` writes the numerical report is written to standard output.
+### Numerical reports
+Respiratory effort patterns are compared second-by-second in the study population in overlap/report.txt, and polysomnogram-by-polysomnogram (PSG-by-PSG) and coarser in plot/report.txt.
 
 Polysomnograms ⇉|NoxPes2Csv|⇉ CSVs of breaths ⇉|csv-to-score|⇉ CSVs of Pes crescendos ⇉|overlap|⇉ Numerical report  ⇇|overlap|⇇ CSVs of timestamped Pes crescendos ⇇|nox2score|⇇ Polysomnograms with differently prescored Pes crescendos (e.g. manually scored)
 
@@ -35,8 +35,9 @@ Short data flow
 ---
 In practice, your polysomnograms may be in a different format. In this case, prepare your dataset as CSVs, one CSV per polysomnogram, containing little but the peak-negative pressure of each breath, timestamped. See NoxPes2Csv/nadir/BbB/\*.txt for examples of such CSVs. Make note of the big-endian datetime format. Choose which phase of a breath to timestamp freely but consistently. and replace them with CSVs based on your data.In special, NoxPes2Csv is hardcoded to exclude a polysomnogram named VSN-14-080-013. Additionally, the definition of the function score in the file lib/src/Records.hs needs to be revised to match the dataset. Currently, score uses the function forbid to exclude polysomnograms named VSN-14-080-013 and VSN-14-080-014. Consult the Makefiles for usage examples, but do not hesitate to modify them to refer to your dataset.
 
-### Numerical report
-CSVs of breaths ⇉|csv-to-score|⇉ CSVs of Pes crescendos ⇉|overlap|⇉ Numerical report
+### Numerical reports
+CSVs of breaths ⇉|csv-to-score|⇉ CSVs of Pes crescendos ⇉|overlap|⇉ Second-by-second comparison
+CSVs of breaths ⇉|csv-to-score|⇉ CSVs of Pes crescendos ⇉|plot|⇉ PSG-by-PSG comparison
 
 ### Heatmaps
 CSVs of breaths ⇉|csv-to-score|⇉ CSVs of Pes crescendos ⇉|plot|⇉ Heatmaps
