@@ -1,0 +1,16 @@
+KENDALL RANK COEFFICIENTS
+	technician	technologist	cresbaseabrupt5	cresbaseabrupt4	cresbaseabrupt3	cresbaseabrupt2	cresabrupt5	cresabrupt4	cresabrupt3	cresabrupt2	cres5	cres4	cres3	cres2
+cres10sec	14%	20%	11%	14%	9%	-2%	8%	19%	11%	5%	13%	27%	12%	-6%
+cres2	-6%	-11%	-1%	-2%	26%	42%	14%	30%	54%	72%	30%	45%	70%
+cres3	18%	15%	9%	14%	35%	37%	18%	41%	59%	54%	52%	70%
+cres4	33%	35%	18%	25%	37%	19%	36%	54%	46%	33%	72%
+cres5	22%	42%	8%	14%	21%	0%	42%	47%	29%	18%
+cresabrupt2	-10%	-19%	-4%	-3%	29%	55%	12%	28%	56%
+cresabrupt3	20%	-1%	21%	22%	45%	45%	42%	63%
+cresabrupt4	26%	18%	18%	22%	33%	20%	61%
+cresabrupt5	15%	17%	31%	16%	25%	6%
+cresbaseabrupt2	3%	-7%	23%	32%	60%
+cresbaseabrupt3	29%	7%	47%	53%
+cresbaseabrupt4	32%	20%	67%
+cresbaseabrupt5	23%	6%
+technologist	39%

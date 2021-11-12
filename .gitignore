@@ -1,3 +1,5 @@
+test_results.txt
+
 */.stack-work
 stack.yaml.lock
 *.cabal
@@ -5,8 +7,9 @@ stack.yaml.lock
 *.xml
 *.ndf
 *.ini
-*.txt
+NoxPes2Csv/nadir/
 !overlap/report.txt
+!plot/report.txt
 *.csv
 *.ndb
 *.nef
@@ -15,3 +18,6 @@ stack.yaml.lock
 *.gz
 *.iml
 *.pyc
+*.swp
+/TAGS
+.#*

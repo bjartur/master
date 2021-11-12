@@ -8,12 +8,16 @@ all: $(foreach method,$(methods), \
 test_results.txt: test/	*.hs src/*.hs cmd/*hs package.yaml stack.yaml csv-to-score.cabal
 	stack build --test >test_results.txt
 	tail -n2 test_results.txt
+output/dip/%/:
+	mkdir -p output/dip/{2,3,4,5}
 output/unabrupt/%/:
 	mkdir -p output/unabrupt/{2,3,4,5}
 output/unabrupt/10sec/:
 	mkdir -p output/unabrupt/10sec
 output/reversal/%/:
 	mkdir -p output/reversal/{2,3,4,5}
+output/abrupt/%/:
+	mkdir -p output/abrupt/{2,3,4,5}
 output/baseline/%/:
 	mkdir -p output/baseline/{2,3,4,5}
 output/baserev/%/:
