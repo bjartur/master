@@ -18,6 +18,7 @@ NoxPes2Csv/nadir/
 *.gz
 *.iml
 *.pyc
+venv
 *.swp
 /TAGS
 .#*
