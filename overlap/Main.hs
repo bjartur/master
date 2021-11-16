@@ -6,8 +6,9 @@ import Control.Monad ( forM, forM_ )
 import Data.Char( toUpper )
 import Data.Function( (&), on )
 import Data.Functor( (<&>) )
-import Data.List( inits, intercalate, tails )
+import Data.List( inits, intercalate, sortOn, tails )
 import Data.Ratio( (%), Ratio )
+import Histogram( combineHistograms, discreteHistogram )
 import System.Environment( getArgs )
 import qualified Data.IntervalSet  as IntervalSet
 import System.FilePath ( takeFileName )
@@ -71,12 +72,23 @@ agreementTotals:: IO ()
 agreementTotals= do
   putStrLn "Drawing agreementTotals.svg"
   eventsByRecordingByPattern <- getEventsByRecordingByPattern ::IO[(String,[Events])]
-  agreements eventsByRecordingByPattern & renderBarPlot"agreementTotals.svg"
+  let histogram = (agreements eventsByRecordingByPattern & bin) ::[(String,Double)]
+  print histogram
+  renderBarPlot"agreementTotals.svg" histogram
+  print "\n"
 
 agreements:: [(String, [Events])]-> [[[(DateTime, DateTime)]]]
 agreements eventsByRecordingByPattern= do
   let labeledEventsByRecording = transposeLabeled eventsByRecordingByPattern ::[[(String, Events)]]
   labeledEventsByRecording <&> map (snd<&>imperiods)
+
+bin:: [[[(DateTime, DateTime)]]]-> [(String,Double)]
+bin agreements=
+      (agreements
+  <&> discreteHistogram
+   &  combineHistograms
+   &  sortOn snd)
+  <&> fmap (fromIntegral<&>(/(60*60)))
 
 indent:: Int-> [String]-> String
 indent indent= intercalate "\t" >$ (replicate indent '\t' ++)
